@@ -1,0 +1,5 @@
+# enable EOL normalization
+*    text=auto
+
+# disable EOL normalization
+# * -text
