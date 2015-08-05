@@ -1,3 +1,5 @@
 .idea
-target
 fe.iml
+node_modules
+build
+tmp
