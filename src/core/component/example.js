@@ -5,12 +5,11 @@ import DummyActions from 'core/action/dummyActions';
 
 @connectToStores
 class Example extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      name: props.name
-    }
-  }
+
+  state = {
+    name: this.props.name
+  };
+
 
   static getStores(props) {
     return [DummyStore];

@@ -1,12 +1,18 @@
 import React from 'react';
-import {Route} from 'react-router';
+import {Route, DefaultRoute} from 'react-router';
 
-import Main from 'core/component/main';
-import Example from 'core/component/example';
+import Application from 'core/container/application';
+import Home from 'core/container/home';
+import PartyList from 'party/page/partyList';
+
 
 const routes = (
-  <Route handler={Main}>
-    <Route name='example' handler={Example}/>
+  <Route path="/" handler={Application}>
+
+    <DefaultRoute name="home" handler={Home}/>
+
+    <Route name="partyList" path="party"  handler={PartyList}/>
+
   </Route>
 );
 

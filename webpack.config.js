@@ -27,7 +27,8 @@ module.exports = {
 
     module: {
         loaders: [
-            {test: /\.js?$/, include: srcPath, loaders: ['react-hot', 'babel?cacheDirectory']}
+            {test: /\.js?$/, include: srcPath, loaders: ['react-hot', 'babel?cacheDirectory']},
+            {test: /\.less$/, loader: 'style!css!less'}
         ]
     },
     plugins: [
