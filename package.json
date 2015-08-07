@@ -6,7 +6,7 @@
   "license": "ISC",
   "repository": "https://github.com/zauzoo/fe",
   "scripts": {
-    "build": "rm -Rf build/* && webpack --progress --profile --colors --devtool source-map --optimize-minimize --optimize-occurence-order --optimize-dedupe",
+    "build": "set NODE_ENV=production && rm -Rf build/* && webpack --progress --profile --colors --devtool source-map --optimize-minimize --optimize-occurence-order --optimize-dedupe",
     "lint": "eslint src",
     "test": "echo \"Error: no test specified\" && exit 1",
     "watch": "rm -Rf build/* && webpack-dev-server --hot --inline --progress --colors"
@@ -18,12 +18,16 @@
     "css-loader": "^0.15.6",
     "eslint": "^1.0.0",
     "eslint-plugin-react": "^3.2.0",
+    "extract-text-webpack-plugin": "^0.8.2",
+    "file-loader": "^0.8.4",
+    "font-awesome": "^4.4.0",
     "html-webpack-plugin": "^1.6.1",
     "less": "^2.5.1",
     "less-loader": "^2.2.0",
     "node-libs-browser": "^0.5.2",
     "react-hot-loader": "^1.2.8",
     "style-loader": "^0.12.3",
+    "url-loader": "^0.5.6",
     "webpack": "^1.10.5",
     "webpack-dev-server": "^1.10.1"
   },

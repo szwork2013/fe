@@ -11,8 +11,9 @@ export default class PartyList extends React.Component {
   }
 
   render() {
-    return <h1>Party list !</h1>
-      ;
+    return (
+        <h1>Party list ! <i className="fa fa-cubes"></i></h1>
+      );
   }
 
 }

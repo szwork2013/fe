@@ -1,8 +1,8 @@
 import React from 'react';
 import {Route, DefaultRoute} from 'react-router';
 
-import Application from 'core/container/application';
-import Home from 'core/container/home';
+import Application from 'core/page/application';
+import Home from 'core/page/home';
 import PartyList from 'party/page/partyList';
 
 

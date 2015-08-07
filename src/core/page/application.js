@@ -2,7 +2,7 @@ import React from 'react';
 import { RouteHandler } from 'react-router';
 import MainMenu from 'core/component/mainMenu';
 
-import styles from 'core/container/application.less';
+import styles from 'core/page/application.less';
 
 export default class Application extends React.Component {
 
