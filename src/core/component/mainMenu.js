@@ -3,13 +3,27 @@ import reactMixin from 'react-mixin';
 import {Navbar, Nav, NavItem, DropdownButton, MenuItem, CollapsibleNav } from 'react-bootstrap';
 import * as RRB from 'react-router-bootstrap';
 import Router from 'react-router';
+import connectToStores from 'alt/utils/connectToStores';
 
 import SecurityService from 'core/security/securityService';
 import CurrentUserActions from 'core/security/currentUserActions';
+import CurrentUserStore from 'core/security/currentUserStore';
 
-
+@connectToStores
 @reactMixin.decorate(Router.Navigation)
 export default class MainMenu extends React.Component {
+
+
+  static getStores(props) {
+    return [CurrentUserStore];
+  }
+
+  static getPropsFromStores(props) {
+    return CurrentUserStore.getState();
+  }
+
+
+  /* *******   EVENT HENDLERS ************ */
 
   logout = (e) => {
     console.log('logout');
@@ -24,21 +38,39 @@ export default class MainMenu extends React.Component {
       });
   }
 
+
+  /* *******   REACT METHODS ************ */
+
   render() {
+
+    let currentUser = this.props.currentUser;
+
+    var userMenuFrag = (
+      <DropdownButton eventKey={3} title={currentUser ? currentUser.displayName : ''} onSelect={this.onSelect}>
+        <MenuItem eventKey='1' onClick={this.logout}>Logout</MenuItem>
+      </DropdownButton>
+    );
+
+    var mainMenuFrag = (
+      <Nav navbar>
+        <RRB.NavItemLink to="home" eventKey={1}>Home</RRB.NavItemLink>
+        <DropdownButton eventKey={2} title='Party' onSelect={this.onSelect}>
+          <RRB.MenuItemLink to="partyList" eventKey='1'>Parties</RRB.MenuItemLink>
+          <MenuItem divider/>
+          <MenuItem eventKey='2'>Separated link</MenuItem>
+        </DropdownButton>
+      </Nav>
+    );
+
     return (
       <Navbar inverse fixedTop fluid brand={<a href="#">Zauzoo IS</a>} toggleNavKey={0}>
         <CollapsibleNav eventKey={0}>
-          <Nav navbar>
-            <RRB.NavItemLink to="home" eventKey={1}>Home</RRB.NavItemLink>
-            <DropdownButton eventKey={2} title='Party' onSelect={this.onSelect}>
-              <RRB.MenuItemLink to="partyList" eventKey='1'>Parties</RRB.MenuItemLink>
-              <MenuItem divider/>
-              <MenuItem eventKey='2'>Separated link</MenuItem>
-            </DropdownButton>
-          </Nav>
+
+          { CurrentUserStore.isLoggedIn() ? mainMenuFrag : '' }
+
           <Nav navbar right>
-            <NavItem eventKey={1} href='#'>Link Right</NavItem>
-            <NavItem eventKey={2} onClick={this.logout}>Logout</NavItem>
+            { CurrentUserStore.isLoggedIn() ? userMenuFrag : '' }
+            <NavItem eventKey={1} href='#'>Language</NavItem>
           </Nav>
         </CollapsibleNav>
       </Navbar>
