@@ -8,12 +8,10 @@ class CurrentUserActions {
     return currentUser;
   }
 
-  login(username, password) {
-    return city;
+  updateRedirectAfterLogin(redirectAfterLogin) {
+    return redirectAfterLogin;
   }
 
-  logout() {
-  }
 
 }
 

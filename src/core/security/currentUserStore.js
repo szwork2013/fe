@@ -12,7 +12,8 @@ class CurrentUserStore {
     });
 
     this.state = {
-      currentUser: null
+      currentUser: null,
+      redirectAfterLogin: null
     };
 
   }
@@ -21,22 +22,21 @@ class CurrentUserStore {
     return (this.state.currentUser);
   }
 
+  static getRedirectAfterLogin() {
+    return this.state.redirectAfterLogin;
+  }
+
 
   @bind(actions.updateCurrentUser)
   updateCurrentUser(currentUser) {
     this.setState({ currentUser });
   }
 
-  @bind(actions.login)
-  login(currentUser) {
-    this.setState({ currentUser });
+  @bind(actions.updateRedirectAfterLogin)
+  updateRedirectAfterLogin(redirectAfterLogin) {
+    this.setState({ redirectAfterLogin });
   }
 
-
-  @bind(actions.logout)
-  dropCurrentUser() {
-    this.setState({ currentUser: null });
-  }
 
 }
 

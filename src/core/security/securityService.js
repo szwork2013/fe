@@ -13,7 +13,7 @@ class SecurityService extends ServiceAncestor {
   }
 
   logout() {
-    return Axios.get(this.api('/core/security/logout'));
+    return Axios.post(this.api('/core/security/logout'));
   }
 
   getCurrentUser() {

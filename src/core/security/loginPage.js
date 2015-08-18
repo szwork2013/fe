@@ -4,13 +4,15 @@ import reactMixin from 'react-mixin';
 import Router from 'react-router';
 import SecurityService from 'core/security/securityService';
 import CurrentUserActions from 'core/security/currentUserActions';
+import CurrentUserStore from 'core/security/currentUserStore';
 
 
 export default class LoginPage extends React.Component {
 
   state = {
     user: '',
-    password: ''
+    password: '',
+    errorMessage: null
   };
 
 
@@ -22,9 +24,11 @@ export default class LoginPage extends React.Component {
     SecurityService.login(this.state.user, this.state.password)
     .then((response) => {
         CurrentUserActions.updateCurrentUser(response.data);
-        this.transitionTo('home');
+        let ral = CurrentUserStore.getRedirectAfterLogin();
+        this.transitionTo( (ral && ral !== '/') ? ral : 'home' );
       }, (err) => {
-        console.log('login error');
+        console.log('login error - ' + err.message, err);
+        this.setState({errorMessage: "Bad username or password"});
       });
   }
 
@@ -36,6 +40,9 @@ export default class LoginPage extends React.Component {
         <h1>
           LOGIN PAGE
         </h1>
+
+        {this.state.errorMessage ? <h3>{this.state.errorMessage}</h3> : ''}
+
         <input type="text" valueLink={this.linkState('user')} placeholder="user"/>
         <br/>
         <input type="password" valueLink={this.linkState('password')} placeholder="password"/>

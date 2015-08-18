@@ -19,6 +19,7 @@ export default class PageAncestor extends React.Component {
           CurrentUserActions.updateCurrentUser(currentUser);
           CommonService.emitter.emit('loadEnd');
         } else {
+          CurrentUserActions.updateRedirectAfterLogin(transition.path);
           transition.redirect('loginPage');
         }
 
