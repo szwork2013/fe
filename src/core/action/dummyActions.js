@@ -1,4 +1,4 @@
-import alt from 'alt-control';
+import alt from 'core/common/config/alt-config';
 import {createActions} from 'alt/utils/decorators';
 
 @createActions(alt)
