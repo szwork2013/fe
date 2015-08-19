@@ -9,7 +9,7 @@ class GridService extends ServiceAncestor {
 
 
   /**
-   * Vrati pole GridConfigy pro dany entityKey a pripadne route
+   * Vrati pole GridConfig pro dany entityKey a pripadne route
    * Podiva se do GridConfigStore jestli bylo inicializovano pro dany entityKey a pokud ano, vrati toto pole jako promise
    * Pokud nebylo, udela api call a pres akci updatne store a vrati pole (jako promise samozrejme)
    * @param entityKey

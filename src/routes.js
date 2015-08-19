@@ -1,8 +1,8 @@
 import React from 'react';
 import {Route, DefaultRoute} from 'react-router';
 
-import Application from 'core/page/application';
-import Home from 'core/page/home';
+import Application from 'core/application/application';
+import Home from 'core/home/home';
 import PartyList from 'party/page/partyList';
 import ContactPersonList from 'party/page/contactPersonList';
 import LoginPage from 'core/security/loginPage';
