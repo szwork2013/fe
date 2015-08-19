@@ -25,6 +25,9 @@ export default class LoginPage extends React.Component {
 
   submit = (e) => {
 
+    console.log('form submited');
+    e.preventDefault();
+
     // form validation
     if (!this.state.user) {
       this.setState({userError: "This Field is required."});
@@ -37,9 +40,7 @@ export default class LoginPage extends React.Component {
       return;
     }
 
-    console.log('form submited');
-    e.preventDefault();
-    // Here, we call an external AuthService. We’ll create it in the next step
+
     SecurityService.login(this.state.user, this.state.password)
     .then((response) => {
         CurrentUserActions.updateCurrentUser(response.data);
@@ -47,7 +48,11 @@ export default class LoginPage extends React.Component {
         this.transitionTo( (ral && ral !== '/') ? ral : 'home' );
       }, (err) => {
         console.log('login error - ' + err.message, err);
-        this.setState({errorMessage: "Bad username or password", user: '', password: '', userError: null, passwordError: null});
+        // po neuspesnem loginu vynulujeme policka a chybove hlasky a nastavime focus na user (v callbacku, protoze az po rerender after setState()
+        this.setState({errorMessage: "Bad username or password", user: '', password: '', userError: null, passwordError: null}, () => {
+          React.findDOMNode(this.refs.userField).getElementsByTagName("input")[0].focus();
+        });
+
       });
   }
 
@@ -58,19 +63,19 @@ export default class LoginPage extends React.Component {
   render() {
 
     return (
-      <div>
+      <form>
         <h1>
           LOGIN PAGE
         </h1>
 
         {this.state.errorMessage ? <h3>{this.state.errorMessage}</h3> : ''}
 
-        <Mui.TextField valueLink={this.linkState('user')} hintText="username" errorText={this.state.userError}  />
+        <Mui.TextField valueLink={this.linkState('user')} hintText="username" errorText={this.state.userError} ref="userField" autoFocus/>
         <br/>
         <Mui.TextField type="password" valueLink={this.linkState('password')} hintText="password" errorText={this.state.passwordError} />
         <br/>
         <Mui.RaisedButton type="submit" onClick={this.submit} label="Login" primary={true} />
-      </div>
+      </form>
     );
   }
 

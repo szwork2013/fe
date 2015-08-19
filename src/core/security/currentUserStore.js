@@ -19,11 +19,11 @@ class CurrentUserStore {
   }
 
   static isLoggedIn() {
-    return (this.state.currentUser);
+    return (this.getState().currentUser);
   }
 
   static getRedirectAfterLogin() {
-    return this.state.redirectAfterLogin;
+    return this.getState().redirectAfterLogin;
   }
 
 

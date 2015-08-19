@@ -55,9 +55,11 @@ export default class MainMenu extends React.Component {
       <Nav navbar>
         <RRB.NavItemLink to="home" eventKey={1}>Home</RRB.NavItemLink>
         <DropdownButton eventKey={2} title='Party' onSelect={this.onSelect}>
-          <RRB.MenuItemLink to="partyList" eventKey='1'>Parties</RRB.MenuItemLink>
+          <RRB.MenuItemLink to="partyList" eventKey='1'>Customers</RRB.MenuItemLink>
+          <RRB.MenuItemLink to="contactPersonList" eventKey='2'>Contact persons</RRB.MenuItemLink>
+
           <MenuItem divider/>
-          <MenuItem eventKey='2'>Separated link</MenuItem>
+          <MenuItem eventKey='3'>Separated link</MenuItem>
         </DropdownButton>
       </Nav>
     );

@@ -8,7 +8,6 @@ import MainMenu from 'core/component/mainMenu';
 
 import styles from 'core/page/application.less';
 
-
 const ThemeManager = new Mui.Styles.ThemeManager();
 injectTapEventPlugin();
 
