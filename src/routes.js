@@ -5,6 +5,8 @@ import Application from 'core/application/application';
 import Home from 'core/home/home';
 import PartyList from 'party/page/partyList';
 import ContactPersonList from 'party/page/contactPersonList';
+import InvoiceList from 'invoicing/page/invoiceList';
+
 import LoginPage from 'core/security/loginPage';
 
 
@@ -13,9 +15,12 @@ const routes = (
 
     <DefaultRoute name="home" handler={Home}/>
 
+    <Route name="loginPage" path="login"  handler={LoginPage}/>
+
     <Route name="partyList" path="party"  handler={PartyList}/>
     <Route name="contactPersonList" path="contact-person"  handler={ContactPersonList}/>
-    <Route name="loginPage" path="login"  handler={LoginPage}/>
+
+    <Route name="invoiceList" path="invoice"  handler={InvoiceList}/>
 
   </Route>
 );

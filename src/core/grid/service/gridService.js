@@ -20,16 +20,14 @@ class GridService extends ServiceAncestor {
 
     let gcArray = GridConfigStore.getGridConfig(entityKey, route);
     if (gcArray) {
+      console.debug("GridService#getGridConfigs(%s, %s) - from store (sync)", entityKey, route);
       return When(gcArray);
     } else {
-      return Axios.get(this.api('/core/grid-config/' + entityKey), {
-        params: {
-          pageToShow: route
-        }
-      }).then((response) => {
+      console.debug("GridService#getGridConfigs(%s, %s) - from server (async)", entityKey, route);
+      return Axios.get(this.api('/core/grid-config/' + entityKey)).then((response) => {
         gcArray = response.data;
         GridConfigActions.updateGridConfigArray(entityKey, gcArray);
-        return gcArray;
+        return (route) ? gcArray.filter(g => (!g.pageToShow || g.pageToShow === route)) : gcArray;
       });
     }
 

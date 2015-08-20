@@ -9,7 +9,8 @@ class GridConfigStore {
   constructor() {
 
     this.state = {
-      // [entityKey] -> gridConfig
+      // [entityKey] -> gridConfig[]
+      gridConfigs: {}
     };
 
   }
@@ -21,7 +22,7 @@ class GridConfigStore {
    * @returns {*}
      */
   static getGridConfig(entityKey, route) {
-    let gridConfigArray = this.getState()[entityKey];
+    let gridConfigArray = this.getState().gridConfigs[entityKey];
     if (gridConfigArray) {
       return (route) ? gridConfigArray.filter(g => (!g.pageToShow || g.pageToShow === route)) : gridConfigArray;
     } else {
@@ -53,7 +54,9 @@ class GridConfigStore {
   @bind(actions.updateGridConfigArray)
   updateGridConfigArray(obj) {
     const { entityKey, gridConfigArray } = obj;
-    this.setState({ [entityKey] : gridConfigArray });
+    const gcs = Object.assign({}, this.state.gridConfigs);
+    gcs[entityKey] = gridConfigArray;
+    this.setState({ gridConfigs : gcs });
   }
 
 
