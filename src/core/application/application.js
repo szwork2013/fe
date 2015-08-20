@@ -20,6 +20,15 @@ ThemeManager.setPalette({
   accent3Color: Colors.pinkA100
 });
 
+ThemeManager.setComponentThemes({
+  toolbar: {
+    backgroundColor: Colors.blueGrey50,
+    height: 40,
+    titleFontSize: 20
+  }
+});
+
+
 injectTapEventPlugin();
 
 
@@ -37,11 +46,11 @@ export default class Application extends React.Component {
 
 
   render() {
-    var { loading } = this.props;
-    return <div className={styles.this + (loading ? ' ' + styles.loading : '')}>
-      <div className={styles.loadingElement}>loading...</div>
-      <MainMenu />
-      <RouteHandler />
-    </div>;
+    return (
+      <div>
+        <MainMenu />
+        <RouteHandler />
+      </div>
+    )
   }
 }

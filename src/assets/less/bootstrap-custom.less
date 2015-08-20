@@ -64,13 +64,25 @@
 
 
 @primary: @indigo-500;
+
 @navbar-height: 40px;
+@navbar-default-bg: @blue-grey-50;
+
+.navbar {
+  border-radius: 0;
+  box-shadow: none;
+}
+
+body {
+  padding-top: @navbar-height;
+}
 
 // used in: alert
 @danger: @red-300;
 
 @body-bg: #fff;
 
+@font-size-small: @font-size-base;
 
 
 // navbar - from missing grid.less

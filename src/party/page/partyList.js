@@ -5,7 +5,7 @@ import When from 'when';
 
 import PageAncestor from 'core/common/page/pageAncestor';
 import GridService from 'core/grid/service/gridService';
-
+import Grid from 'core/grid/component/grid';
 
 @reactMixin.decorate(State)
 export default class PartyList extends PageAncestor {
@@ -27,15 +27,9 @@ export default class PartyList extends PageAncestor {
   //}
 
   render() {
-    var name = this.context.router.getCurrentPath();
-    var name2 = this.getPath();
 
     return (
-        <h1>Party list ! <i className="fa fa-cubes"></i>
-          {name}
-          <br/>
-          {name2}
-        </h1>
+      <Grid/>
       );
   }
 
