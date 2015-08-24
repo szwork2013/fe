@@ -5,7 +5,7 @@ import When from 'when';
 
 import PageAncestor from 'core/common/page/pageAncestor';
 import GridService from 'core/grid/service/gridService';
-import Grid from 'core/grid/component/grid';
+import GridComp from 'core/grid/component/gridComp';
 
 @reactMixin.decorate(State)
 export default class PartyList extends PageAncestor {
@@ -14,23 +14,21 @@ export default class PartyList extends PageAncestor {
     router: React.PropTypes.func.isRequired
   }
 
-  static fetchData(params) {
-    console.log("PartyList#fetchData(%o)", params);
-    return GridService.getGridConfigs('party|Party', 'partyList');
+  static fetchData(routerParams) {
+    console.log("PartyList#fetchData(%o)", routerParams);
+    return GridService.fetchGrids('partyList');
   }
 
-
-  // neni nutne
-  //constructor(props, context){
-  //  super(props);
-  //  console.log('context.router %o', context.router);
-  //}
 
   render() {
 
     return (
-      <Grid/>
-      );
+      <main className="main-content">
+        <GridComp gridLocation="partyList" gridId={this.props.params.gridId} query={this.props.query} connected/>
+        {/*<GridComp gridLocation="partyList"/> */}
+      </main>
+
+    );
   }
 
 }

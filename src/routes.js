@@ -17,7 +17,7 @@ const routes = (
 
     <Route name="loginPage" path="login"  handler={LoginPage}/>
 
-    <Route name="partyList" path="party"  handler={PartyList}/>
+    <Route name="partyList" path="party/list/:gridId?"  handler={PartyList}/>
     <Route name="contactPersonList" path="contact-person"  handler={ContactPersonList}/>
 
     <Route name="invoiceList" path="invoice"  handler={InvoiceList}/>

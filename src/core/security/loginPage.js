@@ -2,7 +2,7 @@ import React from 'react';
 import {addons} from 'react/addons';
 import reactMixin from 'react-mixin';
 import Router from 'react-router';
-import Mui from 'material-ui';
+import {TextField, RaisedButton} from 'material-ui';
 import { Alert } from 'react-bootstrap';
 
 import SecurityService from 'core/security/securityService';
@@ -93,17 +93,17 @@ export default class LoginPage extends React.Component {
 
           <div className="row">
             <div className="col-xs-offset-1 col-xs-10 col-sm-4">
-              <Mui.TextField valueLink={this.linkState('user')} hintText="username" errorText={this.state.userError} ref="userField" autoFocus fullWidth/>
+              <TextField valueLink={this.linkState('user')} hintText="username" errorText={this.state.userError} ref="userField" autoFocus fullWidth/>
             </div>
           </div>
           <div className="row">
             <div className="col-xs-offset-1 col-xs-10 col-sm-4">
-              <Mui.TextField type="password" valueLink={this.linkState('password')} hintText="password" errorText={this.state.passwordError} fullWidth/>
+              <TextField type="password" valueLink={this.linkState('password')} hintText="password" errorText={this.state.passwordError} fullWidth/>
             </div>
           </div>
           <div className="row" style={{marginTop:20}}>
             <div className="col-xs-offset-1 col-xs-10 col-sm-4">
-              <Mui.RaisedButton type="submit" onClick={this.submit} label="Login" primary={true} />
+              <RaisedButton type="submit" onClick={this.submit} label="Login" primary={true} />
             </div>
           </div>
 

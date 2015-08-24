@@ -1,38 +1,43 @@
 import Axios from 'core/common/config/axios-config';
 import When from 'when';
 
-import ServiceAncestor from 'core/common/service/serviceAncestor';
-import GridConfigStore from 'core/grid/store/gridConfigStore';
-import GridConfigActions from 'core/grid/action/gridConfigActions';
+import commonService from 'core/common/service/commonService';
+import GridStore from 'core/grid/store/gridStore';
+import GridActions from 'core/grid/action/gridActions';
+import Grid from 'core/grid/domain/grid';
 
-class GridService extends ServiceAncestor {
+class GridService {
 
 
   /**
-   * Vrati pole GridConfig pro dany entityKey a pripadne route
-   * Podiva se do GridConfigStore jestli bylo inicializovano pro dany entityKey a pokud ano, vrati toto pole jako promise
-   * Pokud nebylo, udela api call a pres akci updatne store a vrati pole (jako promise samozrejme)
-   * @param entityKey
-   * @param route
+   * vlozi do GridStore objekty Grid pro gridLocations ktere tam dosud nebyly
+   * @param jedno nebo vice gridLocation
    * @returns {*}
-     */
-  getGridConfigs(entityKey, route) {
+   */
+  fetchGrids(...gridLocations) {
 
-    let gcArray = GridConfigStore.getGridConfig(entityKey, route);
-    if (gcArray) {
-      console.debug("GridService#getGridConfigs(%s, %s) - from store (sync)", entityKey, route);
-      return When(gcArray);
-    } else {
-      console.debug("GridService#getGridConfigs(%s, %s) - from server (async)", entityKey, route);
-      return Axios.get(this.api('/core/grid-config/' + entityKey)).then((response) => {
-        gcArray = response.data;
-        GridConfigActions.updateGridConfigArray(entityKey, gcArray);
-        return (route) ? gcArray.filter(g => (!g.pageToShow || g.pageToShow === route)) : gcArray;
+    let promises = [];
+    for (let gl of gridLocations) {
+      let grid = GridStore.getGrid(gl);
+      if (!grid) {
+        promises.push(Axios.get( commonService.api('/core/grid-config'), {params: {gridLocation: gl}})
+          .then((response) => {
+            return new Grid(gl, response.data);
+          }));
+      }
+    }
+    if (promises.length > 0) {
+      return When.all(promises).then(gridArray => {
+        let gridObject = gridArray.reduce((acc, grid) => {
+          acc[grid.gridLocation] = grid;
+          return acc;
+        }, {});
+        console.log("fetchGrids promise resolved: %o", gridObject);
+        return GridActions.updateGrids(gridObject);
       });
     }
 
   }
-
 
 
 }

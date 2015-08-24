@@ -1,11 +1,12 @@
 import Axios from 'core/common/config/axios-config';
-import ServiceAncestor from 'core/common/service/serviceAncestor';
 
-class SecurityService extends ServiceAncestor {
+import commonService from 'core/common/service/commonService';
+
+class SecurityService  {
 
 
   login(username, password) {
-    return Axios.get(this.api('/core/security/current-user'), {
+    return Axios.get(commonService.api('/core/security/current-user'), {
       headers: {
         authorization: "Basic " + btoa(username + ":" + password)
       }
@@ -13,12 +14,12 @@ class SecurityService extends ServiceAncestor {
   }
 
   logout() {
-    return Axios.post(this.api('/core/security/logout'));
+    return Axios.post(commonService.api('/core/security/logout'));
   }
 
   getCurrentUser() {
     console.log('Getting current user');
-    return Axios.get(this.api('/core/security/current-user')).then((response) => {
+    return Axios.get(commonService.api('/core/security/current-user')).then((response) => {
       return response.data;
     }, (error) => {
       if (error.status === 401) {

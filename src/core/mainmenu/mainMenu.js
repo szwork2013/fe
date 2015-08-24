@@ -1,7 +1,7 @@
 import React from 'react';
 import reactMixin from 'react-mixin';
 import {Navbar, Nav, NavItem, DropdownButton, MenuItem, CollapsibleNav } from 'react-bootstrap';
-import * as RRB from 'react-router-bootstrap';
+import {NavItemLink, MenuItemLink} from 'react-router-bootstrap';
 import Router from 'react-router';
 import connectToStores from 'alt/utils/connectToStores';
 
@@ -54,17 +54,17 @@ export default class MainMenu extends React.Component {
 
     var mainMenuFrag = (
       <Nav navbar>
-        <RRB.NavItemLink to="home" eventKey={1}>Home</RRB.NavItemLink>
+        <NavItemLink to="home" eventKey={1}>Home</NavItemLink>
         <DropdownButton eventKey={2} title='Party' onSelect={this.onSelect}>
-          <RRB.MenuItemLink to="partyList" eventKey='1'>Customers</RRB.MenuItemLink>
-          <RRB.MenuItemLink to="contactPersonList" eventKey='2'>Contact persons</RRB.MenuItemLink>
+          <MenuItemLink to="partyList" eventKey='1'>Customers</MenuItemLink>
+          <MenuItemLink to="contactPersonList" eventKey='2'>Contact persons</MenuItemLink>
 
           <MenuItem divider/>
           <MenuItem eventKey='3'>Administration</MenuItem>
         </DropdownButton>
 
         <DropdownButton eventKey={3} title='Invoice' onSelect={this.onSelect}>
-          <RRB.MenuItemLink to="invoiceList" eventKey='1'>Invoices</RRB.MenuItemLink>
+          <MenuItemLink to="invoiceList" eventKey='1'>Invoices</MenuItemLink>
 
           <MenuItem divider/>
           <MenuItem eventKey='3'>Administration</MenuItem>

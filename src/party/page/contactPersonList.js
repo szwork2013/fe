@@ -10,7 +10,7 @@ export default class ContactPersonList extends PageAncestor {
 
   static fetchData(params) {
     console.log("ContactPersonList#fetchData(%o)", params);
-    return GridService.getGridConfigs('party|Party', 'contactPersonList');
+    GridService.fetchGrids('contactPersonList');
   }
 
 
