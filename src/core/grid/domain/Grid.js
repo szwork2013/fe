@@ -6,6 +6,14 @@ export default class Grid {
   constructor (gridLocation, gridConfigs) {
     this.gridLocation = gridLocation;
     this.gridConfigs = gridConfigs;
+    this.data = null;
+
+    if (gridConfigs && gridConfigs.length > 0) {
+      this.entityKey = gridConfigs[0].entity;
+    }
+
+    this.$entityRef = null;
+
   }
 
 
