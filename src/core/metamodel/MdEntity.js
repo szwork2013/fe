@@ -13,7 +13,9 @@ export default class MdEntity {
 
 
 
-
+  getField(fieldName) {
+    return this.fields[fieldName];
+  }
 
 
 }

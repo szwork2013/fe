@@ -1,4 +1,3 @@
-import Axios from 'axios';
 import { EventEmitter } from 'events';
 
 
@@ -9,9 +8,6 @@ class CommonService {
   }
 
 
-  formatId(...args) {
-    return args.join('_');
-  }
 
 }
 

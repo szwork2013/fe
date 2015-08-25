@@ -7,6 +7,10 @@ import Grid from 'core/grid/domain/grid';
 
 import MdEntityStore from 'core/metamodel/mdEntityStore';
 import MdEntityActions from 'core/metamodel/mdEntityActions';
+import MdEntity from 'core/metamodel/mdEntity';
+import MdEntityService from 'core/metamodel/mdEntityService';
+
+import Utils from 'core/common/utils/utils';
 
 class GridService {
 
@@ -18,6 +22,7 @@ class GridService {
    */
   fetchGrids(...gridLocations) {
 
+    // pripravime pole Promise<Grid) pro gridy ktere nejsou v GridStore
     let promises = [];
     for (let gl of gridLocations) {
       let grid = GridStore.getGrid(gl);
@@ -28,8 +33,9 @@ class GridService {
           }));
       }
     }
-    if (promises.length > 0) {
 
+    // pokud nejaky takovy existuje
+    if (promises.length > 0) {
       var gridObject = {};
 
       return When.all(promises).then(gridArray => {
@@ -49,17 +55,7 @@ class GridService {
 
 
         if (unresolvedEntities.length > 0) {
-          return Axios.get('/core/metamodel/entity', {params: {entityKey: unresolvedEntities}})
-            .then((response) => {
-              if (response.data.length  > 0) {
-                for(let entity of response.data) {
-                  entityObject[entity.id] = entity;
-                }
-                MdEntityActions.updateEntities(entityObject);
-              }
-              return entityObject;
-            });
-
+          return MdEntityService.fetchEntities(unresolvedEntities, entityObject);
         } else {
           return When(entityObject);
         }
@@ -69,6 +65,17 @@ class GridService {
           for(let gridLocation in gridObject) {
             let grid = gridObject[gridLocation];
             grid.$entityRef = entityObject[grid.entityKey];
+
+            // doplnime gridConfig.$columnRefs: MdField[]
+            for(let gridConfig of grid.gridConfigs) {
+              gridConfig.$columnRefs = [];
+              for(let fieldKey of gridConfig.columns) {
+                let fk = Utils.parseId(fieldKey);
+                let mdField = grid.$entityRef.getField(fk[2]);
+                gridConfig.$columnRefs.push(mdField);
+              }
+            }
+
           }
           console.log("fetchGrids promise resolved: %o", gridObject);
           return GridActions.updateGrids(gridObject);
