@@ -11,6 +11,7 @@ import {NavItemLink, MenuItemLink} from 'react-router-bootstrap';
 import GridStore from 'core/grid/store/gridStore';
 import GridActions from 'core/grid/action/gridActions';
 import Grid from 'core/grid/domain/grid';
+
 import Table from 'core/table/table';
 import TableBody from 'core/table/table-body';
 import TableHeader from 'core/table/table-header';
@@ -70,8 +71,6 @@ export default class GridComp extends React.Component {
   }
 
 
-
-
   constructor(props) {
     super(props);
 
@@ -81,7 +80,8 @@ export default class GridComp extends React.Component {
 
     this.state = {
       searchTerm: searchTerm,
-      activeGridConfig: props.grid.getActiveGridConfig(props.gridId)
+      activeGridConfig: props.grid.getActiveGridConfig(props.gridId),
+      loading: false
     }
     this.search();
   }
@@ -117,6 +117,15 @@ export default class GridComp extends React.Component {
 
   search() {
     console.debug("running search with gridId = %s, searchTerm = %s", this.state.activeGridConfig.gridId, this.state.searchTerm);
+    //this.setState({loading: true}, () => {
+    //
+    //});
+
+    GridActions.fetchData(this.props.grid, this.state.activeGridConfig, this.state.searchTerm)
+      .then((grid) => {
+        this.setState({loading: false});
+      });
+
 
   }
 
@@ -156,7 +165,7 @@ export default class GridComp extends React.Component {
   };
 
   onSearchTermChange = evt => {
-    console.log('onSearchTermSubmit: %s', this.state.searchTerm);
+    console.log('onSearchTermChange: %s', this.state.searchTerm);
   };
 
   _onRowSelection = (rows) => {
@@ -177,7 +186,8 @@ export default class GridComp extends React.Component {
               this.props.grid.gridConfigs.map((gc) => {
                 return (
                   (this.props.connected) ?
-                    <MenuItemLink to={routeName} params={{ gridId: gc.gridId }} key={gc.gridId}>{gc.label}</MenuItemLink>
+                    <MenuItemLink to={routeName} params={{ gridId: gc.gridId }}
+                                  key={gc.gridId}>{gc.label}</MenuItemLink>
                     :
                     <MenuItem eventKey={gc} key={gc.gridId} onSelect={this.onSelectGridConfig}>{gc.label}</MenuItem>
                 );
@@ -190,6 +200,8 @@ export default class GridComp extends React.Component {
         : (<span>No Grid Config defined</span>)
 
     );
+
+    let tableHeaderElement
 
 
     return (

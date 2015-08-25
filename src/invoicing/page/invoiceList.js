@@ -15,7 +15,7 @@ export default class InvoiceList extends PageAncestor {
 
   static fetchData(params) {
     console.log("InvoiceList#fetchData(%o)", params);
-    GridService.fetchGrids('invoiceList');
+    return GridService.fetchGrids('invoiceList');
   }
 
 

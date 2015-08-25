@@ -17,7 +17,7 @@ class GridStore {
   }
 
   /**
-   * Vrati pole gridConfigu pro danou entitu
+   * Vrati Grid objekt pro danou gridLocation
    * @param entityKey
    * @param route - nepovinny parametr
    * @returns {*}
@@ -38,6 +38,12 @@ class GridStore {
   updateGrids(grids) {
     console.debug("updateGrids: ", grids);
     this.setState(grids);
+  }
+
+  @bind(actions.fetchData)
+  fetchData(grid) {
+    console.debug("fetchData: ", grid);
+    this.setState({ [grid.gridLocation] : grid });
   }
 
 }

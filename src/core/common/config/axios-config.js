@@ -7,6 +7,9 @@ console.debug('axios init');
     // Do something before request is sent
     if (!config.headers) config.headers = {};
     config.headers['X-Requested-With'] = 'XMLHttpRequest';
+
+    if (!config.url.startsWith("/api")) config.url = '/api' + config.url;
+
     return config;
   }, function (error) {
     // Do something with request error

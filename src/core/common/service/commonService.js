@@ -8,9 +8,6 @@ class CommonService {
     this.emitter = new EventEmitter();
   }
 
-  api(url) {
-    return "/api" + url;
-  }
 
   formatId(...args) {
     return args.join('_');
