@@ -1,6 +1,6 @@
 import React from 'react';
 import reactMixin from 'react-mixin';
-import {Navbar, Nav, NavItem, DropdownButton, MenuItem, CollapsibleNav } from 'react-bootstrap';
+import {Navbar, Nav, NavItem, NavDropdown, MenuItem, CollapsibleNav } from 'react-bootstrap';
 import {NavItemLink, MenuItemLink} from 'react-router-bootstrap';
 import Router from 'react-router';
 import connectToStores from 'alt/utils/connectToStores';
@@ -24,6 +24,7 @@ export default class MainMenu extends React.Component {
   }
 
 
+
   /* *******   EVENT HENDLERS ************ */
 
   logout = (e) => {
@@ -44,31 +45,39 @@ export default class MainMenu extends React.Component {
 
   render() {
 
+
     let currentUser = this.props.currentUser;
 
     var userMenuFrag = (
-      <DropdownButton eventKey={3} title={currentUser ? currentUser.displayName : ''} onSelect={this.onSelect}>
-        <MenuItem eventKey='1' onClick={this.logout}>Logout</MenuItem>
-      </DropdownButton>
+      <NavDropdown eventKey={3} title={currentUser ? currentUser.displayName : ''}>
+        <MenuItem eventKey='1' onSelect={this.logout}>Logout</MenuItem>
+      </NavDropdown>
     );
+
+
 
     var mainMenuFrag = (
       <Nav navbar>
         <NavItemLink to="home" eventKey={1}>Home</NavItemLink>
-        <DropdownButton eventKey={2} title='Party' onSelect={this.onSelect}>
-          <MenuItemLink to="partyList" eventKey='1'>Customers</MenuItemLink>
-          <MenuItemLink to="contactPersonList" eventKey='2'>Contact persons</MenuItemLink>
+        <NavDropdown title='Party' onSelect={this.onSelectWithTransition}>
+
+          { this._menuItem("partyList", "Customers") }
+          { this._menuItem("contactPersonList", "Contact persons") }
+
+          { /*  dokud bude rozbity react-router-bootstrap po update react-bootstrap na 0.25
+           <MenuItemLink to="partyList" eventKey='1'>Customers</MenuItemLink>
+          */}
 
           <MenuItem divider/>
           <MenuItem eventKey='3'>Administration</MenuItem>
-        </DropdownButton>
+        </NavDropdown>
 
-        <DropdownButton eventKey={3} title='Invoice' onSelect={this.onSelect}>
-          <MenuItemLink to="invoiceList" eventKey='1'>Invoices</MenuItemLink>
+        <NavDropdown eventKey={3} title='Invoice' onSelect={this.onSelectWithTransition}>
+          { this._menuItem("invoiceList", "Invoices") }
 
           <MenuItem divider/>
           <MenuItem eventKey='3'>Administration</MenuItem>
-        </DropdownButton>
+        </NavDropdown>
 
 
       </Nav>
@@ -89,9 +98,17 @@ export default class MainMenu extends React.Component {
     );
   }
 
-  onSelect = evt => {
-    console.log('onSelect');
-  }
 
+  onSelectWithTransition = (event, eventKey) => {
+    console.log('onSelect2: event = %o, eventKey = %o, target = %o', event, eventKey);
+    event.preventDefault();
+    this.transitionTo(eventKey);
+  };
+
+  _menuItem(route, label) {
+    var href = this.makeHref(route);
+    //var isActive = this.isActive('destination', {some: 'params'}, {some: 'query param'});
+    return <MenuItem href={href} eventKey={route}> {label} </MenuItem>;
+  }
 
 }

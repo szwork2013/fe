@@ -5,9 +5,7 @@ import connectToStores from 'alt/utils/connectToStores';
 import _ from 'lodash';
 import classNames from 'classnames';
 
-//import { Toolbar, ToolbarGroup, DropDownMenu, ToolbarTitle, TextField } from 'material-ui';
-import {Navbar, Nav, NavItem, DropdownButton, MenuItem, CollapsibleNav, Input} from 'react-bootstrap';
-import {NavItemLink, MenuItemLink} from 'react-router-bootstrap';
+import {Navbar, Nav, NavDropdown, MenuItem, CollapsibleNav, Input} from 'react-bootstrap';
 
 import GridStore from 'core/grid/store/gridStore';
 import GridActions from 'core/grid/action/gridActions';
@@ -133,11 +131,27 @@ export default class GridComp extends React.Component {
   /* *******   EVENT HENDLERS ************ */
 
 
-  onSelectGridConfig = evt => {
-    console.log('onSelectGridConfig %o', evt);
-    this.setState({activeGridConfig: evt}, () => {
+  onSelectGridConfig = (event, gridId) => {
+    console.log('onSelectGridConfig gridId = ' + gridId);
+
+    if (this.props.connected) {
+      var routeName = _.last(this.context.router.getCurrentRoutes()).name,
+        params = this.context.router.getCurrentParams(),
+        query = this.context.router.getCurrentQuery();
+
+      params = Object.assign(params, {gridId});
+      query = Object.assign(query, {
+        searchTerm: ''
+      });
+
+      this.context.router.replaceWith(routeName, params, query);
+    }
+
+    let newAgc = this.props.grid.getGridConfig(gridId);
+    this.setState({activeGridConfig: newAgc, searchTerm: ''}, () => {
       this.search();
     });
+
   };
 
 
@@ -177,26 +191,21 @@ export default class GridComp extends React.Component {
       'grid-comp--loading': this.state.loading
     });
 
-    var routeName = _.last(this.context.router.getCurrentRoutes()).name;
 
     let gridConfigMenu = (
       (this.state.activeGridConfig) ?
         (
-          <DropdownButton eventKey={3} title={this.state.activeGridConfig.label}>
+          <NavDropdown eventKey={3} title={this.state.activeGridConfig.label}>
             {
               this.props.grid.gridConfigs.map((gc) => {
                 return (
-                  (this.props.connected) ?
-                    <MenuItemLink to={routeName} params={{ gridId: gc.gridId }}
-                                  key={gc.gridId}>{gc.label}</MenuItemLink>
-                    :
-                    <MenuItem eventKey={gc} key={gc.gridId} onSelect={this.onSelectGridConfig}>{gc.label}</MenuItem>
+                    <MenuItem eventKey={gc.gridId} key={gc.gridId} onSelect={this.onSelectGridConfig}>{gc.label}</MenuItem>
                 );
               })
             }
             <MenuItem divider/>
             <MenuItem>Manage</MenuItem>
-          </DropdownButton>
+          </NavDropdown>
         )
         : (<span>No Grid Config defined</span>)
 
