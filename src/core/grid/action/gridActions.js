@@ -17,6 +17,7 @@ import {createActions} from 'alt/utils/decorators';
     return Axios.get('/core/grid/' + activeGridConfig.gridId, {params: {searchTerm}})
       .then((response) => {
         grid.data = response.data;
+        this.dispatch(grid); // this dispatches the action
         return grid;
       });
   }

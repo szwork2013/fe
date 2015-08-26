@@ -42,7 +42,7 @@ class GridStore {
 
   @bind(actions.fetchData)
   fetchData(grid) {
-    console.debug("fetchData: ", grid);
+    console.debug("storing grid with fetchData: ", grid);
     this.setState({ [grid.gridLocation] : grid });
   }
 

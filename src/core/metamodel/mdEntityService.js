@@ -19,11 +19,11 @@ class MdEntityService {
       .then((response) => {
         if (response.data.length  > 0) {
           for(let entity of response.data) {
-            entity.__proto__ = MdEntity.prototype;
+            Object.setPrototypeOf(entity, MdEntity.prototype);
 
             for(let fieldName in entity.fields) {
               let field = entity.fields[fieldName];
-              field.__proto__ = MdField.prototype;
+              Object.setPrototypeOf(field, MdField.prototype);
             }
 
             entityObject[entity.id] = entity;

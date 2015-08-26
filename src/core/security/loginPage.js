@@ -1,5 +1,4 @@
 import React from 'react';
-import {addons} from 'react/addons';
 import reactMixin from 'react-mixin';
 import Router from 'react-router';
 import {TextField, RaisedButton} from 'material-ui';

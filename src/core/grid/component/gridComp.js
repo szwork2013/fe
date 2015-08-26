@@ -3,6 +3,7 @@ import reactMixin from 'react-mixin';
 import Router from 'react-router';
 import connectToStores from 'alt/utils/connectToStores';
 import _ from 'lodash';
+import classNames from 'classnames';
 
 //import { Toolbar, ToolbarGroup, DropDownMenu, ToolbarTitle, TextField } from 'material-ui';
 import {Navbar, Nav, NavItem, DropdownButton, MenuItem, CollapsibleNav, Input} from 'react-bootstrap';
@@ -18,6 +19,8 @@ import TableHeader from 'core/table/table-header';
 import TableRow from 'core/table/table-row';
 import TableHeaderColumn from 'core/table/table-header-column';
 import TableRowColumn from 'core/table/table-row-column';
+
+import styles from 'core/grid/component/gridComp.less';
 
 
 @connectToStores
@@ -83,18 +86,15 @@ export default class GridComp extends React.Component {
       activeGridConfig: props.grid.getActiveGridConfig(props.gridId),
       loading: false
     }
-    this.search();
   }
 
   componentWillReceiveProps(nextProps) {
     console.debug('componentWillReceiveProps nextProps: %o', nextProps);
-    if (nextProps.gridId) {
+    if (nextProps.connected) {
       let searchTerm = (nextProps.connected && nextProps.query && nextProps.query.searchTerm) ? nextProps.query.searchTerm : '';
       this.setState({
         searchTerm: searchTerm,
-        activeGridConfig: nextProps.grid.getActiveGridConfig(nextProps.gridId)
-      }, () => {
-        this.search();
+        activeGridConfig: (nextProps.gridId) ? nextProps.grid.getActiveGridConfig(nextProps.gridId) : this.state.activeGridConfig
       });
     }
 
@@ -104,25 +104,25 @@ export default class GridComp extends React.Component {
   //  console.debug('componentWillUpdate nextProps: %o, nextState: %o', nextProps, nextState);
   //}
   //
-  //componentWillMount() {
-  //  console.debug('componentWillMount');
-  //}
-  //
-  //componentDidMount() {
-  //  console.debug('componentDidMount');
-  //}
+  componentWillMount() {
+    console.debug('componentWillMount');
+    this.search();
+  }
+
+  componentDidMount() {
+    console.debug('componentDidMount');
+  }
 
   /* *******   PRIVATE METHODS ************ */
 
 
   search() {
     console.debug("running search with gridId = %s, searchTerm = %s", this.state.activeGridConfig.gridId, this.state.searchTerm);
-    //this.setState({loading: true}, () => {
-    //
-    //});
+    this.setState({loading: true});
 
     GridActions.fetchData(this.props.grid, this.state.activeGridConfig, this.state.searchTerm)
-      .then((grid) => {
+      .then(() => {
+        console.debug('search returned from server');
         this.setState({loading: false});
       });
 
@@ -140,9 +140,6 @@ export default class GridComp extends React.Component {
     });
   };
 
-  onSearchTermChange = evt => {
-    this.setState({searchTerm: evt.target.value});
-  };
 
   onSearchTermSubmit = evt => {
     evt.preventDefault();
@@ -158,14 +155,14 @@ export default class GridComp extends React.Component {
       });
 
       this.context.router.replaceWith(routeName, params, query);
-    } else {
-      this.search();
     }
+
+    this.search();
 
   };
 
   onSearchTermChange = evt => {
-    console.log('onSearchTermChange: %s', this.state.searchTerm);
+    this.setState({searchTerm: evt.target.value});
   };
 
   _onRowSelection = (rows) => {
@@ -176,6 +173,10 @@ export default class GridComp extends React.Component {
   /* *******   REACT METHODS ************ */
 
   render() {
+    var classes = classNames({
+      'grid-comp--loading': this.state.loading
+    });
+
     var routeName = _.last(this.context.router.getCurrentRoutes()).name;
 
     let gridConfigMenu = (
@@ -201,7 +202,13 @@ export default class GridComp extends React.Component {
 
     );
 
-    let tableHeaderElement
+    let loadingElement = (
+      <div className="grid-comp--loading">
+        <div><i className="fa fa-3x fa-refresh fa-spin"></i></div>
+      </div>
+    );
+
+    //let tableHeaderElement
 
 
     return (
@@ -218,6 +225,9 @@ export default class GridComp extends React.Component {
                    bsSize="small"/>
           </form>
         </Navbar>
+
+        { (this.state.loading) ? loadingElement : '' }
+
 
         <Table
           height={this.props.height}
