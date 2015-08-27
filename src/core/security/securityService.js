@@ -4,10 +4,11 @@ import Axios from 'core/common/config/axios-config';
 class SecurityService  {
 
 
-  login(username, password) {
+  login(username, password, tenantId) {
     return Axios.get('/core/security/current-user', {
       headers: {
-        authorization: "Basic " + btoa(username + ":" + password)
+        authorization: "Basic " + btoa(username + ":" + password),
+        tenantId: tenantId
       }
     });
   }
@@ -28,6 +29,12 @@ class SecurityService  {
         throw error;
       }
     })
+  }
+
+  getTenants(username) {
+    return Axios.get('/public/tenant', {
+      params: {username}
+    }).then(response => response.data);
   }
 
 }

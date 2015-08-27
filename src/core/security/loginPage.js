@@ -1,7 +1,7 @@
 import React from 'react';
 import reactMixin from 'react-mixin';
 import Router from 'react-router';
-import {TextField, RaisedButton} from 'material-ui';
+import {TextField, RaisedButton, SelectField} from 'material-ui';
 import { Alert } from 'react-bootstrap';
 
 import SecurityService from 'core/security/securityService';
@@ -16,14 +16,33 @@ export default class LoginPage extends React.Component {
     password: '',
     errorMessage: null,
     userError: null,
-    passwordError: null
+    passwordError: null,
+    tenants: [],
+    tenantId: null
   };
 
 
 
   /* *******   EVENT HENDLERS ************ */
 
-  submit = (e) => {
+  onChangeUsername = (e) => {
+    this.setState({user: e.target.value});
+
+    SecurityService.getTenants(e.target.value)
+    .then(data => {
+        this.setState({
+          tenants: data,
+          tenantId: (data.length > 0) ? data[0].id : null
+        });
+      });
+  };
+
+  onChangeTenantId = (e) => {
+    this.setState({tenantId: e.target.value});
+  };
+
+
+    submit = (e) => {
 
     console.log('form submited');
     e.preventDefault();
@@ -41,7 +60,7 @@ export default class LoginPage extends React.Component {
     }
 
 
-    SecurityService.login(this.state.user, this.state.password)
+    SecurityService.login(this.state.user, this.state.password, this.state.tenantId)
     .then((response) => {
         CurrentUserActions.updateCurrentUser(response.data);
         let ral = CurrentUserStore.getRedirectAfterLogin();
@@ -54,7 +73,7 @@ export default class LoginPage extends React.Component {
         });
 
       });
-  }
+  };
 
 
 
@@ -76,6 +95,9 @@ export default class LoginPage extends React.Component {
       </div>
     );
 
+    var tenantIdDisabled = (this.state.tenants.length <= 1);
+
+
     return (
       <form>
         <div className="container-fluid" style={topComponent}>
@@ -92,17 +114,24 @@ export default class LoginPage extends React.Component {
 
           <div className="row">
             <div className="col-xs-offset-1 col-xs-10 col-sm-4">
-              <TextField valueLink={this.linkState('user')} hintText="username" errorText={this.state.userError} ref="userField" autoFocus fullWidth/>
+              <TextField value={this.state.user} hintText="username" errorText={this.state.userError} ref="userField"
+                         autoFocus fullWidth onChange={this.onChangeUsername} autoComplete="off" tabIndex="1"/>
+            </div>
+            <div className="col-xs-offset-1 col-sm-offset-0 col-xs-10 col-sm-2">
+              <SelectField
+                value={this.state.tenantId} onChange={this.onChangeTenantId} disabled={tenantIdDisabled}
+                hintText="Client" fullWidth
+                menuItems={this.state.tenants}  displayMember="label" valueMember="id" autocomplete="off"/>
             </div>
           </div>
           <div className="row">
             <div className="col-xs-offset-1 col-xs-10 col-sm-4">
-              <TextField type="password" valueLink={this.linkState('password')} hintText="password" errorText={this.state.passwordError} fullWidth/>
+              <TextField type="password" valueLink={this.linkState('password')} hintText="password" errorText={this.state.passwordError} fullWidth autoComplete="off" tabIndex="3"/>
             </div>
           </div>
           <div className="row" style={{marginTop:20}}>
             <div className="col-xs-offset-1 col-xs-10 col-sm-4">
-              <RaisedButton type="submit" onClick={this.submit} label="Login" primary={true} />
+              <RaisedButton type="submit" onClick={this.submit} label="Login" primary={true} tabIndex="4"/>
             </div>
           </div>
 

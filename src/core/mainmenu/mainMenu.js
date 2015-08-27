@@ -49,7 +49,7 @@ export default class MainMenu extends React.Component {
     let currentUser = this.props.currentUser;
 
     var userMenuFrag = (
-      <NavDropdown eventKey={3} title={currentUser ? currentUser.displayName : ''}>
+      <NavDropdown eventKey={3} title={currentUser ? (currentUser.displayName + ' (' + currentUser.tenantName + ')' ) : ''}>
         <MenuItem eventKey='1' onSelect={this.logout}>Logout</MenuItem>
       </NavDropdown>
     );

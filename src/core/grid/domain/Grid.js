@@ -17,6 +17,10 @@ export default class Grid {
   }
 
 
+  getGridConfig(gridId) {
+    return this.gridConfigs.find(gc => gc.gridId == gridId);
+  }
+
   /**
    * Vrati aktivni gridConfig, pokud je zadany gridId, zkousi hledat ten
    * @param gridId -nepovinny paramter
