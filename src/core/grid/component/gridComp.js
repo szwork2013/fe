@@ -98,10 +98,6 @@ export default class GridComp extends React.Component {
 
   }
 
-  //componentWillUpdate(nextProps, nextState) {
-  //  console.debug('componentWillUpdate nextProps: %o, nextState: %o', nextProps, nextState);
-  //}
-  //
   componentWillMount() {
     console.debug('componentWillMount');
     this.search();
@@ -217,7 +213,19 @@ export default class GridComp extends React.Component {
       </div>
     );
 
-    //let tableHeaderElement
+    let tableHeaderRow = (
+      <TableRow>
+        {
+          this.state.activeGridConfig.$columnRefs.map( (mdField) => {
+            return (
+              <TableHeaderColumn key={mdField.fieldName} tooltip={mdField.gridHeaderTooltipActive}>
+                {mdField.gridHeaderLabelActive}
+              </TableHeaderColumn>
+            );
+          })
+        }
+      </TableRow>
+    );
 
 
     return (
@@ -246,11 +254,7 @@ export default class GridComp extends React.Component {
           multiSelectable={this.props.multiSelectable}
           onRowSelection={this._onRowSelection}>
           <TableHeader enableSelectAll={this.props.enableSelectAll}>
-            <TableRow>
-              <TableHeaderColumn tooltip='The ID'>ID</TableHeaderColumn>
-              <TableHeaderColumn tooltip='The Name'>Name</TableHeaderColumn>
-              <TableHeaderColumn tooltip='The Status'>Status</TableHeaderColumn>
-            </TableRow>
+            {tableHeaderRow}
           </TableHeader>
           <TableBody
             deselectOnClickaway={this.props.deselectOnClickaway}

@@ -22,14 +22,13 @@ export default class LoginPage extends React.Component {
   };
 
 
-
   /* *******   EVENT HENDLERS ************ */
 
   onChangeUsername = (e) => {
     this.setState({user: e.target.value});
 
     SecurityService.getTenants(e.target.value)
-    .then(data => {
+      .then(data => {
         this.setState({
           tenants: data,
           tenantId: (data.length > 0) ? data[0].id : null
@@ -42,7 +41,7 @@ export default class LoginPage extends React.Component {
   };
 
 
-    submit = (e) => {
+  submit = (e) => {
 
     console.log('form submited');
     e.preventDefault();
@@ -61,20 +60,25 @@ export default class LoginPage extends React.Component {
 
 
     SecurityService.login(this.state.user, this.state.password, this.state.tenantId)
-    .then((response) => {
+      .then((response) => {
         CurrentUserActions.updateCurrentUser(response.data);
         let ral = CurrentUserStore.getRedirectAfterLogin();
-        this.transitionTo( (ral && ral !== '/') ? ral : 'home' );
+        this.transitionTo((ral && ral !== '/') ? ral : 'home');
       }, (err) => {
         console.log('login error - ' + err.message, err);
         // po neuspesnem loginu vynulujeme policka a chybove hlasky a nastavime focus na user (v callbacku, protoze az po rerender after setState()
-        this.setState({errorMessage: "Bad username or password", user: '', password: '', userError: null, passwordError: null}, () => {
+        this.setState({
+          errorMessage: "Bad username or password",
+          user: '',
+          password: '',
+          userError: null,
+          passwordError: null
+        }, () => {
           React.findDOMNode(this.refs.userField).getElementsByTagName("input")[0].focus();
         });
 
       });
   };
-
 
 
   /* *******   REACT METHODS ************ */
@@ -111,27 +115,28 @@ export default class LoginPage extends React.Component {
           </div>
 
 
-
           <div className="row">
-            <div className="col-xs-offset-1 col-xs-10 col-sm-4">
+            <div className="col-xs-offset-1 col-xs-10" style={{display:'flex'}}>
               <TextField value={this.state.user} hintText="username" errorText={this.state.userError} ref="userField"
+                         style={{maxWidth:200}}
                          autoFocus fullWidth onChange={this.onChangeUsername} autoComplete="off" tabIndex="1"/>
-            </div>
-            <div className="col-xs-offset-1 col-sm-offset-0 col-xs-10 col-sm-2">
               <SelectField
+                style={{marginLeft:15, maxWidth:200}}
                 value={this.state.tenantId} onChange={this.onChangeTenantId} disabled={tenantIdDisabled}
                 hintText="Client" fullWidth
-                menuItems={this.state.tenants}  displayMember="label" valueMember="id" autocomplete="off"/>
+                menuItems={this.state.tenants} displayMember="label" valueMember="id" autocomplete="off"/>
             </div>
           </div>
           <div className="row">
-            <div className="col-xs-offset-1 col-xs-10 col-sm-4">
-              <TextField type="password" valueLink={this.linkState('password')} hintText="password" errorText={this.state.passwordError} fullWidth autoComplete="off" tabIndex="3"/>
+            <div className="col-xs-offset-1 col-xs-10">
+              <TextField type="password" valueLink={this.linkState('password')} hintText="password"
+                         errorText={this.state.passwordError} fullWidth autoComplete="off" tabIndex="3"
+                         style={{maxWidth:200}}/>
             </div>
           </div>
           <div className="row" style={{marginTop:20}}>
-            <div className="col-xs-offset-1 col-xs-10 col-sm-4">
-              <RaisedButton type="submit" onClick={this.submit} label="Login" primary={true} tabIndex="4"/>
+            <div className="col-xs-offset-1 col-xs-10">
+              <RaisedButton type="submit" onClick={this.submit} label="Login" primary={true} tabIndex={4}/>
             </div>
           </div>
 

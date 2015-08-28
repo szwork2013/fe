@@ -13,6 +13,12 @@ export default class MdField {
     // grid column label override
     this.gridHeaderLabel = null;
 
+    // main tooltip
+    this.tooltip = null;
+
+    // grid column tooltip override
+    this.gridHeaderTooltip = null;
+
   }
 
 
@@ -20,6 +26,9 @@ export default class MdField {
     return (this.gridHeaderLabel) ? this.gridHeaderLabel : this.label;
   }
 
+  get gridHeaderTooltipActive() {
+    return (this.gridHeaderTooltip) ? this.gridHeaderTooltip : this.tooltip;
+  }
 
 }
 

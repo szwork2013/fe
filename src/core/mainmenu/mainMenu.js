@@ -9,6 +9,7 @@ import SecurityService from 'core/security/securityService';
 import CurrentUserActions from 'core/security/currentUserActions';
 import CurrentUserStore from 'core/security/currentUserStore';
 
+import Locales from 'core/common/config/locales';
 
 @connectToStores
 @reactMixin.decorate(Router.Navigation)
@@ -41,6 +42,20 @@ export default class MainMenu extends React.Component {
   }
 
 
+  onSelectWithTransition = (event, eventKey) => {
+    console.log('onSelect2: event = %o, eventKey = %o, target = %o', event, eventKey);
+    event.preventDefault();
+    this.transitionTo(eventKey);
+  };
+
+  onSelectLanguage = (event, eventKey) => {
+    console.log('onSelect2: event = %o, eventKey = %o, target = %o', event, eventKey);
+    event.preventDefault();
+    Locales.lang = eventKey;
+    window.location.reload();
+  }
+
+
   /* *******   REACT METHODS ************ */
 
   render() {
@@ -51,6 +66,20 @@ export default class MainMenu extends React.Component {
     var userMenuFrag = (
       <NavDropdown eventKey={3} title={currentUser ? (currentUser.displayName + ' (' + currentUser.tenantName + ')' ) : ''}>
         <MenuItem eventKey='1' onSelect={this.logout}>Logout</MenuItem>
+      </NavDropdown>
+    );
+
+
+
+    var languagesFrag = (
+      <NavDropdown eventKey={3} title={ <span><i className="fa fa-file"></i> {Locales.lang} </span> } >
+          {
+            Locales.available.filter(x => x !== Locales.lang).map((locale) => {
+              return (
+                <MenuItem eventKey={locale} key={locale} onSelect={this.onSelectLanguage}>{locale}</MenuItem>
+              );
+            })
+          }
       </NavDropdown>
     );
 
@@ -91,7 +120,7 @@ export default class MainMenu extends React.Component {
 
           <Nav navbar right>
             { CurrentUserStore.isLoggedIn() ? userMenuFrag : '' }
-            <NavItem eventKey={1} href='#'>Language</NavItem>
+            {languagesFrag}
           </Nav>
         </CollapsibleNav>
       </Navbar>
@@ -99,11 +128,6 @@ export default class MainMenu extends React.Component {
   }
 
 
-  onSelectWithTransition = (event, eventKey) => {
-    console.log('onSelect2: event = %o, eventKey = %o, target = %o', event, eventKey);
-    event.preventDefault();
-    this.transitionTo(eventKey);
-  };
 
   _menuItem(route, label) {
     var href = this.makeHref(route);

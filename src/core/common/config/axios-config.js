@@ -1,4 +1,5 @@
 import Axios from 'axios';
+import Locales from 'core/common/config/locales';
 
 console.debug('axios init');
 
@@ -6,7 +7,14 @@ console.debug('axios init');
   Axios.interceptors.request.use((config) => {
     // Do something before request is sent
     if (!config.headers) config.headers = {};
-    config.headers['X-Requested-With'] = 'XMLHttpRequest';
+    Object.assign(config.headers, {
+      'X-Requested-With': 'XMLHttpRequest',
+      'Content-Type': 'application/json; charset=UTF-8',
+      'Accept': 'application/json',
+      'Accept-Language': Locales.lang
+    });
+
+
 
     if (!config.url.startsWith("/api")) config.url = '/api' + config.url;
 
