@@ -134,7 +134,7 @@ let TableBody = React.createClass({
       <TableRowColumn
         key={key}
         columnNumber={0}
-        style={{width: 24}}>
+        style={{width: 22, paddingLeft: 0}}>
         {checkbox}
       </TableRowColumn>
     );

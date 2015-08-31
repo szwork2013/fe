@@ -30,6 +30,9 @@ export default class GridConfig {
     // [{field : fieldKey, fixed: true|false, sortOrder: ASC|DESC}, ...]
     this.sortColumns = null;
 
+    // pole sirek sloupcu, pouze pro tento gridConfig, bez dat
+    this.gridWidths = null;
+
   }
 
 

@@ -17,6 +17,7 @@ let TableHeaderColumn = React.createClass({
     style: React.PropTypes.object,
     tooltip: React.PropTypes.string,
     tooltipStyle: React.PropTypes.object,
+    columnWidth: React.PropTypes.string
   },
 
   getInitialState() {
@@ -35,8 +36,8 @@ let TableHeaderColumn = React.createClass({
       root:  {
         fontWeight: 'normal',
         fontSize: 12,
-        paddingLeft: theme.spacing,
-        paddingRight: theme.spacing,
+        paddingLeft: 6,
+        paddingRight: 6,
         height: theme.height,
         textAlign: 'left',
         whiteSpace: 'nowrap',
@@ -67,6 +68,7 @@ let TableHeaderColumn = React.createClass({
       style,
       tooltip,
       tooltipStyle,
+      columnWidth,
       ...other,
     } = this.props;
     let classes = 'mui-table-header-column';
@@ -86,6 +88,7 @@ let TableHeaderColumn = React.createClass({
         key={this.props.key}
         className={classes}
         style={this.mergeAndPrefix(styles.root, style)}
+        width={columnWidth}
         {...handlers}
         {...other}>
         {tooltip}

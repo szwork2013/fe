@@ -154,7 +154,7 @@ let Table = React.createClass({
       {
         enableSelectAll: base.props.enableSelectAll && this.props.selectable && this.props.multiSelectable,
         onSelectAll: this._onSelectAll,
-        selectAllSelected: this.state.allRowsSelected,
+        selectAllSelected: this.state.allRowsSelected
       }
     );
   },

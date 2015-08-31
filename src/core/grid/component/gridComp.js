@@ -32,7 +32,7 @@ export default class GridComp extends React.Component {
     allRowsSelected: true,
     fixedFooter: true,
     fixedHeader: true,
-    height: '300px',
+    height: '100%',
     multiSelectable: true,
     selectable: true,
     deselectOnClickaway: true,
@@ -105,6 +105,14 @@ export default class GridComp extends React.Component {
 
   componentDidMount() {
     console.debug('componentDidMount');
+  }
+
+  componentWillUnmount() {
+    console.debug('componentWillUnmount');
+    let grid = this.props.grid;
+    grid.data = null;
+    grid.gridWidths = null;
+    GridActions.updateGrid(grid);
   }
 
   /* *******   PRIVATE METHODS ************ */
@@ -183,6 +191,9 @@ export default class GridComp extends React.Component {
   /* *******   REACT METHODS ************ */
 
   render() {
+
+    console.debug('rendering');
+
     var classes = classNames({
       'grid-comp--loading': this.state.loading
     });
@@ -213,12 +224,14 @@ export default class GridComp extends React.Component {
       </div>
     );
 
+    let columnWidths = (this.props.grid.gridWidths) ? this.props.grid.gridWidths : this.state.activeGridConfig.gridWidths;
+
     let tableHeaderRow = (
       <TableRow>
         {
-          this.state.activeGridConfig.$columnRefs.map( (mdField) => {
+          this.state.activeGridConfig.$columnRefs.map( (mdField, columnIndex) => {
             return (
-              <TableHeaderColumn key={mdField.fieldName} tooltip={mdField.gridHeaderTooltipActive}>
+              <TableHeaderColumn key={columnIndex} tooltip={mdField.gridHeaderTooltipActive} columnWidth={ columnWidths[columnIndex] } >
                 {mdField.gridHeaderLabelActive}
               </TableHeaderColumn>
             );
@@ -227,13 +240,15 @@ export default class GridComp extends React.Component {
       </TableRow>
     );
 
+    let _gridData = this.props.grid.data;
+
 
     return (
 
 
       <div>
 
-        <Navbar fluid toggleNavKey={0}>
+        <Navbar fluid toggleNavKey={0} style={{marginBottom: 10}}>
           <Nav navbar>
             {gridConfigMenu}
           </Nav>
@@ -260,48 +275,40 @@ export default class GridComp extends React.Component {
             deselectOnClickaway={this.props.deselectOnClickaway}
             showRowHover={this.props.showRowHover}
             stripedRows={this.props.stripedRows}>
-            <TableRow selected={true}>
-              <TableRowColumn>1</TableRowColumn>
-              <TableRowColumn>John Smith</TableRowColumn>
-              <TableRowColumn>Employed</TableRowColumn>
-            </TableRow>
-            <TableRow>
-              <TableRowColumn>2</TableRowColumn>
-              <TableRowColumn>Randal White</TableRowColumn>
-              <TableRowColumn>Unemployed</TableRowColumn>
-            </TableRow>
-            <TableRow selected={true}>
-              <TableRowColumn>3</TableRowColumn>
-              <TableRowColumn>Stephanie Sanders</TableRowColumn>
-              <TableRowColumn>Employed</TableRowColumn>
-            </TableRow>
-            <TableRow>
-              <TableRowColumn>4</TableRowColumn>
-              <TableRowColumn>Steve Brown</TableRowColumn>
-              <TableRowColumn>Employed</TableRowColumn>
-            </TableRow>
-            <TableRow>
-              <TableRowColumn>5</TableRowColumn>
-              <TableRowColumn>Joyce Whitten</TableRowColumn>
-              <TableRowColumn>Employed</TableRowColumn>
-            </TableRow>
-            <TableRow>
-              <TableRowColumn>6</TableRowColumn>
-              <TableRowColumn>Samuel Roberts</TableRowColumn>
-              <TableRowColumn>Unemployed</TableRowColumn>
-            </TableRow>
-            <TableRow>
-              <TableRowColumn>7</TableRowColumn>
-              <TableRowColumn>Adam Moore</TableRowColumn>
-              <TableRowColumn>Employed</TableRowColumn>
-            </TableRow>
+
+            { (_gridData) ? ((_gridData.totalCount === 0) ? 'No data found' : this._tableRowsElement(_gridData.rows, columnWidths)) : '' }
+
           </TableBody>
         </Table>
-
 
       </div>
     );
   }
+
+  _tableRowsElement(rows, columnWidths) {
+
+    return (
+
+      rows.map((row, rowIndex) => {
+        return (
+          <TableRow key={rowIndex}>
+            {
+              row.cells.map( (gridCell, columnIndex) => {
+                return (
+                  <TableRowColumn key={columnIndex} tooltip={gridCell.tooltip} columnWidth={ columnWidths[columnIndex] } >
+                    {gridCell.value}
+                  </TableRowColumn>
+                );
+              })
+            }
+          </TableRow>
+        );
+      })
+
+
+    );
+  }
+
 
 
 }

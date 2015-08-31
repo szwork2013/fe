@@ -1,5 +1,6 @@
 import Axios from 'core/common/config/axios-config';
 import When from 'when';
+import _ from 'lodash';
 
 import GridStore from 'core/grid/store/gridStore';
 import GridActions from 'core/grid/action/gridActions';
@@ -74,6 +75,7 @@ class GridService {
                 let mdField = grid.$entityRef.getField(fk[2]);
                 gridConfig.$columnRefs.push(mdField);
               }
+              gridConfig.gridWidths = this.computeGridWidths(null, gridConfig);
             }
 
           }
@@ -82,6 +84,34 @@ class GridService {
         });
     }
 
+  }
+
+
+  computeGridWidths(gridData, gridConfig) {
+    console.time("computeGridWidths");
+
+    let matrix = [];
+    matrix.push(gridConfig.$columnRefs.map( (mdField) => {
+      let v = mdField.gridHeaderLabelActive;
+      return  (v) ? ( (typeof v == 'string') ? v.length : v.toString.length ) : 0;
+    }));
+
+    if (gridData) {
+      for(let row of gridData.rows) {
+        matrix.push(row.cells.map((cell) => {
+          let v = cell.value;
+          return  (v) ? ( (typeof v == 'string') ? v.length : v.toString.length ) : 0;
+        }));
+      }
+    }
+
+    let absoluteLengths = _.zip(...matrix).map(col => _.max(col));
+
+    let absoluteMax = _.sum(absoluteLengths);
+    let gridWidths = absoluteLengths.map(v => Math.round(100 * v / absoluteMax) + "%");
+    console.timeEnd("computeGridWidths");
+    console.debug('computeGridWidths: %o', gridWidths);
+    return gridWidths;
   }
 
 

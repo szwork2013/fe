@@ -25,7 +25,16 @@ ThemeManager.setComponentThemes({
     backgroundColor: Colors.blueGrey50,
     height: 40,
     titleFontSize: 20
+  },
+  tableRowColumn: {
+    height: 28,
+    spacing: 16
+  },
+  tableHeaderColumn: {
+    height: 28,
+    spacing: 16
   }
+
 });
 
 

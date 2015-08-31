@@ -139,7 +139,7 @@ let TableHeader = React.createClass({
         onCheck={this._onSelectAll} />;
 
     return (
-      <TableHeaderColumn style={{width: 24}}>
+      <TableHeaderColumn style={{width: 22, paddingLeft: 0}}>
         {checkbox}
       </TableHeaderColumn>
     );
