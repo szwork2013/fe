@@ -41,7 +41,7 @@
     "flexboxgrid": "^6.2.0",
     "material-ui": "^0.11.0",
     "react": "^0.13.3",
-    "react-bootstrap": "^0.25.0",
+    "react-bootstrap": "^0.25.1",
     "react-mixin": "^1.7.0",
     "react-router": "^0.13.3",
     "react-router-bootstrap": "^0.18.1",

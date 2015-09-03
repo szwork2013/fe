@@ -1,24 +1,37 @@
 import _ from 'lodash';
 
+import GridConfig from 'core/grid/domain/gridConfig';
 
 export default class Grid {
 
   constructor (gridLocation, gridConfigs) {
+    // string gridLocation
     this.gridLocation = gridLocation;
+
+    // array of GridConfig
     this.gridConfigs = gridConfigs;
+
+    // navratova hodnota Grid ze serveru
     this.data = null;
+
+    // reference na MdEntity
+    this.$entityRef = null;
+
+    // pole sirek sloupcu, spocitane na zaklade aktivniho gridConfigu a dat
+    this.gridWidths = null;
 
     if (gridConfigs && gridConfigs.length > 0) {
       this.entityKey = gridConfigs[0].entity;
+      for(let gc of gridConfigs) {
+        Object.setPrototypeOf(gc, GridConfig.prototype);
+      }
     }
-
-    this.$entityRef = null;
 
   }
 
 
   getGridConfig(gridId) {
-    return this.gridConfigs.find(gc => gc.gridId == gridId);
+    return _(this.gridConfigs).find(gc => gc.gridId == gridId);
   }
 
   /**
@@ -28,7 +41,7 @@ export default class Grid {
   getActiveGridConfig(gridId) {
     let agc;
     if (gridId) {
-      agc = this.gridConfigs.find(gc => gc.gridId == gridId);
+      agc = _(this.gridConfigs).find(gc => gc.gridId == gridId);
     }
 
     if (!agc) {
