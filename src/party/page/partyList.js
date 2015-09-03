@@ -20,6 +20,7 @@ export default class PartyList extends PageAncestor {
   }
 
 
+
   render() {
 
     return (

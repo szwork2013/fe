@@ -26,7 +26,7 @@ export default class GridComp extends React.Component {
 
   static contextTypes = {
     router: React.PropTypes.func.isRequired
-  }
+  };
 
   static defaultProps = {
     allRowsSelected: true,
@@ -39,7 +39,7 @@ export default class GridComp extends React.Component {
     showRowHover: true,
     stripedRows: false
 
-  }
+  };
 
   static propTypes = {
     gridLocation: React.PropTypes.string.isRequired,
@@ -58,7 +58,7 @@ export default class GridComp extends React.Component {
 
     // from store
     grid: React.PropTypes.instanceOf(Grid)
-  }
+  };
 
 
   static getStores(props) {
@@ -158,6 +158,11 @@ export default class GridComp extends React.Component {
 
   };
 
+  onSelectGridManage = (evt) => {
+    evt.preventDefault();
+    this.context.router.transitionTo('gridAdmin', {gridLocation: this.props.gridLocation})
+  };
+
 
   onSearchTermSubmit = evt => {
     evt.preventDefault();
@@ -190,6 +195,7 @@ export default class GridComp extends React.Component {
 
   /* *******   REACT METHODS ************ */
 
+
   render() {
 
     console.debug('rendering');
@@ -198,11 +204,15 @@ export default class GridComp extends React.Component {
       'grid-comp--loading': this.state.loading
     });
 
+    let dropdownId = this.props.gridLocation + "_dropdown";
+
+
+
 
     let gridConfigMenu = (
       (this.state.activeGridConfig) ?
         (
-          <NavDropdown eventKey={3} title={this.state.activeGridConfig.label}>
+          <NavDropdown id={dropdownId} eventKey={3} title={this.state.activeGridConfig.label}>
             {
               this.props.grid.gridConfigs.map((gc) => {
                 return (
@@ -211,7 +221,7 @@ export default class GridComp extends React.Component {
               })
             }
             <MenuItem divider/>
-            <MenuItem>Manage</MenuItem>
+            <MenuItem href={this.context.router.makeHref('gridAdmin', {gridLocation: this.props.gridLocation})} onSelect={this.onSelectGridManage}> Manage </MenuItem>
           </NavDropdown>
         )
         : (<span>No Grid Config defined</span>)
@@ -248,7 +258,7 @@ export default class GridComp extends React.Component {
 
       <div>
 
-        <Navbar fluid toggleNavKey={0} style={{marginBottom: 10}}>
+        <Navbar fluid style={{marginBottom: 10}}>
           <Nav navbar>
             {gridConfigMenu}
           </Nav>

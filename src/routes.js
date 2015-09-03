@@ -9,18 +9,24 @@ import InvoiceList from 'invoicing/page/invoiceList';
 
 import LoginPage from 'core/security/loginPage';
 
+import GridAdminPage from 'core/grid/page/gridAdminPage';
+
 
 const routes = (
   <Route path="/" handler={Application}>
 
     <DefaultRoute name="home" handler={Home}/>
 
+
     <Route name="loginPage" path="login"  handler={LoginPage}/>
 
-    <Route name="partyList" path="party/list/:gridId?"  handler={PartyList}/>
-    <Route name="contactPersonList" path="contact-person"  handler={ContactPersonList}/>
+    <Route name="partyList" path="party/customer/list/:gridId?"  handler={PartyList}/>
+    <Route name="contactPersonList" path="party/contact-person/list/:gridId?"  handler={ContactPersonList}/>
 
-    <Route name="invoiceList" path="invoice"  handler={InvoiceList}/>
+    <Route name="invoiceList" path="invoice/list/:gridId?"  handler={InvoiceList}/>
+
+    <Route name="gridAdmin" path="core/grid/admin/:gridLocation"  handler={GridAdminPage}/>
+
 
   </Route>
 );

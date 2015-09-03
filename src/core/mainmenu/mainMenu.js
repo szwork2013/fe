@@ -64,7 +64,7 @@ export default class MainMenu extends React.Component {
     let currentUser = this.props.currentUser;
 
     var userMenuFrag = (
-      <NavDropdown eventKey={3} title={currentUser ? (currentUser.displayName + ' (' + currentUser.tenantName + ')' ) : ''}>
+      <NavDropdown eventKey={3} id="user_menu_dropdown" title={currentUser ? (currentUser.displayName + ' (' + currentUser.tenantName + ')' ) : ''}>
         <MenuItem eventKey='1' onSelect={this.logout}>Logout</MenuItem>
       </NavDropdown>
     );
@@ -72,7 +72,7 @@ export default class MainMenu extends React.Component {
 
 
     var languagesFrag = (
-      <NavDropdown eventKey={3} title={ <span><i className="fa fa-file"></i> {Locales.lang} </span> } >
+      <NavDropdown id="languages_menu_dropdown" eventKey={3} title={ <span><i className="fa fa-file"></i> {Locales.lang} </span> } >
           {
             Locales.available.filter(x => x !== Locales.lang).map((locale) => {
               return (
@@ -86,9 +86,9 @@ export default class MainMenu extends React.Component {
 
 
     var mainMenuFrag = (
-      <Nav navbar>
-        <NavItemLink to="home" eventKey={1}>Home</NavItemLink>
-        <NavDropdown title='Party' onSelect={this.onSelectWithTransition}>
+      <Nav navbar eventKey={11}>
+        <NavItemLink to="home">Home</NavItemLink>
+        <NavDropdown id="party_menu_dropdown" title='Party' onSelect={this.onSelectWithTransition}>
 
           { this._menuItem("partyList", "Customers") }
           { this._menuItem("contactPersonList", "Contact persons") }
@@ -101,7 +101,7 @@ export default class MainMenu extends React.Component {
           <MenuItem eventKey='3'>Administration</MenuItem>
         </NavDropdown>
 
-        <NavDropdown eventKey={3} title='Invoice' onSelect={this.onSelectWithTransition}>
+        <NavDropdown id="invoice_menu_dropdown"  title='Invoice' onSelect={this.onSelectWithTransition}>
           { this._menuItem("invoiceList", "Invoices") }
 
           <MenuItem divider/>
@@ -113,12 +113,12 @@ export default class MainMenu extends React.Component {
     );
 
     return (
-      <Navbar inverse fixedTop fluid brand={<a href="#">Zauzoo</a>} toggleNavKey={0}>
-        <CollapsibleNav eventKey={0}>
+      <Navbar inverse fixedTop fluid brand={<a href="#">Zauzoo</a>} toggleNavKey={1}>
+        <CollapsibleNav eventKey={1}>
 
           { CurrentUserStore.isLoggedIn() ? mainMenuFrag : '' }
 
-          <Nav navbar right>
+          <Nav navbar right eventKey={12}>
             { CurrentUserStore.isLoggedIn() ? userMenuFrag : '' }
             {languagesFrag}
           </Nav>
