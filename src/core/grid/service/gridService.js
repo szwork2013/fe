@@ -69,12 +69,7 @@ class GridService {
 
             // doplnime gridConfig.$columnRefs: MdField[]
             for(let gridConfig of grid.gridConfigs) {
-              gridConfig.$columnRefs = [];
-              for(let fieldKey of gridConfig.columns) {
-                let fk = Utils.parseId(fieldKey);
-                let mdField = grid.$entityRef.getField(fk[2]);
-                gridConfig.$columnRefs.push(mdField);
-              }
+              gridConfig.syncColumnRefs(grid.$entityRef);
               gridConfig.gridWidths = this.computeGridWidths(null, gridConfig);
             }
 

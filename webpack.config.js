@@ -11,7 +11,7 @@ module.exports = {
     target: 'web',
     cache: true,
     entry: {
-        module: ["assets/less/bootstrap-custom.less", "font-awesome/less/font-awesome.less", path.join(srcPath, 'module.js')],
+        module: ["assets/less/main.less", "font-awesome/less/font-awesome.less", path.join(srcPath, 'module.js')],
         common: ['react', 'react-router', 'alt', 'axios', 'events', 'material-ui', 'react-bootstrap', 'react-mixin', 'react-router-bootstrap', 'react-tap-event-plugin', 'when']
     },
     resolve: {

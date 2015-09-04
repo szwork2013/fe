@@ -1,5 +1,6 @@
 import _ from 'lodash';
 
+import Utils from 'core/common/utils/utils';
 
 export default class GridConfig {
 
@@ -36,7 +37,14 @@ export default class GridConfig {
   }
 
 
-
+  syncColumnRefs(entityRef) {
+    this.$columnRefs = [];
+    for(let fieldKey of this.columns) {
+      let fk = Utils.parseId(fieldKey);
+      let mdField = entityRef.getField(fk[2]);
+      this.$columnRefs.push(mdField);
+    }
+  }
 
 
 }

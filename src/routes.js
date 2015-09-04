@@ -9,7 +9,7 @@ import InvoiceList from 'invoicing/page/invoiceList';
 
 import LoginPage from 'core/security/loginPage';
 
-import GridAdminPage from 'core/grid/page/gridAdminPage';
+import GridAdminView from 'core/grid/view/gridAdminView';
 
 
 const routes = (
@@ -25,7 +25,7 @@ const routes = (
 
     <Route name="invoiceList" path="invoice/list/:gridId?"  handler={InvoiceList}/>
 
-    <Route name="gridAdmin" path="core/grid/admin/:gridLocation"  handler={GridAdminPage}/>
+    <Route name="gridAdmin" path="core/grid/admin/:gridLocation"  handler={GridAdminView}/>
 
 
   </Route>
