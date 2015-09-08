@@ -12,7 +12,7 @@ export default class GridAdminStore {
   constructor() {
 
     this.state = {
-      editedGridConfig: new GridConfig()
+      editedGridConfig: null
     }
 
   }

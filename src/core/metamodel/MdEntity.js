@@ -9,6 +9,9 @@ export default class MdEntity {
 
     // objekt (mapa) (fieldName -> MdField)
     this.fields = null;
+
+    // list of lovItems for this entity (e.g. Country has list of countries: [{id:'CZ','Czech Republic'},...]
+    this.lovItems = null;
   }
 
 

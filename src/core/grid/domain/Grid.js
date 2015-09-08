@@ -34,6 +34,10 @@ export default class Grid {
     return _(this.gridConfigs).find(gc => gc.gridId == gridId);
   }
 
+  deleteGridConfig(gridId) {
+    _.remove(this.gridConfigs, gc => gc.gridId == gridId);
+  }
+
   /**
    * Vrati aktivni gridConfig, pokud je zadany gridId, zkousi hledat ten
    * @param gridId -nepovinny paramter

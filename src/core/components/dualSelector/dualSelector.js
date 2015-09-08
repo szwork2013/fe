@@ -1,6 +1,6 @@
 import React from 'react';
 import {Input} from 'react-bootstrap';
-import { RaisedButton, FontIcon, Styles} from 'material-ui';
+import { RaisedButton, Styles} from 'material-ui';
 
 import styles from 'core/components/dualSelector/dualSelector.less';
 
@@ -19,7 +19,9 @@ export default class DualSelector extends React.Component {
     selectedObjectsLabel: React.PropTypes.string.isRequired,
 
     onAdd: React.PropTypes.func.isRequired,
-    onDelete: React.PropTypes.func.isRequired
+    onDelete: React.PropTypes.func.isRequired,
+    onUp: React.PropTypes.func.isRequired,
+    onDown: React.PropTypes.func.isRequired
   };
 
   //static defaultProps = {
@@ -37,6 +39,7 @@ export default class DualSelector extends React.Component {
     let selectedColumns = this.refs.allObjectsField.getValue();
     if (selectedColumns && selectedColumns.length > 0) {
       this.props.onAdd(selectedColumns);
+      this._selectOptions(this.refs.allObjectsField, 'DESELECT');
     }
   };
 
@@ -44,10 +47,27 @@ export default class DualSelector extends React.Component {
     let selectedColumns = this.refs.selectedObjectsField.getValue();
     if (selectedColumns && selectedColumns.length > 0) {
       this.props.onDelete(selectedColumns);
+      this._selectOptions(this.refs.selectedObjectsField, 'DESELECT');
     }
   };
 
 
+
+  onClickUp = () => {
+    let selectedColumns = this.refs.selectedObjectsField.getValue();
+    if (selectedColumns && selectedColumns.length > 0) {
+      this.props.onUp(selectedColumns);
+      this._selectOptions(this.refs.selectedObjectsField, 'UP');
+    }
+  };
+
+  onClickDown = () => {
+    let selectedColumns = this.refs.selectedObjectsField.getValue();
+    if (selectedColumns && selectedColumns.length > 0) {
+      this.props.onDown(selectedColumns);
+      this._selectOptions(this.refs.selectedObjectsField, 'DOWN');
+    }
+  };
 
   render() {
 
@@ -67,7 +87,8 @@ export default class DualSelector extends React.Component {
     let selectedObjectsNames = selectedObjectsFixed.map(v => v.fieldName);
     let allObjectsFiltered = allObjects.filter(v => !_.includes(selectedObjectsNames, v.fieldName));
 
-    let buttonStyle = {fontWeight: 'normal', marginTop: 10, marginBottom: 10};
+    let addButtonStyle = {fontWeight: 'normal', marginTop: 10, marginBottom: 10};
+    let sortButtonStyle = {fontWeight: 'normal', width: 40, minWidth: 40};
 
     return (
       <div className="dualselector">
@@ -82,11 +103,11 @@ export default class DualSelector extends React.Component {
           }
         </Input>
 
-        <div className="buttons">
-          <RaisedButton style={buttonStyle} onClick={this.onClickPridat}>
+        <div className="addbuttons">
+          <RaisedButton style={addButtonStyle} onClick={this.onClickPridat}>
             <span style={{lineHeight: '40px'}}> Přidat </span> <span className="fa fa-chevron-right"/>
           </RaisedButton>
-          <RaisedButton style={buttonStyle} onClick={this.onClickOdstranit}>
+          <RaisedButton style={addButtonStyle} onClick={this.onClickOdstranit}>
             <span className="fa fa-chevron-left"/> <span style={{lineHeight: '40px'}}> Odstranit </span>
           </RaisedButton>
         </div>
@@ -101,11 +122,49 @@ export default class DualSelector extends React.Component {
           }
         </Input>
 
+        <div className="sortbuttons">
+          <RaisedButton style={sortButtonStyle} onClick={this.onClickUp}>
+            <span style={{lineHeight: '40px'}} className="fa fa-chevron-up"/>
+          </RaisedButton>
+          <RaisedButton style={sortButtonStyle} onClick={this.onClickDown}>
+            <span style={{lineHeight: '40px'}} className="fa fa-chevron-down"/>
+          </RaisedButton>
+        </div>
+
 
       </div>
     )
   }
 
+
+  _selectOptions(inputRef, action) {
+    let inputElement = React.findDOMNode(inputRef);
+    let selectElement = inputElement.getElementsByTagName('select')[0];
+
+    for (let i=0, iLen=selectElement.options.length; i<iLen; i++) {
+      let opt = selectElement.options[i];
+      if (opt.selected && action === 'DESELECT') {
+        opt.selected = false;
+      }
+      if (opt.selected && action === 'UP') {
+        if (i > 0) {
+          opt.selected = false;
+          selectElement.options[i-1].selected = true;
+        }
+      }
+    }
+    let iLen = selectElement.options.length;
+    for (let i=iLen-1; i>=0; i--) {
+      let opt = selectElement.options[i];
+      if (opt.selected && action === 'DOWN') {
+        if (i < iLen-1) {
+          opt.selected = false;
+          selectElement.options[i+1].selected = true;
+        }
+      }
+    }
+
+  }
 
 }
 

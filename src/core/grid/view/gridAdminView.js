@@ -1,6 +1,6 @@
 import React from 'react';
 //import {Input} from 'react-bootstrap';
-import { FlatButton, SelectField, TextField } from 'material-ui';
+import { FlatButton, SelectField, TextField, RaisedButton } from 'material-ui';
 import connectToStores from 'alt/utils/connectToStores';
 import reactMixin from 'react-mixin';
 import Router from 'react-router';
@@ -15,8 +15,10 @@ import GridAdminStore from 'core/grid/store/gridAdminStore';
 import GridActions from 'core/grid/action/gridActions';
 import Grid from 'core/grid/domain/grid';
 import GridConfig from 'core/grid/domain/gridConfig';
+import GridConfigCondition from 'core/grid/domain/gridConfigCondition';
 import GridService from 'core/grid/service/gridService';
 import Utils from 'core/common/utils/utils';
+import ArrayUtils from 'core/common/utils/ArrayUtils';
 
 
 import Toolmenu from 'core/components/toolmenu/toolmenu';
@@ -40,9 +42,9 @@ class GridAdminView extends PageAncestor {
     editedGridConfig: React.PropTypes.instanceOf(GridConfig)
   };
 
-  static defaultProps = {
-    editedGridConfig: {}
-  }
+  //static defaultProps = {
+  //  editedGridConfig: {}
+  //}
 
 
   static getStores(props) {
@@ -78,16 +80,35 @@ class GridAdminView extends PageAncestor {
     console.log('onClickSave');
   };
 
+  onClickAdd = (evt) => {
+    console.log('onClickAdd');
+    let grid = this.props.grid;
+
+    let gridConfig = new GridConfig();
+    gridConfig.columns = [];
+    gridConfig.conditions = [];
+    gridConfig.entity = grid.$entityRef.id;
+    GridActions.updateEditedGridConfig(gridConfig);
+  };
+
+  onClickDelete = (evt) => {
+    console.log('onClickDelete');
+    let gridId = this.state.gridId;
+    let grid = this.props.grid;
+    if (gridId) {
+      grid.deleteGridConfig(gridId);
+      this.setState({gridId: null});
+    }
+    GridActions.updateEditedGridConfig(null);
+  };
+
+
   onChangeGridConfigLabel = (evt) => {
     let gridConfigLabel = evt.target.value;
     let editedGridConfig = this.props.editedGridConfig;
     editedGridConfig.label = gridConfigLabel;
     GridActions.updateEditedGridConfig(editedGridConfig);
   };
-
-
-
-  /* ****************   NORMAL METHODS ************************************************************ */
 
   onAddColumn = (fieldNames) => {
     console.log('onAddColumn FieldNames: ' + fieldNames);
@@ -100,7 +121,7 @@ class GridAdminView extends PageAncestor {
     editedGridConfig.syncColumnRefs(grid.$entityRef);
 
     GridActions.updateEditedGridConfig(editedGridConfig);
-  }
+  };
 
   onDeleteColumn = (fieldNames) => {
     console.log('onDeleteColumn FieldNames: ' + fieldNames);
@@ -115,9 +136,55 @@ class GridAdminView extends PageAncestor {
     editedGridConfig.syncColumnRefs(grid.$entityRef);
 
     GridActions.updateEditedGridConfig(editedGridConfig);
-  }
+  };
 
+  onUpColumn = (fieldNames) => {
+    console.log('onUpColumn FieldNames: ' + fieldNames);
+    let grid = this.props.grid;
+    let editedGridConfig = this.props.editedGridConfig;
 
+    for(let v of fieldNames) {
+      let fieldKey = Utils.formatId(editedGridConfig.entity, v);
+      let index = editedGridConfig.columns.indexOf(fieldKey);
+      if (index < 1) {
+        return;
+      }
+      ArrayUtils.move(editedGridConfig.columns, index, index - 1);
+    }
+
+    editedGridConfig.syncColumnRefs(grid.$entityRef);
+
+    GridActions.updateEditedGridConfig(editedGridConfig);
+  };
+
+  onDownColumn = (fieldNames) => {
+    console.log('onDownColumn FieldNames: ' + fieldNames);
+    let grid = this.props.grid;
+    let editedGridConfig = this.props.editedGridConfig;
+
+    let iLen = fieldNames.length;
+    for (let i=iLen-1; i>=0; i--) {
+      let v = fieldNames[i];
+      let fieldKey = Utils.formatId(editedGridConfig.entity, v);
+      let index = editedGridConfig.columns.indexOf(fieldKey);
+      if (index >= editedGridConfig.columns.length - 1) {
+        return;
+      }
+      ArrayUtils.move(editedGridConfig.columns, index, index + 1);
+    }
+
+    editedGridConfig.syncColumnRefs(grid.$entityRef);
+
+    GridActions.updateEditedGridConfig(editedGridConfig);
+  };
+
+  onClickAddFilter = (evt) => {
+    console.log('onClickAddFilter');
+    let editedGridConfig = this.props.editedGridConfig;
+
+    let condition = new GridConfigCondition();
+    editedGridConfig.conditions.push(condition);
+  };
 
 
   /* ****************   REACT METHODS ************************************************************ */
@@ -135,6 +202,7 @@ class GridAdminView extends PageAncestor {
     console.debug('editedGridConfig %o', editedGridConfig);
 
     let toolMenu = this._createToolMenu();
+    let addButtonStyle = {fontWeight: 'normal', marginTop: 10, marginBottom: 10};
 
     return (
       <main className="main-content">
@@ -152,32 +220,60 @@ class GridAdminView extends PageAncestor {
 
         <hr/>
 
-        <h4 style={{marginTop: 20}} >Edituj sestavu</h4>
+        { (editedGridConfig) ? (
+          <div>
+            <h4 style={{marginTop: 20}}>Edituj sestavu</h4>
 
-        <BlockComp header="1. Změna názvu sestavy">
-          <TextField
-            floatingLabelText="Název sestavy"
-            style={inputStyle}
-            value={editedGridConfig.label} onChange={this.onChangeGridConfigLabel} />
-          <LocalizeField/>
-        </BlockComp>
+            <BlockComp header="1. Změna názvu sestavy">
+              <TextField
+                floatingLabelText="Název sestavy"
+                style={inputStyle}
+                value={editedGridConfig.label} onChange={this.onChangeGridConfigLabel}/>
+              <LocalizeField/>
+            </BlockComp>
 
-        <BlockComp header="2. Zvol sloupce sestavy">
+            <BlockComp header="2. Zvol sloupce sestavy">
+              <DualSelector allObjects={_.values(grid.$entityRef.fields)}
+                            selectedObjects={editedGridConfig.$columnRefs}
+                            optionValuePropertyName="fieldName"
+                            optionTextPropertyName="label"
+                            allObjectsLabel="Dostupné sloupce pro sestavu"
+                            selectedObjectsLabel="Vložené sloupce v sestavě"
+                            onAdd={this.onAddColumn}
+                            onDelete={this.onDeleteColumn}
+                            onUp={this.onUpColumn}
+                            onDown={this.onDownColumn}/>
+            </BlockComp>
 
-          <DualSelector allObjects={_.values(grid.$entityRef.fields)}
-                        selectedObjects={editedGridConfig.$columnRefs}
-                        optionValuePropertyName="fieldName"
-                        optionTextPropertyName="label"
-                        allObjectsLabel="Dostupné sloupce pro sestavu"
-                        selectedObjectsLabel="Vložené sloupce v sestavě"
-                        onAdd={this.onAddColumn} onDelete={this.onDeleteColumn}/>
+            <BlockComp header="3. Aplikuj výběrové filtry">
+              <table className="table">
+                <thead>
+                  <tr>
+                    <td>Název sloupce</td>
+                    <td>Operátor</td>
+                    <td>Hodnota</td>
+                  </tr>
+                </thead>
+                <tBody>
+                </tBody>
+              </table>
+              <RaisedButton style={addButtonStyle} onClick={this.onClickAddFilter}>
+                <span className="fa fa-plus"/> <span style={{lineHeight: '40px'}}> Přidat filtr </span>
+              </RaisedButton>
+            </BlockComp>
 
-        </BlockComp>
+          </div>
+        ) : ''}
+
+
 
       </main>
 
     );
   }
+
+
+  /* ****************   NORMAL METHODS ************************************************************ */
 
 
   _createToolMenu() {
@@ -186,10 +282,10 @@ class GridAdminView extends PageAncestor {
           <FlatButton onClick={this.onClickSave}>
             <span className="fa fa-save"/><span> Uložit sestavu</span>
           </FlatButton>
-          <FlatButton>
+          <FlatButton onClick={this.onClickAdd}>
             <span className="fa fa-file"/><span> Vytvořit novou sestavu</span>
           </FlatButton>
-          <FlatButton>
+          <FlatButton onClick={this.onClickDelete}>
             <span className="fa fa-trash"/><span> Smazat sestavu</span>
           </FlatButton>
         </Toolmenu>
