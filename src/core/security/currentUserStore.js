@@ -4,6 +4,7 @@ import actions from 'core/security/currentUserActions';
 
 @createStore(alt)
 class CurrentUserStore {
+  static displayName = 'CurrentUserStore';
 
   constructor() {
     console.log('CurrentUserStore constructor');

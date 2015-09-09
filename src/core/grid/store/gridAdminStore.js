@@ -8,6 +8,7 @@ import actions from 'core/grid/action/gridActions';
 
 @createStore(alt)
 export default class GridAdminStore {
+  static displayName = 'GridAdminStore';
 
   constructor() {
 

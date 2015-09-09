@@ -7,6 +7,7 @@ import actions from 'core/grid/action/gridActions';
 
 @createStore(alt)
 class GridStore {
+  static displayName = 'GridStore';
 
   constructor() {
 

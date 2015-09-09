@@ -40,6 +40,14 @@ ThemeManager.setComponentThemes({
 
 injectTapEventPlugin();
 
+  try {
+    React.createClass({});
+  } catch(e) {
+    console.log('REACT IS RUNNING IN ' + ((e.message.indexOf('render') >= 0)?'DEV':'PROD') + ' MODE');
+  }
+
+
+
 
 export default class Application extends React.Component {
 

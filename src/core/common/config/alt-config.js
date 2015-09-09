@@ -4,5 +4,4 @@ console.debug('alt init');
 
 const alt = new Alt();
 
-
 export default alt;

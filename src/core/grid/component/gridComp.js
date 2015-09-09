@@ -32,7 +32,7 @@ export default class GridComp extends React.Component {
     allRowsSelected: true,
     fixedFooter: true,
     fixedHeader: true,
-    height: '100%',
+    height: '700px',
     multiSelectable: true,
     selectable: true,
     deselectOnClickaway: true,
@@ -197,8 +197,8 @@ export default class GridComp extends React.Component {
 
 
   render() {
+    console.debug("gridComp rendering");
 
-    console.debug('rendering');
 
     var classes = classNames({
       'grid-comp--loading': this.state.loading
