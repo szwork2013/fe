@@ -23,7 +23,7 @@ Router.run(routes, Router.HistoryLocation, (Root, state) => {
 
   When.all(promises)
     .then((data) => {
-      React.render(<Root {...state} data={data}/>, document.getElementById("content"));
+      React.render(<Root {...state} data={data}/>, document.body);
     })
 
 });

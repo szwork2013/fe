@@ -64,7 +64,7 @@ export default class Application extends React.Component {
 
   render() {
     return (
-      <div>
+      <div id="content">
         <MainMenu />
         <RouteHandler />
       </div>

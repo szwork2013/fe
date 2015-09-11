@@ -251,7 +251,7 @@ export default class GridComp extends React.Component {
     return (
 
 
-      <div>
+      <div className="md-grid-comp">
 
         <Navbar fluid style={{marginBottom: 10}}>
           <Nav navbar>
@@ -265,29 +265,35 @@ export default class GridComp extends React.Component {
 
         { (this.state.loading) ? loadingElement : '' }
 
+        <div className="md-grid">
 
-        <div className="md-grid-header">
-          {
-            this.state.activeGridConfig.$columnRefs.map((mdField,columnIndex) => {
-              return (
-                <div key={columnIndex} className="md-grid-header-cell" style={{width: this.columnWidths[columnIndex]}}>
-                  {mdField.gridHeaderLabelActive}
-                </div>
-              );
-            })
-          }
-        </div>
+          <div className="md-grid-header">
+            {
+              this.state.activeGridConfig.$columnRefs.map((mdField, columnIndex) => {
+                return (
+                  <div key={columnIndex} className="md-grid-header-cell"
+                       style={{width: this.columnWidths[columnIndex]}}>
+                    {mdField.gridHeaderLabelActive}
+                  </div>
+                );
+              })
+            }
+          </div>
 
           <div ref="rowContainer" className="md-grid-body">
             {
               ( this.props.grid.data) ? (( this.props.grid.data.totalCount === 0) ? 'No data found'
                   :
                   //this._tableRowsElement(_gridData.rows, columnWidths)) : ''
-                  ( <VirtualList items={ this.props.grid.data.rows} renderItem={this.renderItem} itemHeight={28} container={this.container} scrollDelay={15} /> )
+                  (<VirtualList items={ this.props.grid.data.rows} renderItem={this.renderItem} itemHeight={28}
+                                container={this.container} scrollDelay={15}/> )
               ) : ''
             }
           </div>
-
+          <div className="md-grid-footer">
+            Ahoj
+          </div>
+        </div>
 
 
       </div>

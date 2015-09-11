@@ -24,10 +24,10 @@ export default class PartyList extends PageAncestor {
   render() {
 
     return (
-      <main className="main-content">
+
         <GridComp gridLocation="partyList" gridId={this.props.params.gridId} query={this.props.query} connected/>
-        {/*<GridComp gridLocation="partyList"/> */}
-      </main>
+
+
 
     );
   }

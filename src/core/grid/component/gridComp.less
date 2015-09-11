@@ -1,3 +1,5 @@
+@import "~bootstrap-material-design/less/_colors.less";
+
 // overflows whole grid when loading data
 .grid-comp--loading {
   position: absolute;
@@ -16,9 +18,23 @@
   }
 }
 
+.md-grid-comp {
+  margin: 10px;
+  height: 100%;
+}
+
+
+.md-grid {
+  font-size: 12px;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  //width: 100%;
+}
 
 .md-grid-row {
   height: 28px;
+  border-top: 1px @blue-grey-100 solid;
 }
 
 .md-grid-cell {
@@ -29,7 +45,8 @@
 
 .md-grid-body {
   overflow: auto;
-  height: 700px;
+  flex: 1 1 auto;
+  min-height: 0;
 }
 
 .md-grid-header {
@@ -39,4 +56,5 @@
 .md-grid-header-cell {
   display: inline-block;
   white-space: nowrap;
+  color: @grey-500;
 }
