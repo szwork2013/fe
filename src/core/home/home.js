@@ -4,7 +4,12 @@ import PageAncestor from 'core/common/page/pageAncestor';
 export default class Home extends PageAncestor {
 
   render() {
-    return <h1>Home !</h1>
+    return (
+      <main className="main-content">
+        <h1>Home !</h1>
+      </main>
+
+    )
       ;
   }
 

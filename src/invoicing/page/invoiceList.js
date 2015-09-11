@@ -24,11 +24,13 @@ export default class InvoiceList extends PageAncestor {
     var name2 = this.getPath();
 
     return (
+      <main className="main-content">
         <h1>Invoice list ! <i className="fa fa-fa-file"></i>
           {name}
           <br/>
           {name2}
         </h1>
+        </main>
       );
   }
 

@@ -18,9 +18,11 @@ export default class ContactPersonList extends PageAncestor {
     var name = this.getPath();
 
     return (
+      <main className="main-content">
         <h1>Contact Person list
           {name}
         </h1>
+      </main>
       );
   }
 

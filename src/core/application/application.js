@@ -33,7 +33,10 @@ ThemeManager.setComponentThemes({
   tableHeaderColumn: {
     height: 28,
     spacing: 16
-  }
+  },
+  button: {
+    iconButtonSize: 40,
+  },
 
 });
 

@@ -9,13 +9,16 @@ var VirtualList = React.createClass({
     container: React.PropTypes.object.isRequired,
     tagName: React.PropTypes.string.isRequired,
     scrollDelay: React.PropTypes.number,
-    itemBuffer: React.PropTypes.number
+    resizeDelay: React.PropTypes.number,
+    itemBuffer: React.PropTypes.number,
+    triggerChange: React.PropTypes.number
   },
   getDefaultProps: function() {
     return {
       container: typeof window !== 'undefined' ? window : undefined,
       tagName: 'div',
       scrollDelay: 0,
+      resizeDelay: 0,
       itemBuffer: 0
     };
   },
@@ -70,18 +73,27 @@ var VirtualList = React.createClass({
     return !equal;
   },
   componentWillReceiveProps: function(nextProps) {
+    console.log('virtualList#componentWillReceiveProps %o', nextProps);
     var state = this.getVirtualState(nextProps);
 
-    this.props.container.removeEventListener('scroll', this.onScrollDebounced);
+    if (this.props.scrollDelay != nextProps.scrollDelay) {
+      this.props.container.removeEventListener('scroll', this.onScrollDebounced);
+      this.onScrollDebounced = utils.debounce(this.onScroll, nextProps.scrollDelay, false);
+      nextProps.container.addEventListener('scroll', this.onScrollDebounced);
+    }
 
-    this.onScrollDebounced = utils.debounce(this.onScroll, nextProps.scrollDelay, false);
-
-    nextProps.container.addEventListener('scroll', this.onScrollDebounced);
+    if (this.props.resizeDelay != nextProps.resizeDelay) {
+      window.removeEventListener('resize', this.onResizeDebounced);
+      this.onResizeDebounced = utils.debounce(this.onResize, nextProps.resizeDelay, false);
+      window.addEventListener('resize', this.onResizeDebounced);
+    }
 
     this.setState(state);
+    this.forceUpdate();
   },
   componentWillMount: function() {
     this.onScrollDebounced = utils.debounce(this.onScroll, this.props.scrollDelay, false);
+    this.onResizeDebounced = utils.debounce(this.onResize, this.props.resizeDelay, false);
   },
   componentDidMount: function() {
     var state = this.getVirtualState(this.props);
@@ -89,13 +101,20 @@ var VirtualList = React.createClass({
     this.setState(state);
 
     this.props.container.addEventListener('scroll', this.onScrollDebounced);
+
+    window.addEventListener('resize', this.onResizeDebounced);
   },
   componentWillUnmount: function() {
     this.props.container.removeEventListener('scroll', this.onScrollDebounced);
+    window.removeEventListener('resize', this.onResizeDebounced);
   },
   onScroll: function() {
     var state = this.getVirtualState(this.props);
 
+    this.setState(state);
+  },
+  onResize: function() {
+    var state = this.getVirtualState(this.props);
     this.setState(state);
   },
   // in case you need to get the currently visible items

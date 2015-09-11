@@ -8,17 +8,13 @@ import classNames from 'classnames';
 import VirtualList from 'core/components/virtualList/virtualList';
 
 import {Navbar, Nav, NavDropdown, MenuItem, CollapsibleNav, Input} from 'react-bootstrap';
+import {Checkbox, FlatButton, IconButton, FontIcon} from 'material-ui';
 
 import GridStore from 'core/grid/store/gridStore';
 import GridActions from 'core/grid/action/gridActions';
 import Grid from 'core/grid/domain/grid';
 
-import Table from 'core/table/table';
-import TableBody from 'core/table/table-body';
-import TableHeader from 'core/table/table-header';
-import TableRow from 'core/table/table-row';
-import TableHeaderColumn from 'core/table/table-header-column';
-import TableRowColumn from 'core/table/table-row-column';
+
 
 import styles from 'core/grid/component/gridComp.less';
 
@@ -84,7 +80,8 @@ export default class GridComp extends React.Component {
     this.state = {
       searchTerm: searchTerm,
       activeGridConfig: props.grid.getActiveGridConfig(props.gridId),
-      loading: false
+      loading: false,
+      showSelection: false
     }
   }
 
@@ -194,16 +191,21 @@ export default class GridComp extends React.Component {
 
   _onRowSelection = (rows) => {
     console.log(rows);
-  }
+  };
 
 
+  onClickCheck = (evt) => {
+    console.log('onCheckSquare %o', evt);
+    this.setState({showSelection: !this.state.showSelection});
+    this.changeVirtualList = Date.now();
+  };
 
 
   /* *******   REACT METHODS ************ */
 
 
   render() {
-    console.debug("gridComp rendering");
+    console.debug("gridComp rendering: " + this.changeVirtualList + " " +  Date.now());
 
 
     var classes = classNames({
@@ -257,6 +259,10 @@ export default class GridComp extends React.Component {
           <Nav navbar>
             {gridConfigMenu}
           </Nav>
+          <IconButton onClick={this.onClickCheck} tooltip="Show selection" iconStyle={{fontSize: 15, height: 40}}>
+            <FontIcon className="fa fa-check-square-o" />
+          </IconButton>
+
           <form className="navbar-form navbar-right" role="search" onSubmit={this.onSearchTermSubmit}>
             <Input type="text" value={this.state.searchTerm} onChange={this.onSearchTermChange} placeholder='Search'
                    bsSize="small"/>
@@ -267,6 +273,16 @@ export default class GridComp extends React.Component {
 
 
           <div className="md-grid-header">
+
+            {
+              ( (this.state.showSelection) ? (
+                <div className="md-grid-header-cell">
+                  <Checkbox name="selectAllCheckbox"/>
+                </div>
+              ) : '')
+            }
+
+
             {
               this.state.activeGridConfig.$columnRefs.map((mdField, columnIndex) => {
                 return (
@@ -284,8 +300,8 @@ export default class GridComp extends React.Component {
               ( this.props.grid.data) ? (( this.props.grid.data.totalCount === 0) ? 'No data found'
                   :
                   //this._tableRowsElement(_gridData.rows, columnWidths)) : ''
-                  (<VirtualList items={ this.props.grid.data.rows} renderItem={this.renderItem} itemHeight={28}
-                                container={this.container} scrollDelay={15}/> )
+                  (<VirtualList ref="VirtualList" items={ this.props.grid.data.rows} renderItem={this.renderItem} itemHeight={28}
+                                container={this.container} scrollDelay={15} resizeDelay={100} triggerChange={this.changeVirtualList}/> )
               ) : ''
             }
           </div>
@@ -298,6 +314,15 @@ export default class GridComp extends React.Component {
   renderItem = (item) => {
     return (
       <div key={item.rowId} className="md-grid-row">
+
+        {
+          ( (this.state.showSelection) ? (
+            <div className="md-grid-cell">
+              <Checkbox name="selectRowCheckbox"/>
+            </div>
+          ) : '')
+        }
+
         {
           item.cells.map( (gridCell, columnIndex) => {
 
