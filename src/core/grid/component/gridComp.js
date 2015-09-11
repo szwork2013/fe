@@ -266,12 +266,12 @@ export default class GridComp extends React.Component {
         { (this.state.loading) ? loadingElement : '' }
 
 
-          <div ref="rowContainer" style={{overflow: 'scroll', height: 700}}>
+          <div ref="rowContainer" style={{overflow: 'auto', height: 700}}>
             {
               ( this.props.grid.data) ? (( this.props.grid.data.totalCount === 0) ? 'No data found'
                   :
                   //this._tableRowsElement(_gridData.rows, columnWidths)) : ''
-                  ( <VirtualList items={ this.props.grid.data.rows} renderItem={this.renderItem} itemHeight={28} container={this.container} scrollDelay={10} /> )
+                  ( <VirtualList items={ this.props.grid.data.rows} renderItem={this.renderItem} itemHeight={28} container={this.container} scrollDelay={15} /> )
               ) : ''
             }
           </div>
