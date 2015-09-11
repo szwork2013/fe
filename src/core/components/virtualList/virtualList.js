@@ -103,11 +103,15 @@ var VirtualList = React.createClass({
     return this.state.items;
   },
   render: function() {
-    return (
-      <this.props.tagName {...this.props} style={{boxSizing: 'border-box', height: this.state.height, paddingTop: this.state.bufferStart }} >
-        {this.state.items.map(this.props.renderItem)}
-      </this.props.tagName>
-    );
+    try {
+      return (
+        <this.props.tagName {...this.props} style={{boxSizing: 'border-box', height: this.state.height, paddingTop: this.state.bufferStart }} >
+          {this.state.items.map(this.props.renderItem)}
+        </this.props.tagName>
+      );
+    } catch(err) {
+      console.error('Error in render item: ', err);
+    }
   }
 });
 

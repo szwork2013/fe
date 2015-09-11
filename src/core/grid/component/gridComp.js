@@ -300,14 +300,9 @@ export default class GridComp extends React.Component {
       <div key={item.rowId} className="md-grid-row">
         {
           item.cells.map( (gridCell, columnIndex) => {
-            try {
-              console.log(this.columnWidths[columnIndex]);
-            } catch(err) {
-              console.log(err);
-            }
 
             return (
-              <div key={columnIndex} className="md-grid-cell" style={{width: 100 }} >
+              <div key={columnIndex} className="md-grid-cell" style={{width: this.columnWidths[columnIndex] }} >
                 {gridCell.value}
               </div>
             );
