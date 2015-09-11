@@ -129,7 +129,7 @@ export default class GridComp extends React.Component {
     GridActions.fetchData(this.props.grid, this.state.activeGridConfig, this.state.searchTerm)
       .then(() => {
         console.debug('search returned from server');
-        this.setState({loading: false, activeGridConfig: this.state.activeGridConfig});
+        this.setState({loading: false});
       });
 
 
@@ -266,7 +266,19 @@ export default class GridComp extends React.Component {
         { (this.state.loading) ? loadingElement : '' }
 
 
-          <div ref="rowContainer" style={{overflow: 'auto', height: 700}}>
+        <div className="md-grid-header">
+          {
+            this.state.activeGridConfig.$columnRefs.map((mdField,columnIndex) => {
+              return (
+                <div key={columnIndex} className="md-grid-header-cell" style={{width: this.columnWidths[columnIndex]}}>
+                  {mdField.gridHeaderLabelActive}
+                </div>
+              );
+            })
+          }
+        </div>
+
+          <div ref="rowContainer" className="md-grid-body">
             {
               ( this.props.grid.data) ? (( this.props.grid.data.totalCount === 0) ? 'No data found'
                   :
@@ -283,13 +295,19 @@ export default class GridComp extends React.Component {
   }
 
 
-  renderItem(item) {
+  renderItem = (item) => {
     return (
-      <div key={item.rowId} className="grid-row">
+      <div key={item.rowId} className="md-grid-row">
         {
           item.cells.map( (gridCell, columnIndex) => {
+            try {
+              console.log(this.columnWidths[columnIndex]);
+            } catch(err) {
+              console.log(err);
+            }
+
             return (
-              <div key={columnIndex} className="grid-cell" style={{width: 100 }} >
+              <div key={columnIndex} className="md-grid-cell" style={{width: 100 }} >
                 {gridCell.value}
               </div>
             );
