@@ -251,7 +251,7 @@ export default class GridComp extends React.Component {
     return (
 
 
-      <div className="md-grid-comp">
+      <div className="md-grid">
 
         <Navbar fluid style={{marginBottom: 10}}>
           <Nav navbar>
@@ -265,7 +265,6 @@ export default class GridComp extends React.Component {
 
         { (this.state.loading) ? loadingElement : '' }
 
-        <div className="md-grid">
 
           <div className="md-grid-header">
             {
@@ -290,11 +289,6 @@ export default class GridComp extends React.Component {
               ) : ''
             }
           </div>
-          <div className="md-grid-footer">
-            Ahoj
-          </div>
-        </div>
-
 
       </div>
     );
