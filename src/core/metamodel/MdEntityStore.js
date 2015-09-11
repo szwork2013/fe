@@ -7,6 +7,7 @@ import actions from 'core/metamodel/mdEntityActions';
 
 @createStore(alt)
 class MdEntityStore {
+  static displayName = 'MdEntityStore';
 
   constructor() {
 

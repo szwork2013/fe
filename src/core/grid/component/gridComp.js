@@ -5,6 +5,8 @@ import connectToStores from 'alt/utils/connectToStores';
 import _ from 'lodash';
 import classNames from 'classnames';
 
+import VirtualList from 'core/components/virtualList/virtualList';
+
 import {Navbar, Nav, NavDropdown, MenuItem, CollapsibleNav, Input} from 'react-bootstrap';
 
 import GridStore from 'core/grid/store/gridStore';
@@ -105,6 +107,7 @@ export default class GridComp extends React.Component {
 
   componentDidMount() {
     console.debug('componentDidMount');
+    this.container = React.findDOMNode(this.refs.rowContainer);
   }
 
   componentWillUnmount() {
@@ -120,12 +123,13 @@ export default class GridComp extends React.Component {
 
   search() {
     console.debug("running search with gridId = %s, searchTerm = %s", this.state.activeGridConfig.gridId, this.state.searchTerm);
+
     this.setState({loading: true});
 
     GridActions.fetchData(this.props.grid, this.state.activeGridConfig, this.state.searchTerm)
       .then(() => {
         console.debug('search returned from server');
-        this.setState({loading: false});
+        this.setState({loading: false, activeGridConfig: this.state.activeGridConfig});
       });
 
 
@@ -193,6 +197,8 @@ export default class GridComp extends React.Component {
   }
 
 
+
+
   /* *******   REACT METHODS ************ */
 
 
@@ -234,23 +240,12 @@ export default class GridComp extends React.Component {
       </div>
     );
 
-    let columnWidths = (this.props.grid.gridWidths) ? this.props.grid.gridWidths : this.state.activeGridConfig.gridWidths;
+    this.columnWidths = (this.props.grid.gridWidths) ? this.props.grid.gridWidths : this.state.activeGridConfig.gridWidths;
 
-    let tableHeaderRow = (
-      <TableRow>
-        {
-          this.state.activeGridConfig.$columnRefs.map( (mdField, columnIndex) => {
-            return (
-              <TableHeaderColumn key={columnIndex} tooltip={mdField.gridHeaderTooltipActive} columnWidth={ columnWidths[columnIndex] } >
-                {mdField.gridHeaderLabelActive}
-              </TableHeaderColumn>
-            );
-          })
-        }
-      </TableRow>
-    );
+
 
     let _gridData = this.props.grid.data;
+
 
 
     return (
@@ -271,51 +266,36 @@ export default class GridComp extends React.Component {
         { (this.state.loading) ? loadingElement : '' }
 
 
-        <Table
-          height={this.props.height}
-          fixedHeader={this.props.fixedHeader}
-          fixedFooter={this.props.fixedFooter}
-          selectable={this.props.selectable}
-          multiSelectable={this.props.multiSelectable}
-          onRowSelection={this._onRowSelection}>
-          <TableHeader enableSelectAll={this.props.enableSelectAll}>
-            {tableHeaderRow}
-          </TableHeader>
-          <TableBody
-            deselectOnClickaway={this.props.deselectOnClickaway}
-            showRowHover={this.props.showRowHover}
-            stripedRows={this.props.stripedRows}>
+          <div ref="rowContainer" style={{overflow: 'scroll', height: 700}}>
+            {
+              ( this.props.grid.data) ? (( this.props.grid.data.totalCount === 0) ? 'No data found'
+                  :
+                  //this._tableRowsElement(_gridData.rows, columnWidths)) : ''
+                  ( <VirtualList items={ this.props.grid.data.rows} renderItem={this.renderItem} itemHeight={28} container={this.container} scrollDelay={10} /> )
+              ) : ''
+            }
+          </div>
 
-            { (_gridData) ? ((_gridData.totalCount === 0) ? 'No data found' : this._tableRowsElement(_gridData.rows, columnWidths)) : '' }
 
-          </TableBody>
-        </Table>
 
       </div>
     );
   }
 
-  _tableRowsElement(rows, columnWidths) {
 
+  renderItem(item) {
     return (
-
-      rows.map((row, rowIndex) => {
-        return (
-          <TableRow key={rowIndex}>
-            {
-              row.cells.map( (gridCell, columnIndex) => {
-                return (
-                  <TableRowColumn key={columnIndex} tooltip={gridCell.tooltip} columnWidth={ columnWidths[columnIndex] } >
-                    {gridCell.value}
-                  </TableRowColumn>
-                );
-              })
-            }
-          </TableRow>
-        );
-      })
-
-
+      <div key={item.rowId} className="grid-row">
+        {
+          item.cells.map( (gridCell, columnIndex) => {
+            return (
+              <div key={columnIndex} className="grid-cell" style={{width: 100 }} >
+                {gridCell.value}
+              </div>
+            );
+          })
+        }
+      </div>
     );
   }
 

@@ -85,7 +85,7 @@ module.exports = {
 
 
     debug: true,
-    devtool: 'cheap-module-eval-source-map',
+    devtool: 'eval-source-map',
     devServer: {
         contentBase: './build',
         historyApiFallback: true,
