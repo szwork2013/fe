@@ -89,7 +89,7 @@ var VirtualList = React.createClass({
     }
 
     this.setState(state);
-    this.forceUpdate();
+    this.forceUpdate(); // kvuli vynuceni renderu pri zapnuti checkboxu
   },
   componentWillMount: function() {
     this.onScrollDebounced = utils.debounce(this.onScroll, this.props.scrollDelay, false);
