@@ -197,7 +197,7 @@ export default class GridComp extends React.Component {
   onClickCheck = (evt) => {
     console.log('onCheckSquare %o', evt);
     this.setState({showSelection: !this.state.showSelection});
-    this.changeVirtualList = Date.now();
+    this.refs.VirtualList.forceUpdate();
   };
 
 
@@ -205,7 +205,7 @@ export default class GridComp extends React.Component {
 
 
   render() {
-    console.debug("gridComp rendering: " + this.changeVirtualList + " " +  Date.now());
+    console.debug("gridComp rendering: " + Date.now());
 
 
     var classes = classNames({
@@ -271,7 +271,6 @@ export default class GridComp extends React.Component {
 
         { (this.state.loading) ? loadingElement : '' }
 
-
           <div className="md-grid-header">
 
             {
@@ -300,8 +299,9 @@ export default class GridComp extends React.Component {
               ( this.props.grid.data) ? (( this.props.grid.data.totalCount === 0) ? 'No data found'
                   :
                   //this._tableRowsElement(_gridData.rows, columnWidths)) : ''
-                  (<VirtualList ref="VirtualList" items={ this.props.grid.data.rows} renderItem={this.renderItem} itemHeight={28}
-                                container={this.container} scrollDelay={15} resizeDelay={100} triggerChange={this.changeVirtualList}/> )
+                  (<VirtualList ref="VirtualList" items={ this.props.grid.data.rows} renderItem={this.renderItem}
+                                itemHeight={28}
+                                container={this.container} scrollDelay={15} resizeDelay={100} /> )
               ) : ''
             }
           </div>

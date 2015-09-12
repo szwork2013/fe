@@ -10,8 +10,7 @@ var VirtualList = React.createClass({
     tagName: React.PropTypes.string.isRequired,
     scrollDelay: React.PropTypes.number,
     resizeDelay: React.PropTypes.number,
-    itemBuffer: React.PropTypes.number,
-    triggerChange: React.PropTypes.number
+    itemBuffer: React.PropTypes.number
   },
   getDefaultProps: function() {
     return {
@@ -89,7 +88,6 @@ var VirtualList = React.createClass({
     }
 
     this.setState(state);
-    this.forceUpdate(); // kvuli vynuceni renderu pri zapnuti checkboxu
   },
   componentWillMount: function() {
     this.onScrollDebounced = utils.debounce(this.onScroll, this.props.scrollDelay, false);
