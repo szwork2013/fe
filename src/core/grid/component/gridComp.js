@@ -13,7 +13,7 @@ import {Checkbox, FlatButton, IconButton, FontIcon} from 'material-ui';
 import GridStore from 'core/grid/store/gridStore';
 import GridActions from 'core/grid/action/gridActions';
 import Grid from 'core/grid/domain/grid';
-
+import GridHeader from 'core/grid/component/gridHeader';
 
 
 import styles from 'core/grid/component/gridComp.less';
@@ -76,18 +76,21 @@ export default class GridComp extends React.Component {
     console.debug('Grid#constructor, props: %o', props);
 
     let searchTerm = (props.connected && props.query && props.query.searchTerm) ? props.query.searchTerm : '';
+    let sortArray = (props.connected && props.query && props.query.sort) ? props.query.searchTerm : '';
 
     this.state = {
       searchTerm: searchTerm,
       activeGridConfig: props.grid.getActiveGridConfig(props.gridId),
       loading: false,
-      showSelection: false
+      showSelection: false,
+      sortArray: sortArray  // [{field: MdField, direction: ASC/DESC}, ....]
     }
   }
 
   componentWillReceiveProps(nextProps) {
     console.debug('componentWillReceiveProps nextProps: %o', nextProps);
     if (nextProps.connected) {
+      let searchTerm = (nextProps.connected && nextProps.query && nextProps.query.searchTerm) ? nextProps.query.searchTerm : '';
       let searchTerm = (nextProps.connected && nextProps.query && nextProps.query.searchTerm) ? nextProps.query.searchTerm : '';
       this.setState({
         searchTerm: searchTerm,
@@ -123,7 +126,9 @@ export default class GridComp extends React.Component {
 
     this.setState({loading: true});
 
-    GridActions.fetchData(this.props.grid, this.state.activeGridConfig, this.state.searchTerm)
+    let sortTerms = this.state.sortArray.map(v => v.field.fieldName + '_' + v.direction);
+
+    GridActions.fetchData(this.props.grid, this.state.activeGridConfig, this.state.searchTerm, sortTerms)
       .then(() => {
         console.debug('search returned from server');
         this.setState({loading: false});
@@ -146,7 +151,8 @@ export default class GridComp extends React.Component {
 
       params = Object.assign(params, {gridId});
       query = Object.assign(query, {
-        searchTerm: ''
+        searchTerm: '',
+        sort: []
       });
 
       this.context.router.replaceWith(routeName, params, query);
@@ -200,6 +206,32 @@ export default class GridComp extends React.Component {
     this.refs.VirtualList.forceUpdate();
   };
 
+  onClickRefresh = (evt) => {
+    console.log('onClickRefresh %o', evt);
+    this.search();
+  };
+
+  onClickColumnSort(sortObject) {
+    console.log('onClickColumnSort %o', sortObject);
+    let sortArray = [sortObject];
+    this.setState(sortArray);
+
+    if (this.props.connected) {
+      var routeName = _.last(this.context.router.getCurrentRoutes()).name,
+        params = this.context.router.getCurrentParams(),
+        query = this.context.router.getCurrentQuery();
+
+      query = Object.assign({}, query, {
+        searchTerm: this.state.searchTerm
+      });
+
+      this.context.router.replaceWith(routeName, params, query);
+    }
+
+    this.search();
+
+  }
+
 
   /* *******   REACT METHODS ************ */
 
@@ -248,7 +280,11 @@ export default class GridComp extends React.Component {
 
     let _gridData = this.props.grid.data;
 
-
+    let iconbuttonStyle = {
+      height: 40,
+      width: 40
+    };
+    let iconStyle = {fontSize: 15};
 
     return (
 
@@ -259,9 +295,14 @@ export default class GridComp extends React.Component {
           <Nav navbar>
             {gridConfigMenu}
           </Nav>
-          <IconButton onClick={this.onClickCheck} tooltip="Show selection" iconStyle={{fontSize: 15, height: 40}}>
-            <FontIcon className="fa fa-check-square-o" />
+          <IconButton onClick={this.onClickCheck} tooltip="Show selection" style={iconbuttonStyle} iconStyle={iconStyle}>
+            <FontIcon className={classNames('fa', {'fa-check-square': this.state.showSelection, 'fa-check-square-o': !this.state.showSelection})} />
           </IconButton>
+          <IconButton onClick={this.onClickRefresh} tooltip="Refresh" style={iconbuttonStyle} iconStyle={iconStyle}>
+            <FontIcon className="fa fa-refresh" />
+          </IconButton>
+
+          { (_gridData && _gridData.totalCount) ? (_gridData.totalCount + ' rows') : '' }
 
           <form className="navbar-form navbar-right" role="search" onSubmit={this.onSearchTermSubmit}>
             <Input type="text" value={this.state.searchTerm} onChange={this.onSearchTermChange} placeholder='Search'
@@ -287,7 +328,7 @@ export default class GridComp extends React.Component {
                 return (
                   <div key={columnIndex} className="md-grid-header-cell"
                        style={{width: this.columnWidths[columnIndex]}}>
-                    {mdField.gridHeaderLabelActive}
+                    <GridHeader field={mdField} sortArray={this.state.sortArray} onClickLink={this.onClickColumnSort} />
                   </div>
                 );
               })
@@ -296,10 +337,10 @@ export default class GridComp extends React.Component {
 
           <div ref="rowContainer" className="md-grid-body">
             {
-              ( this.props.grid.data) ? (( this.props.grid.data.totalCount === 0) ? 'No data found'
+              ( _gridData) ? (( _gridData.totalCount === 0) ? 'No data found'
                   :
                   //this._tableRowsElement(_gridData.rows, columnWidths)) : ''
-                  (<VirtualList ref="VirtualList" items={ this.props.grid.data.rows} renderItem={this.renderItem}
+                  (<VirtualList ref="VirtualList" items={ _gridData.rows} renderItem={this.renderItem}
                                 itemHeight={28}
                                 container={this.container} scrollDelay={15} resizeDelay={100} /> )
               ) : ''

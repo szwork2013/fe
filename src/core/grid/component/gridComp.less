@@ -35,12 +35,14 @@
 
 .md-grid-cell {
   display: inline-block;
-
+  min-width: -webkit-max-content;
+  min-width: -moz-max-content;
+  padding: 0 2px;
 }
 
 
 .md-grid-body {
-  overflow: auto;
+  overflow-y: auto;
   flex: 1 1 auto;
   min-height: 0;
   white-space: nowrap;
@@ -54,4 +56,12 @@
 .md-grid-header-cell {
   display: inline-block;
   color: @grey-500;
+  min-width: -webkit-max-content;
+  min-width: -moz-max-content;
+  padding: 0 2px;
+
+  a {
+    cursor: pointer;
+  }
+
 }

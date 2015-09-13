@@ -15,11 +15,11 @@ import GridService from 'core/grid/service/gridService';
     return grids;
   }
 
-  fetchData(grid, activeGridConfig, searchTerm) {
+  fetchData(grid, activeGridConfig, searchTerm, sortTerms) {
     grid.data = null;
     grid.gridWidths = null;
     this.dispatch(grid); // this dispatches the action
-    return Axios.get('/core/grid/' + activeGridConfig.gridId, {params: {searchTerm}})
+    return Axios.get('/core/grid/' + activeGridConfig.gridId, {params: {searchTerm, sort: sortTerms}})
       .then((response) => {
         grid.data = response.data;
         grid.gridWidths = GridService.computeGridWidths(grid.data, activeGridConfig);
