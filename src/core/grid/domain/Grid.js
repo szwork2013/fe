@@ -27,6 +27,15 @@ export default class Grid {
       }
     }
 
+    // searchTerm
+    this.searchTerm = null;
+
+    // vybrany gridConfig
+    this.activeGridConfig = null;
+
+    // aktualni [{field: MdField, desc: false/true}, ....]
+    this.sortArray = null;
+
   }
 
 
@@ -57,6 +66,38 @@ export default class Grid {
     }
 
     return agc;
+  }
+
+  get activeGridWidths() {
+    return (this.gridWidths) ? this.gridWidths : this.activeGridConfig.gridWidths;
+  }
+
+
+  get sort() {
+    return (this.sortArray) ? this.sortArray.map(o => o.field.fieldName + ((o.desc)? "_DESC" : "_ASC") ) : null;
+  }
+
+  set sort(sortValue) {
+    if (sortValue) {
+      if (_.isString(sortValue)) {
+        sortValue = [sortValue];
+      }
+      this.sortArray = sortValue.map(str => {
+        let split = str.split('_');
+        return {field: this.$entityRef.fields[split[0]], desc: (split[1] === 'DESC') };
+      });
+    } else {
+      this.sortArray = [];
+    }
+  }
+
+
+  reset() {
+    this.data = null;
+    this.gridWidths = null;
+    this.searchTerm = null;
+    this.activeGridConfig = null;
+    this.sortArray = null;
   }
 
 

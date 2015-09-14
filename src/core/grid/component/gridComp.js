@@ -1,6 +1,6 @@
 import React from 'react';
 import reactMixin from 'react-mixin';
-import Router from 'react-router';
+import {Router, Link} from 'react-router';
 import connectToStores from 'alt/utils/connectToStores';
 import _ from 'lodash';
 import classNames from 'classnames';
@@ -27,35 +27,15 @@ export default class GridComp extends React.Component {
   };
 
   static defaultProps = {
-    allRowsSelected: true,
-    fixedFooter: true,
-    fixedHeader: true,
-    height: '700px',
-    multiSelectable: true,
-    selectable: true,
-    deselectOnClickaway: true,
-    showRowHover: true,
-    stripedRows: false
 
   };
 
   static propTypes = {
     gridLocation: React.PropTypes.string.isRequired,
-    gridId: React.PropTypes.string,
-    connected: React.PropTypes.bool,
-
-    allRowsSelected: React.PropTypes.bool,
-    fixedFooter: React.PropTypes.bool,
-    fixedHeader: React.PropTypes.bool,
-    height: React.PropTypes.string,
-    multiSelectable: React.PropTypes.bool,
-    selectable: React.PropTypes.bool,
-    deselectOnClickaway: React.PropTypes.bool,
-    showRowHover: React.PropTypes.bool,
-    stripedRows: React.PropTypes.bool,
 
     // from store
-    grid: React.PropTypes.instanceOf(Grid)
+    grid: React.PropTypes.instanceOf(Grid),
+    onGridChange: React.PropTypes.func
   };
 
 
@@ -75,29 +55,20 @@ export default class GridComp extends React.Component {
 
     console.debug('Grid#constructor, props: %o', props);
 
-    let searchTerm = (props.connected && props.query && props.query.searchTerm) ? props.query.searchTerm : '';
-    let sortArray = (props.connected && props.query && props.query.sort) ? props.query.searchTerm : '';
-
     this.state = {
-      searchTerm: searchTerm,
-      activeGridConfig: props.grid.getActiveGridConfig(props.gridId),
       loading: false,
       showSelection: false,
-      sortArray: sortArray  // [{field: MdField, direction: ASC/DESC}, ....]
+      searchTerm: undefined
     }
   }
 
   componentWillReceiveProps(nextProps) {
-    console.debug('componentWillReceiveProps nextProps: %o', nextProps);
-    if (nextProps.connected) {
-      let searchTerm = (nextProps.connected && nextProps.query && nextProps.query.searchTerm) ? nextProps.query.searchTerm : '';
-      let searchTerm = (nextProps.connected && nextProps.query && nextProps.query.searchTerm) ? nextProps.query.searchTerm : '';
-      this.setState({
-        searchTerm: searchTerm,
-        activeGridConfig: (nextProps.gridId) ? nextProps.grid.getActiveGridConfig(nextProps.gridId) : this.state.activeGridConfig
-      });
-    }
+    console.debug('componentWillReceiveProps oldProps: %o, nextProps: %o', this.props, nextProps);
 
+    this.setState({
+      loading: false,
+      searchTerm: nextProps.grid.searchTerm
+    });
   }
 
   componentWillMount() {
@@ -113,28 +84,19 @@ export default class GridComp extends React.Component {
   componentWillUnmount() {
     console.debug('componentWillUnmount');
     let grid = this.props.grid;
-    grid.data = null;
-    grid.gridWidths = null;
+    grid.reset();
     GridActions.updateGrid(grid);
   }
+
 
   /* *******   PRIVATE METHODS ************ */
 
 
   search() {
-    console.debug("running search with gridId = %s, searchTerm = %s", this.state.activeGridConfig.gridId, this.state.searchTerm);
-
+    let grid = this.props.grid;
+    console.debug("running search with gridId = %s, searchTerm = %s", grid.activeGridConfig.gridId, grid.searchTerm);
     this.setState({loading: true});
-
-    let sortTerms = this.state.sortArray.map(v => v.field.fieldName + '_' + v.direction);
-
-    GridActions.fetchData(this.props.grid, this.state.activeGridConfig, this.state.searchTerm, sortTerms)
-      .then(() => {
-        console.debug('search returned from server');
-        this.setState({loading: false});
-      });
-
-
+    GridActions.fetchData(grid);
   }
 
 
@@ -144,25 +106,16 @@ export default class GridComp extends React.Component {
   onSelectGridConfig = (event, gridId) => {
     console.log('onSelectGridConfig gridId = ' + gridId);
 
-    if (this.props.connected) {
-      var routeName = _.last(this.context.router.getCurrentRoutes()).name,
-        params = this.context.router.getCurrentParams(),
-        query = this.context.router.getCurrentQuery();
+    let grid = this.props.grid;
+    grid.activeGridConfig = this.props.grid.getGridConfig(gridId);
+    grid.searchTerm = null;
+    grid.sortArray = null;
 
-      params = Object.assign(params, {gridId});
-      query = Object.assign(query, {
-        searchTerm: '',
-        sort: []
-      });
-
-      this.context.router.replaceWith(routeName, params, query);
+    if (this.props.onGridChange) {
+      this.props.onGridChange(grid);
     }
 
-    let newAgc = this.props.grid.getGridConfig(gridId);
-    this.setState({activeGridConfig: newAgc, searchTerm: ''}, () => {
-      this.search();
-    });
-
+    this.search();
   };
 
   onSelectGridManage = (evt) => {
@@ -170,34 +123,38 @@ export default class GridComp extends React.Component {
     this.context.router.transitionTo('gridAdmin', {gridLocation: this.props.gridLocation})
   };
 
+  onSearchTermChange = evt => {
+    this.setState({searchTerm: evt.target.value});
+  };
 
   onSearchTermSubmit = evt => {
     evt.preventDefault();
     console.log('onSearchTermSubmit: %s', this.state.searchTerm);
 
-    if (this.props.connected) {
-      var routeName = _.last(this.context.router.getCurrentRoutes()).name,
-        params = this.context.router.getCurrentParams(),
-        query = this.context.router.getCurrentQuery();
+    let grid = this.props.grid;
+    grid.searchTerm = this.state.searchTerm;
 
-      query = Object.assign({}, query, {
-        searchTerm: this.state.searchTerm
-      });
+    if (this.props.onGridChange) {
+      this.props.onGridChange(grid);
+    }
 
-      this.context.router.replaceWith(routeName, params, query);
+    this.search();
+  };
+
+
+  onClickColumnSort = (sortObject) => {
+    console.log('onClickColumnSort %o', sortObject);
+
+    let grid = this.props.grid;
+    grid.sortArray = [sortObject];
+
+    if (this.props.onGridChange) {
+      this.props.onGridChange(grid);
     }
 
     this.search();
 
-  };
-
-  onSearchTermChange = evt => {
-    this.setState({searchTerm: evt.target.value});
-  };
-
-  _onRowSelection = (rows) => {
-    console.log(rows);
-  };
+  }
 
 
   onClickCheck = (evt) => {
@@ -211,26 +168,7 @@ export default class GridComp extends React.Component {
     this.search();
   };
 
-  onClickColumnSort(sortObject) {
-    console.log('onClickColumnSort %o', sortObject);
-    let sortArray = [sortObject];
-    this.setState(sortArray);
 
-    if (this.props.connected) {
-      var routeName = _.last(this.context.router.getCurrentRoutes()).name,
-        params = this.context.router.getCurrentParams(),
-        query = this.context.router.getCurrentQuery();
-
-      query = Object.assign({}, query, {
-        searchTerm: this.state.searchTerm
-      });
-
-      this.context.router.replaceWith(routeName, params, query);
-    }
-
-    this.search();
-
-  }
 
 
   /* *******   REACT METHODS ************ */
@@ -239,6 +177,7 @@ export default class GridComp extends React.Component {
   render() {
     console.debug("gridComp rendering: " + Date.now());
 
+    let grid = this.props.grid;
 
     var classes = classNames({
       'grid-comp--loading': this.state.loading
@@ -250,11 +189,11 @@ export default class GridComp extends React.Component {
 
 
     let gridConfigMenu = (
-      (this.state.activeGridConfig) ?
+      (grid.activeGridConfig) ?
         (
-          <NavDropdown id={dropdownId} eventKey={3} title={this.state.activeGridConfig.label}>
+          <NavDropdown id={dropdownId} eventKey={3} title={grid.activeGridConfig.label}>
             {
-              this.props.grid.gridConfigs.map((gc) => {
+              grid.gridConfigs.map((gc) => {
                 return (
                     <MenuItem eventKey={gc.gridId} key={gc.gridId} onSelect={this.onSelectGridConfig}>{gc.label}</MenuItem>
                 );
@@ -274,11 +213,11 @@ export default class GridComp extends React.Component {
       </div>
     );
 
-    this.columnWidths = (this.props.grid.gridWidths) ? this.props.grid.gridWidths : this.state.activeGridConfig.gridWidths;
+    this.columnWidths = grid.activeGridWidths;
 
 
 
-    let _gridData = this.props.grid.data;
+    let _gridData = grid.data;
 
     let iconbuttonStyle = {
       height: 40,
@@ -305,7 +244,7 @@ export default class GridComp extends React.Component {
           { (_gridData && _gridData.totalCount) ? (_gridData.totalCount + ' rows') : '' }
 
           <form className="navbar-form navbar-right" role="search" onSubmit={this.onSearchTermSubmit}>
-            <Input type="text" value={this.state.searchTerm} onChange={this.onSearchTermChange} placeholder='Search'
+            <Input type="text"  placeholder='Search' onChange={this.onSearchTermChange} value={this.state.searchTerm}
                    bsSize="small"/>
           </form>
         </Navbar>
@@ -324,11 +263,11 @@ export default class GridComp extends React.Component {
 
 
             {
-              this.state.activeGridConfig.$columnRefs.map((mdField, columnIndex) => {
+              grid.activeGridConfig.$columnRefs.map((mdField, columnIndex) => {
                 return (
                   <div key={columnIndex} className="md-grid-header-cell"
                        style={{width: this.columnWidths[columnIndex]}}>
-                    <GridHeader field={mdField} sortArray={this.state.sortArray} onClickLink={this.onClickColumnSort} />
+                    <GridHeader field={mdField} sortArray={grid.sortArray} onClickLink={this.onClickColumnSort} />
                   </div>
                 );
               })

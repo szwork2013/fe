@@ -5,7 +5,7 @@ import When from 'when';
 
 import PageAncestor from 'core/common/page/pageAncestor';
 import GridService from 'core/grid/service/gridService';
-import GridComp from 'core/grid/component/gridComp';
+import GridCompConnected from 'core/grid/component/gridCompConnected';
 
 @reactMixin.decorate(State)
 export default class PartyList extends PageAncestor {
@@ -25,7 +25,7 @@ export default class PartyList extends PageAncestor {
 
     return (
 
-        <GridComp gridLocation="partyList" gridId={this.props.params.gridId} query={this.props.query} connected/>
+        <GridCompConnected gridLocation="partyList" gridId={this.props.params.gridId} query={this.props.query} />
 
 
 

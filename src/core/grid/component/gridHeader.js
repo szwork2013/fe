@@ -1,4 +1,6 @@
 import React from 'react';
+import _ from 'lodash';
+import classNames from 'classnames';
 
 import {Tooltip, OverlayTrigger} from 'react-bootstrap';
 
@@ -15,15 +17,15 @@ export default class GridHeader extends React.Component {
 
 
   _onClickLink = (evt) => {
-    console.log('_onClickLink: %o', this.props.field);
-    let sortArray = this.props.sortArray;
-    let newSortObject = {field: this.props.field, direction: 'ASC'};
-    if (sortArray.length === 1) {
-      let sortObject = sortArray[0];
-      if (sortObject.field.fieldName === newSortObject.field.fieldName) {
-        newSortObject.direction = (sortObject.direction === 'ASC') ? 'DESC' : 'ASC';
-      }
-    }
+    let field = this.props.field;
+    console.log('_onClickLink: %o', field);
+    let sortObject = _.find(this.props.sortArray, so => so.field.fieldName === field.fieldName);
+
+    let newSortObject = {
+      field: field,
+      desc: (sortObject) ? !sortObject.desc : false
+    };
+
     this.props.onClickLink(newSortObject);
   };
 
@@ -33,20 +35,16 @@ export default class GridHeader extends React.Component {
     let sortArray = this.props.sortArray;
     let tooltipText = field.gridHeaderTooltipActive;
 
-    let sorting;
-    if (sortArray.length === 1) {
-      let sortObject = sortArray[0];
-      if (sortObject.field.fieldName === field.fieldName) {
-        sorting = sortObject.direction;
-      }
-    }
+    let sortObject = _.find(sortArray, so => so.field.fieldName === field.fieldName);
+    let desc = (sortObject && sortObject.desc) ? true : false;
+
 
     let tooltip = <Tooltip placement="top" id={field.fieldName}>{tooltipText}</Tooltip>;
 
     let anchor = <a onClick={this._onClickLink}>
-      { (sorting) ? <span className={classNames('fa', {'long-arrow-up': sorting === 'ASC', 'long-arrow-down': sorting === 'DESC'})}/> : '' }
+      { (sortObject) ? (<span className={classNames('fa', {'fa-long-arrow-up': !desc, 'fa-long-arrow-down': desc})}> </span> ) : '' }
       {field.gridHeaderLabelActive}
-    </a>
+    </a>;
 
     return (
 

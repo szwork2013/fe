@@ -103,7 +103,7 @@ class GridService {
     let absoluteLengths = _.zip(...matrix).map(col => _.max(col));
 
     let absoluteMax = _.sum(absoluteLengths);
-    let gridWidths = absoluteLengths.map(v => Math.round(100 * v / absoluteMax) + "%");
+    let gridWidths = absoluteLengths.map(v => Math.round(10000 * v / absoluteMax)/100 + "%");
     console.timeEnd("computeGridWidths");
     console.debug('computeGridWidths: %o', gridWidths);
     return gridWidths;

@@ -15,14 +15,18 @@ import GridService from 'core/grid/service/gridService';
     return grids;
   }
 
-  fetchData(grid, activeGridConfig, searchTerm, sortTerms) {
-    grid.data = null;
-    grid.gridWidths = null;
-    this.dispatch(grid); // this dispatches the action
-    return Axios.get('/core/grid/' + activeGridConfig.gridId, {params: {searchTerm, sort: sortTerms}})
+  /**
+   *
+   * @param grid - Grid
+   * @returns Promise<Grid>
+   */
+  fetchData(grid) {
+
+  //  this.dispatch(grid); // this dispatches the action
+    return Axios.get('/core/grid/' + grid.activeGridConfig.gridId, {params: {searchTerm: grid.searchTerm, sort: grid.sort}})
       .then((response) => {
         grid.data = response.data;
-        grid.gridWidths = GridService.computeGridWidths(grid.data, activeGridConfig);
+        grid.gridWidths = GridService.computeGridWidths(grid.data, grid.activeGridConfig);
         this.dispatch(grid); // this dispatches the action
         return grid;
       });
