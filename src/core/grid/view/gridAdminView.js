@@ -18,7 +18,7 @@ import GridConfig from 'core/grid/domain/gridConfig';
 import GridConfigCondition from 'core/grid/domain/gridConfigCondition';
 import GridService from 'core/grid/service/gridService';
 import Utils from 'core/common/utils/utils';
-import ArrayUtils from 'core/common/utils/ArrayUtils';
+import ArrayUtils from 'core/common/utils/arrayUtils';
 
 
 import Toolmenu from 'core/components/toolmenu/toolmenu';
