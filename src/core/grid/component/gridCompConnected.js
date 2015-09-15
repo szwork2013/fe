@@ -66,7 +66,7 @@ export default class GridCompConnected extends React.Component {
   render() {
     console.debug('GridCompConnected#render, props: %o', this.props);
     return (
-      <GridComp gridLocation="partyList" onGridChange={this.onGridChange}/>
+      <GridComp gridLocation={this.props.gridLocation} onGridChange={this.onGridChange}/>
     );
   }
 

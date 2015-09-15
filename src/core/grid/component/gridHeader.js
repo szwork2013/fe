@@ -2,7 +2,7 @@ import React from 'react';
 import _ from 'lodash';
 import classNames from 'classnames';
 
-import {Tooltip, OverlayTrigger} from 'react-bootstrap';
+import {Tooltip, OverlayTrigger, Overlay, Popover} from 'react-bootstrap';
 
 import MdField from 'core/metamodel/mdField';
 
@@ -17,7 +17,8 @@ export default class GridHeader extends React.Component {
   };
 
   state = {
-    showFilterIcon: false
+    showFilterIcon: false,
+    showFilterPopover: false
   };
 
 
@@ -37,6 +38,7 @@ export default class GridHeader extends React.Component {
   onClickFilter = (evt) => {
     let field = this.props.field;
     console.log('onClickFilter: %o', field);
+    this.setState({showFilterPopover: true});
   };
 
   onMouseOver = (evt) => {
@@ -58,10 +60,25 @@ export default class GridHeader extends React.Component {
 
     let tooltip = <Tooltip placement="top" id={field.fieldName}>{tooltipText}</Tooltip>;
 
+    let filterPopover = (
+      <Overlay
+        show={this.state.showFilterPopover}
+        onHide={() => this.setState({ showFilterPopover: false })}
+        rootClose={true}
+        target={()=> React.findDOMNode(this.refs.filterIconRef)}
+        placement="bottom">
+        <Popover title="Column Filter" id={field.fieldName + '_filter'}>
+          Tady bude filter na toto policko
+        </Popover>
+      </Overlay>
+    );
+
+
     let filter = (
-      <a onClick={this.onClickFilter} onMouseOver={this.onMouseOver} onMouseOut={this.onMouseOut}>
+      <a ref="filterIconRef" onClick={this.onClickFilter} onMouseOver={this.onMouseOver} onMouseOut={this.onMouseOut}>
         <span className={classNames('fa', 'fa-filter', {'invisible': !this.state.showFilterIcon})}/>
       </a>
+
     );
 
 
@@ -75,13 +92,18 @@ export default class GridHeader extends React.Component {
 
     return (
 
-    (tooltipText) ?
-    (
-      <OverlayTrigger overlay={tooltip} delayShow={300} delayHide={150}>
-        <span>{ anchor } { filter } </span>
-      </OverlayTrigger>
-    ) :
-    ( <span> { anchor } { filter } </span> )
+      <span>
+        { (tooltipText) ?
+          (
+            <OverlayTrigger overlay={tooltip} delayShow={300} delayHide={150}>
+              { anchor }
+            </OverlayTrigger>
+          ) : {anchor}
+        }
+        { filter }
+        { filterPopover }
+      </span>
+
 
     );
   }

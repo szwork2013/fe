@@ -53,7 +53,7 @@ export default class GridComp extends React.Component {
   constructor(props) {
     super(props);
 
-    console.debug('Grid#constructor, props: %o', props);
+    console.debug('GridComp#constructor, props: %o', props);
 
     this.state = {
       loading: false,

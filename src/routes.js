@@ -3,8 +3,11 @@ import {Route, DefaultRoute} from 'react-router';
 
 import Application from 'core/application/application';
 import Home from 'core/home/home';
+
 import PartyList from 'party/page/partyList';
 import ContactPersonList from 'party/page/contactPersonList';
+import PartyDetail from 'party/page/partyDetail';
+
 import InvoiceList from 'invoicing/page/invoiceList';
 
 import LoginPage from 'core/security/loginPage';
@@ -22,6 +25,8 @@ const routes = (
 
     <Route name="partyList" path="party/customer/list/:gridId?"  handler={PartyList}/>
     <Route name="contactPersonList" path="party/contact-person/list/:gridId?"  handler={ContactPersonList}/>
+    <Route name="partyDetail" path="party/customer/list/:gridId?"  handler={PartyDetail}/>
+
 
     <Route name="invoiceList" path="invoice/list/:gridId?"  handler={InvoiceList}/>
 

@@ -4,26 +4,24 @@ import reactMixin from 'react-mixin';
 
 import PageAncestor from 'core/common/page/pageAncestor';
 import GridService from 'core/grid/service/gridService';
+import GridCompConnected from 'core/grid/component/gridCompConnected';
+
+var gridLocation = 'partyContacts';
 
 @reactMixin.decorate(State)
 export default class ContactPersonList extends PageAncestor {
 
+
   static fetchData(params) {
-    console.log("ContactPersonList#fetchData(%o)", params);
-    return GridService.fetchGrids('contactPersonList');
+    console.log("ContactPersonList#fetchData(%s)", gridLocation);
+    return GridService.fetchGrids(gridLocation);
   }
 
 
   render() {
-    var name = this.getPath();
-
     return (
-      <main className="main-content">
-        <h1>Contact Person list
-          {name}
-        </h1>
-      </main>
-      );
+      <GridCompConnected gridLocation={gridLocation} gridId={this.props.params.gridId} query={this.props.query} />
+    );
   }
 
 }
