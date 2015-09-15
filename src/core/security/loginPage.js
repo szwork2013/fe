@@ -103,6 +103,8 @@ export default class LoginPage extends React.Component {
 
 
     return (
+      <main className="main-content">
+
       <form>
         <div className="container-fluid" style={topComponent}>
 
@@ -143,6 +145,8 @@ export default class LoginPage extends React.Component {
         </div>
 
       </form>
+      </main>
+
     );
   }
 
