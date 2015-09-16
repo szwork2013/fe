@@ -5,17 +5,15 @@ var _alreadyOneCreated = false;
 export function handleFavicon(viewClass) {
 
   if (viewClass.iconLink) {
-
     window.setTimeout(() => {
       document.getElementsByTagName('head')[0].appendChild(viewClass.iconLink);
     }, 160);
-
   } else {
 
     if (viewClass.icon) {
       window.setTimeout(() => {
         create(viewClass);
-      }, (_alreadyOneCreated) ? 160 : 1000);
+      }, 160);
     }
 
   }
