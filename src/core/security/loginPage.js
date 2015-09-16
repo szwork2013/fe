@@ -7,9 +7,12 @@ import { Alert } from 'react-bootstrap';
 import SecurityService from 'core/security/securityService';
 import CurrentUserActions from 'core/security/currentUserActions';
 import CurrentUserStore from 'core/security/currentUserStore';
-
+import * as favicon from 'core/common/utils/favicon';
 
 export default class LoginPage extends React.Component {
+
+  static title = 'Zauzoo Login';
+  static icon = 'lock';
 
   state = {
     user: '',
@@ -20,6 +23,8 @@ export default class LoginPage extends React.Component {
     tenants: [],
     tenantId: null
   };
+
+
 
 
   /* *******   EVENT HENDLERS ************ */
@@ -82,6 +87,10 @@ export default class LoginPage extends React.Component {
 
 
   /* *******   REACT METHODS ************ */
+
+  componentDidMount() {
+    favicon.handleFavicon(LoginPage);
+  }
 
   render() {
 

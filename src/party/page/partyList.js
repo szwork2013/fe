@@ -12,9 +12,12 @@ var gridLocation = 'partyCustomers';
 @reactMixin.decorate(State)
 export default class PartyList extends PageAncestor {
 
+  static title = 'Customers';
+  static icon = 'user';
+
   static contextTypes = {
     router: React.PropTypes.func.isRequired
-  }
+  };
 
 
 

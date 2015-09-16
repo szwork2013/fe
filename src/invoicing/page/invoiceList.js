@@ -9,6 +9,10 @@ import GridService from 'core/grid/service/gridService';
 @reactMixin.decorate(State)
 export default class InvoiceList extends PageAncestor {
 
+  static title = 'Invoices';
+  static icon = 'money';
+
+
   static contextTypes = {
     router: React.PropTypes.func.isRequired
   }

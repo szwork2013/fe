@@ -5,6 +5,7 @@ import {NavItemLink, MenuItemLink} from 'react-router-bootstrap';
 import Router from 'react-router';
 import connectToStores from 'alt/utils/connectToStores';
 
+import routes from 'routes';
 import SecurityService from 'core/security/securityService';
 import CurrentUserActions from 'core/security/currentUserActions';
 import CurrentUserStore from 'core/security/currentUserStore';
@@ -15,6 +16,9 @@ import Locales from 'core/common/config/locales';
 @reactMixin.decorate(Router.Navigation)
 export default class MainMenu extends React.Component {
 
+  static contextTypes = {
+    router: React.PropTypes.func.isRequired
+  };
 
   static getStores(props) {
     return [CurrentUserStore];
@@ -90,8 +94,8 @@ export default class MainMenu extends React.Component {
         <NavItemLink to="home">Home</NavItemLink>
         <NavDropdown id="party_menu_dropdown" title='Party' onSelect={this.onSelectWithTransition}>
 
-          { this._menuItem("partyList", "Customers") }
-          { this._menuItem("contactPersonList", "Contact persons") }
+          { this._menuItem("partyList") }
+          { this._menuItem("contactPersonList") }
 
           { /*  dokud bude rozbity react-router-bootstrap po update react-bootstrap na 0.25
            <MenuItemLink to="partyList" eventKey='1'>Customers</MenuItemLink>
@@ -102,7 +106,7 @@ export default class MainMenu extends React.Component {
         </NavDropdown>
 
         <NavDropdown id="invoice_menu_dropdown"  title='Invoice' onSelect={this.onSelectWithTransition}>
-          { this._menuItem("invoiceList", "Invoices") }
+          { this._menuItem("invoiceList") }
 
           <MenuItem divider/>
           <MenuItem eventKey='3'>Administration</MenuItem>
@@ -129,10 +133,21 @@ export default class MainMenu extends React.Component {
 
 
 
-  _menuItem(route, label) {
+  _menuItem(route, title, icon) {
+    //console.log('_menuItem: ', routes);
+    //console.log('this.context.router', this.context.router);
+
+    let routeObj = this.context.router.namedRoutes[route];
+    let routeHandler = (routeObj) ? routeObj.handler : null;
+    let resolvedIcon = (icon) ? icon : ((routeHandler) ? routeHandler.icon : null);
+    let resolvedIconClassname = (resolvedIcon) ? ('fa fa-' + resolvedIcon.replace(/^fa-/, '')) : null;
+    let resolvedTitle = (title) ? title : ((routeHandler) ? routeHandler.title : null);
+
     var href = this.makeHref(route);
     //var isActive = this.isActive('destination', {some: 'params'}, {some: 'query param'});
-    return <MenuItem href={href} eventKey={route}> {label} </MenuItem>;
+    var iconElement = (resolvedIconClassname) ? <span className={resolvedIconClassname}/> :  '';
+
+    return <MenuItem href={href} eventKey={route}> {iconElement} {resolvedTitle} </MenuItem>;
   }
 
 }

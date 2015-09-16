@@ -11,6 +11,8 @@ var gridLocation = 'partyContacts';
 @reactMixin.decorate(State)
 export default class ContactPersonList extends PageAncestor {
 
+  static title = 'Contact persons';
+  static icon = 'male';
 
   static fetchData(params) {
     console.log("ContactPersonList#fetchData(%s)", gridLocation);

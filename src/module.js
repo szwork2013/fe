@@ -13,7 +13,11 @@ Router.run(routes, Router.HistoryLocation, (Root, state) => {
   console.debug('router run');
   CommonService.emitter.emit('loadStart');
 
-  document.title = 'ZZ ' + state.routes.map(r => r.name).join(' / ');
+  const routes = state.routes;
+  const lastRoute = routes[routes.length - 1];
+
+  document.title =  lastRoute.handler.title;  // 'ZZ ' + routes.map(r => r.handler.title).join(' / ');
+
 
   var promises = state.routes.filter((route) => route.handler.fetchData)
     .reduce((promises, route) => {
