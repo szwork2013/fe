@@ -18,8 +18,9 @@
 *Running on Apache httpd* 
  - this is config file when running production build on local apache httpd server:
 
-    Alias / c:/zauzoo/fe/build/
     ```
+    Alias / c:/zauzoo/fe/build/
+
     <Directory "c:/zauzoo/fe/build/">
         AllowOverride All
         Order allow,deny
@@ -50,5 +51,4 @@
     RewriteRule ^/(.*) /index.html [P,QSA,L]
 ```
 
-dd
  
