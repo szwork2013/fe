@@ -5,20 +5,22 @@ var _alreadyOneCreated = false;
 export function handleFavicon(viewClass) {
 
   if (viewClass.iconLink) {
-    document.getElementsByTagName('head')[0].appendChild(viewClass.iconLink);
-  } else {
-    if (viewClass.icon) {
-      if (_alreadyOneCreated) {
-        create(viewClass);
-      } else {
-        window.setTimeout(() => {
-          create(viewClass);
-        }, 1000);
-      }
-    }
-  }
 
+    window.setTimeout(() => {
+      document.getElementsByTagName('head')[0].appendChild(viewClass.iconLink);
+    }, 160);
+
+  } else {
+
+    if (viewClass.icon) {
+      window.setTimeout(() => {
+        create(viewClass);
+      }, (_alreadyOneCreated) ? 160 : 1000);
+    }
+
+  }
 }
+
 
 function create(viewClass) {
   viewClass.iconLink = createFaviconLink(viewClass.icon, '#000');
