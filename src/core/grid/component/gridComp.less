@@ -30,7 +30,6 @@
 
 .md-grid-row {
   height: 28px;
-  border-top: 1px @blue-grey-100 solid;
 }
 
 .md-grid-cell {
@@ -38,6 +37,10 @@
   min-width: -webkit-max-content;
   min-width: -moz-max-content;
   padding: 0 2px;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  height: 100%;
+  border-top: 1px @blue-grey-100 solid;
 }
 
 
@@ -50,7 +53,15 @@
 
 .md-grid-header {
   height: 32px;
+  position: relative;
   white-space: nowrap;
+}
+
+.md-grid-header-wrapper {
+  overflow: hidden;
+  padding-right: 15px;
+  width: 100%;
+  min-height: 32px;
 }
 
 .md-grid-header-cell {
@@ -59,7 +70,8 @@
   min-width: -webkit-max-content;
   min-width: -moz-max-content;
   padding: 0 2px;
-
+  text-overflow: ellipsis;
+  overflow: hidden;
   a {
     cursor: pointer;
   }

@@ -79,6 +79,7 @@ export default class GridComp extends React.Component {
   componentDidMount() {
     console.debug('componentDidMount');
     this.container = React.findDOMNode(this.refs.rowContainer);
+    this.gridHeader = React.findDOMNode(this.refs.gridHeader);
   }
 
   componentWillUnmount() {
@@ -230,7 +231,7 @@ export default class GridComp extends React.Component {
 
       <div className="md-grid">
 
-        <Navbar fluid style={{marginBottom: 10}}>
+        <Navbar fluid style={{marginBottom: 10, minHeight: 'initial'}}>
           <Nav navbar>
             {gridConfigMenu}
           </Nav>
@@ -250,8 +251,8 @@ export default class GridComp extends React.Component {
         </Navbar>
 
         { (this.state.loading) ? loadingElement : '' }
-
-          <div className="md-grid-header">
+          <div className="md-grid-header-wrapper">
+          <div className="md-grid-header" ref="gridHeader">
 
             {
               ( (this.state.showSelection) ? (
@@ -266,12 +267,13 @@ export default class GridComp extends React.Component {
               grid.activeGridConfig.$columnRefs.map((mdField, columnIndex) => {
                 return (
                   <div key={columnIndex} className="md-grid-header-cell"
-                       style={{width: this.columnWidths[columnIndex]}}>
+                       style={{width: this.columnWidths[columnIndex], minWidth: '50px'}}>
                     <GridHeader field={mdField} sortArray={grid.sortArray} onClickLink={this.onClickColumnSort} />
                   </div>
                 );
               })
             }
+          </div>
           </div>
 
           <div ref="rowContainer" className="md-grid-body">
@@ -281,11 +283,10 @@ export default class GridComp extends React.Component {
                   //this._tableRowsElement(_gridData.rows, columnWidths)) : ''
                   (<VirtualList ref="VirtualList" items={ _gridData.rows} renderItem={this.renderItem}
                                 itemHeight={28}
-                                container={this.container} scrollDelay={15} resizeDelay={100} /> )
+                                container={this.container} scrollDelay={15} resizeDelay={100} header={this.gridHeader} /> )
               ) : ''
             }
           </div>
-
       </div>
     );
   }
@@ -307,7 +308,7 @@ export default class GridComp extends React.Component {
           item.cells.map( (gridCell, columnIndex) => {
 
             return (
-              <div key={columnIndex} className="md-grid-cell" style={{width: this.columnWidths[columnIndex] }} >
+              <div key={columnIndex} className="md-grid-cell" style={{width: this.columnWidths[columnIndex], minWidth: '50px' }} >
                 {gridCell.value}
               </div>
             );
