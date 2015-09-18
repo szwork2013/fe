@@ -87,44 +87,33 @@ class GridService {
     var MAXIMAL_COLUMN_MIN_WIDTH_PX = 350;
 
     let matrix = [];
-    let maxs = [];
-    let i = 0;
     matrix.push(gridConfig.$columnRefs.map( (mdField) => {
       let v = mdField.gridHeaderLabelActive;
-      let stringValue = (v) ? ( (typeof v == 'string') ? v : v.toString() ) : '';
-      maxs[i++] = stringValue.trim();
-      return  stringValue.length;
+      return (v) ? ( (typeof v == 'string') ? v.trim().length : v.toString().trim().length ) : 0;
     }));
 
     if (gridData) {
       for(let row of gridData.rows) {
-        i = 0;
         matrix.push(row.cells.map((cell) => {
           let v = cell.value;
-          let stringValue = (v) ? ( (typeof v == 'string') ? v : v.toString() ) : '';
-          if (maxs[i].length < stringValue.trim().length) {maxs[i] = stringValue.trim()}
-          i++;
-          return  stringValue.length;
+          return (v) ? ( (typeof v == 'string') ? v.trim().length : v.toString().trim().length ) : 0;
         }));
       }
     }
 
     let absoluteLengths = _.zip(...matrix).map(col => _.max(col));
 
-    let gridMinWidths = [];
-    gridMinWidths = maxs.map(max => {
+    let absoluteMax = _.sum(absoluteLengths);
+    let gridWidths = absoluteLengths.map(v => Math.round(10000 * v / absoluteMax)/100 + "%");
+    let gridMinWidths = absoluteLengths.map(v => {
       var elemDiv = document.createElement('div');
       elemDiv.style.cssText = 'position:absolute;left:0;top:0;z-index:20;';
-      elemDiv.textContent = max;
+      elemDiv.textContent = Array(v).join("C");
       document.body.appendChild(elemDiv);
       let elemWidth = elemDiv.clientWidth;
       document.body.removeChild(elemDiv);
       return elemWidth < MAXIMAL_COLUMN_MIN_WIDTH_PX ? elemWidth+"px" : MAXIMAL_COLUMN_MIN_WIDTH_PX+"px";
     });
-
-
-    let absoluteMax = _.sum(absoluteLengths);
-    let gridWidths = absoluteLengths.map(v => Math.round(10000 * v / absoluteMax)/100 + "%");
     console.timeEnd("computeGridWidths");
     console.debug('computeGridWidths: %o', gridWidths);
     console.debug('computeGridMinWidths: %o', gridMinWidths);
