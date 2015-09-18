@@ -58,17 +58,27 @@ export default class GridComp extends React.Component {
     this.state = {
       loading: false,
       showSelection: false,
-      searchTerm: undefined
+      searchTerm: undefined,
+      headerPaddingRight: 0
     }
   }
 
   componentWillReceiveProps(nextProps) {
     console.debug('componentWillReceiveProps oldProps: %o, nextProps: %o', this.props, nextProps);
+    var _cont = this.container;
 
     this.setState({
       loading: false,
       searchTerm: nextProps.grid.searchTerm
     });
+
+    // bez toho timeoutu to nechodi !
+    window.setTimeout(() => {
+      this.setState({
+        headerPaddingRight: (_cont.scrollHeight > _cont.clientHeight) ? 15 : 0
+      });
+    }, 0);
+
   }
 
   componentWillMount() {
@@ -161,7 +171,10 @@ export default class GridComp extends React.Component {
   onClickCheck = (evt) => {
     console.log('onCheckSquare %o', evt);
     this.setState({showSelection: !this.state.showSelection});
-    this.refs.VirtualList.forceUpdate();
+
+    if (this.refs.VirtualList) {
+      this.refs.VirtualList.forceUpdate();
+    }
   };
 
   onClickRefresh = (evt) => {
@@ -226,6 +239,8 @@ export default class GridComp extends React.Component {
     };
     let iconStyle = {fontSize: 15};
 
+
+
     return (
 
 
@@ -251,29 +266,29 @@ export default class GridComp extends React.Component {
         </Navbar>
 
         { (this.state.loading) ? loadingElement : '' }
-          <div className="md-grid-header-wrapper">
-          <div className="md-grid-header" ref="gridHeader">
+          <div className="md-grid-header-wrapper" style={{paddingRight: this.state.headerPaddingRight}}>
+            <div className="md-grid-header" ref="gridHeader">
 
-            {
-              ( (this.state.showSelection) ? (
-                <div className="md-grid-header-cell">
-                  <Checkbox name="selectAllCheckbox"/>
-                </div>
-              ) : '')
-            }
-
-
-            {
-              grid.activeGridConfig.$columnRefs.map((mdField, columnIndex) => {
-                return (
-                  <div key={columnIndex} className="md-grid-header-cell"
-                       style={{width: this.columnWidths[0][columnIndex]+'%', minWidth: this.columnWidths[1][columnIndex]+'px', maxWidth: this.columnWidths[2][columnIndex]+'px'}}>
-                    <GridHeader field={mdField} sortArray={grid.sortArray} onClickLink={this.onClickColumnSort} />
+              {
+                ( (this.state.showSelection) ? (
+                  <div className="md-grid-header-cell">
+                    <Checkbox name="selectAllCheckbox"/>
                   </div>
-                );
-              })
-            }
-          </div>
+                ) : '')
+              }
+
+
+              {
+                grid.activeGridConfig.$columnRefs.map((mdField, columnIndex) => {
+                  return (
+                    <div key={columnIndex} className="md-grid-header-cell"
+                         style={{width: this.columnWidths[0][columnIndex]+'%', minWidth: this.columnWidths[1][columnIndex]+'px', maxWidth: this.columnWidths[2][columnIndex]+'px'}}>
+                      <GridHeader field={mdField} sortArray={grid.sortArray} onClickLink={this.onClickColumnSort} />
+                    </div>
+                  );
+                })
+              }
+            </div>
           </div>
 
           <div ref="rowContainer" className="md-grid-body">
