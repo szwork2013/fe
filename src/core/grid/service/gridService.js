@@ -81,10 +81,18 @@ class GridService {
 
   }
 
-
+/*
+ * Spocita width, min-width a max-width pro sloupce gridu.
+ *
+ * return Array[widths, min-widths, max-widths]
+ */
   computeGridWidths(gridData, gridConfig) {
     console.time("computeGridWidths");
+    // maximalni hodnota, kterou muze nabyvat min-width
     var MAXIMAL_COLUMN_MIN_WIDTH_PX = 350;
+    // hodnata pro max-width sloupcu
+    var MAXIMAL_COLUMN_WIDTH_PX = 7000;
+    // pismeno, jimz se vyplnuji divy, podle kterych se pocita min-width
     var PATTERN_LETTER = 'C';
 
     let matrix = [];
@@ -105,20 +113,35 @@ class GridService {
     let absoluteLengths = _.zip(...matrix).map(col => _.max(col));
 
     let absoluteMax = _.sum(absoluteLengths);
-    let gridWidths = absoluteLengths.map(v => Math.round(10000 * v / absoluteMax)/100 + "%");
-    let gridMinWidths = absoluteLengths.map(v => {
+
+    // puvodni vypocet sirky sloupcu - podle nejdelsich textu
+    // let gridWidths = absoluteLengths.map(v => Math.round(10000 * v / absoluteMax)/100 + "%");
+
+    // vypocet min-width pro sloupce - pomoci fiktivnich DIVu
+    // horni hranice pro min-width je MAXIMAL_COLUMN_MAX_WIDTH_PX
+    let gridMinWidthsPX = absoluteLengths.map(v => {
       var elemDiv = document.createElement('div');
       elemDiv.style.cssText = 'position:absolute;left:0;top:0;z-index:20;';
       elemDiv.textContent = Array(v).join(PATTERN_LETTER);
       document.body.appendChild(elemDiv);
       let elemWidth = elemDiv.clientWidth;
       document.body.removeChild(elemDiv);
-      return elemWidth < MAXIMAL_COLUMN_MIN_WIDTH_PX ? elemWidth+"px" : MAXIMAL_COLUMN_MIN_WIDTH_PX+"px";
+      return elemWidth < MAXIMAL_COLUMN_MIN_WIDTH_PX ? elemWidth : MAXIMAL_COLUMN_MIN_WIDTH_PX;
     });
+
+    // udelame sumu minWidths
+    let sumGridMinWidths = _.sum(gridMinWidthsPX);
+    // spocitame width pro sloupce tak, aby odpovidaly pomerum min-width
+    let gridWidthsPrct = gridMinWidthsPX.map(v => ((100*v)/sumGridMinWidths));
+
+    // spocitame maxWidths (jen vytvorime array)
+    let gridMaxWidthsPX = Array.from(new Array(gridWidthsPrct.length), () => MAXIMAL_COLUMN_WIDTH_PX);
+
     console.timeEnd("computeGridWidths");
-    console.debug('computeGridWidths: %o', gridWidths);
-    console.debug('computeGridMinWidths: %o', gridMinWidths);
-    return [gridWidths, gridMinWidths];
+    console.debug('computeGridWidths: %o', gridWidthsPrct);
+    console.debug('computeGridMinWidths: %o', gridMinWidthsPX);
+    console.debug('computeGridMaxWidths: %o', gridMaxWidthsPX);
+    return [gridWidthsPrct, gridMinWidthsPX, gridMaxWidthsPX];
   }
 
 

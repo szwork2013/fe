@@ -267,7 +267,7 @@ export default class GridComp extends React.Component {
               grid.activeGridConfig.$columnRefs.map((mdField, columnIndex) => {
                 return (
                   <div key={columnIndex} className="md-grid-header-cell"
-                       style={{width: this.columnWidths[0][columnIndex], minWidth: this.columnWidths[1][columnIndex]}}>
+                       style={{width: this.columnWidths[0][columnIndex]+'%', minWidth: this.columnWidths[1][columnIndex]+'px', maxWidth: this.columnWidths[2][columnIndex]+'px'}}>
                     <GridHeader field={mdField} sortArray={grid.sortArray} onClickLink={this.onClickColumnSort} />
                   </div>
                 );
@@ -308,7 +308,7 @@ export default class GridComp extends React.Component {
           item.cells.map( (gridCell, columnIndex) => {
 
             return (
-              <div key={columnIndex} className="md-grid-cell" style={{width: this.columnWidths[0][columnIndex], minWidth: this.columnWidths[1][columnIndex] }} >
+              <div key={columnIndex} className="md-grid-cell" style={{width: this.columnWidths[0][columnIndex]+'%', minWidth: this.columnWidths[1][columnIndex]+'px', maxWidth: this.columnWidths[2][columnIndex]+'px' }} >
                 {gridCell.value}
               </div>
             );
