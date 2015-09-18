@@ -112,7 +112,7 @@ class GridService {
 
     let absoluteLengths = _.zip(...matrix).map(col => _.max(col));
 
-    let absoluteMax = _.sum(absoluteLengths);
+    // let absoluteMax = _.sum(absoluteLengths);
 
     // puvodni vypocet sirky sloupcu - podle nejdelsich textu
     // let gridWidths = absoluteLengths.map(v => Math.round(10000 * v / absoluteMax)/100 + "%");
@@ -120,7 +120,7 @@ class GridService {
     // vypocet min-width pro sloupce - pomoci fiktivnich DIVu
     // horni hranice pro min-width je MAXIMAL_COLUMN_MAX_WIDTH_PX
     let gridMinWidthsPX = absoluteLengths.map(v => {
-      var elemDiv = document.createElement('div');
+      let elemDiv = document.createElement('div');
       elemDiv.style.cssText = 'position:absolute;left:0;top:0;z-index:20;';
       elemDiv.textContent = Array(v).join(PATTERN_LETTER);
       document.body.appendChild(elemDiv);
