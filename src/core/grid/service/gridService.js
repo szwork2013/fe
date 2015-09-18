@@ -84,29 +84,51 @@ class GridService {
 
   computeGridWidths(gridData, gridConfig) {
     console.time("computeGridWidths");
+    var MAXIMAL_COLUMN_MIN_WIDTH_PX = 350;
 
     let matrix = [];
+    let maxs = [];
+    let i = 0;
     matrix.push(gridConfig.$columnRefs.map( (mdField) => {
       let v = mdField.gridHeaderLabelActive;
-      return  (v) ? ( (typeof v == 'string') ? v.length : v.toString.length ) : 0;
+      let stringValue = (v) ? ( (typeof v == 'string') ? v : v.toString() ) : '';
+      maxs[i++] = stringValue.trim();
+      return  stringValue.length;
     }));
 
     if (gridData) {
       for(let row of gridData.rows) {
+        i = 0;
         matrix.push(row.cells.map((cell) => {
           let v = cell.value;
-          return  (v) ? ( (typeof v == 'string') ? v.length : v.toString.length ) : 0;
+          let stringValue = (v) ? ( (typeof v == 'string') ? v : v.toString() ) : '';
+          if (maxs[i].length < stringValue.trim().length) {maxs[i] = stringValue.trim()}
+          i++;
+          return  stringValue.length;
         }));
       }
     }
 
     let absoluteLengths = _.zip(...matrix).map(col => _.max(col));
 
+    let gridMinWidths = [];
+    gridMinWidths = maxs.map(max => {
+      var elemDiv = document.createElement('div');
+      elemDiv.style.cssText = 'position:absolute;left:0;top:0;z-index:20;';
+      elemDiv.textContent = max;
+      document.body.appendChild(elemDiv);
+      let elemWidth = elemDiv.clientWidth;
+      document.body.removeChild(elemDiv);
+      return elemWidth < MAXIMAL_COLUMN_MIN_WIDTH_PX ? elemWidth+"px" : MAXIMAL_COLUMN_MIN_WIDTH_PX+"px";
+    });
+
+
     let absoluteMax = _.sum(absoluteLengths);
     let gridWidths = absoluteLengths.map(v => Math.round(10000 * v / absoluteMax)/100 + "%");
     console.timeEnd("computeGridWidths");
     console.debug('computeGridWidths: %o', gridWidths);
-    return gridWidths;
+    console.debug('computeGridMinWidths: %o', gridMinWidths);
+    return [gridWidths, gridMinWidths];
   }
 
 
