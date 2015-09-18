@@ -85,6 +85,7 @@ class GridService {
   computeGridWidths(gridData, gridConfig) {
     console.time("computeGridWidths");
     var MAXIMAL_COLUMN_MIN_WIDTH_PX = 350;
+    var PATTERN_LETTER = 'C';
 
     let matrix = [];
     matrix.push(gridConfig.$columnRefs.map( (mdField) => {
@@ -108,7 +109,7 @@ class GridService {
     let gridMinWidths = absoluteLengths.map(v => {
       var elemDiv = document.createElement('div');
       elemDiv.style.cssText = 'position:absolute;left:0;top:0;z-index:20;';
-      elemDiv.textContent = Array(v).join("C");
+      elemDiv.textContent = Array(v).join(PATTERN_LETTER);
       document.body.appendChild(elemDiv);
       let elemWidth = elemDiv.clientWidth;
       document.body.removeChild(elemDiv);
