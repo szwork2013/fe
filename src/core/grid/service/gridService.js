@@ -81,32 +81,67 @@ class GridService {
 
   }
 
-
+/*
+ * Spocita width, min-width a max-width pro sloupce gridu.
+ *
+ * return Array[widths, min-widths, max-widths]
+ */
   computeGridWidths(gridData, gridConfig) {
     console.time("computeGridWidths");
+    // maximalni hodnota, kterou muze nabyvat min-width
+    var MAXIMAL_COLUMN_MIN_WIDTH_PX = 350;
+    // hodnata pro max-width sloupcu
+    var MAXIMAL_COLUMN_WIDTH_PX = 7000;
+    // pismeno, jimz se vyplnuji divy, podle kterych se pocita min-width
+    var PATTERN_LETTER = 'C';
 
     let matrix = [];
     matrix.push(gridConfig.$columnRefs.map( (mdField) => {
       let v = mdField.gridHeaderLabelActive;
-      return  (v) ? ( (typeof v == 'string') ? v.length : v.toString.length ) : 0;
+      return (v) ? ( (typeof v == 'string') ? v.trim().length : v.toString().trim().length ) : 0;
     }));
 
     if (gridData) {
       for(let row of gridData.rows) {
         matrix.push(row.cells.map((cell) => {
           let v = cell.value;
-          return  (v) ? ( (typeof v == 'string') ? v.length : v.toString.length ) : 0;
+          return (v) ? ( (typeof v == 'string') ? v.trim().length : v.toString().trim().length ) : 0;
         }));
       }
     }
 
     let absoluteLengths = _.zip(...matrix).map(col => _.max(col));
 
-    let absoluteMax = _.sum(absoluteLengths);
-    let gridWidths = absoluteLengths.map(v => Math.round(10000 * v / absoluteMax)/100 + "%");
+    // let absoluteMax = _.sum(absoluteLengths);
+
+    // puvodni vypocet sirky sloupcu - podle nejdelsich textu
+    // let gridWidths = absoluteLengths.map(v => Math.round(10000 * v / absoluteMax)/100 + "%");
+
+    // vypocet min-width pro sloupce - pomoci fiktivnich DIVu
+    // horni hranice pro min-width je MAXIMAL_COLUMN_MAX_WIDTH_PX
+    let gridMinWidthsPX = absoluteLengths.map(v => {
+      let elemDiv = document.createElement('div');
+      elemDiv.style.cssText = 'position:absolute;left:0;top:0;z-index:20;';
+      elemDiv.textContent = Array(v).join(PATTERN_LETTER);
+      document.body.appendChild(elemDiv);
+      let elemWidth = elemDiv.clientWidth;
+      document.body.removeChild(elemDiv);
+      return elemWidth < MAXIMAL_COLUMN_MIN_WIDTH_PX ? elemWidth : MAXIMAL_COLUMN_MIN_WIDTH_PX;
+    });
+
+    // udelame sumu minWidths
+    let sumGridMinWidths = _.sum(gridMinWidthsPX);
+    // spocitame width pro sloupce tak, aby odpovidaly pomerum min-width
+    let gridWidthsPrct = gridMinWidthsPX.map(v => ((100*v)/sumGridMinWidths));
+
+    // spocitame maxWidths (jen vytvorime array)
+    let gridMaxWidthsPX = Array.from(new Array(gridWidthsPrct.length), () => MAXIMAL_COLUMN_WIDTH_PX);
+
     console.timeEnd("computeGridWidths");
-    console.debug('computeGridWidths: %o', gridWidths);
-    return gridWidths;
+    console.debug('computeGridWidths: %o', gridWidthsPrct);
+    console.debug('computeGridMinWidths: %o', gridMinWidthsPX);
+    console.debug('computeGridMaxWidths: %o', gridMaxWidthsPX);
+    return [gridWidthsPrct, gridMinWidthsPX, gridMaxWidthsPX];
   }
 
 

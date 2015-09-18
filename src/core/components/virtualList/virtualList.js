@@ -10,7 +10,8 @@ var VirtualList = React.createClass({
     tagName: React.PropTypes.string.isRequired,
     scrollDelay: React.PropTypes.number,
     resizeDelay: React.PropTypes.number,
-    itemBuffer: React.PropTypes.number
+    itemBuffer: React.PropTypes.number,
+    header: React.PropTypes.object
   },
   getDefaultProps: function() {
     return {
@@ -110,6 +111,9 @@ var VirtualList = React.createClass({
     var state = this.getVirtualState(this.props);
 
     this.setState(state);
+
+    // v pripade ze je header, posuneme ho do spravne pozice
+    if (this.props.header) { this.props.header.style.left = -this.props.container.scrollLeft + 'px'; }
   },
   onResize: function() {
     var state = this.getVirtualState(this.props);
