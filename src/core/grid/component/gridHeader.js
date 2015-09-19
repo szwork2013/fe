@@ -90,16 +90,16 @@ export default class GridHeader extends React.Component {
       </a>
     );
 
+    let anchorWithTooltip = (
+      <OverlayTrigger overlay={tooltip} delayShow={300} delayHide={150}>
+        { anchor }
+      </OverlayTrigger>
+    );
+
     return (
 
       <span>
-        { (tooltipText) ?
-          (
-            <OverlayTrigger overlay={tooltip} delayShow={300} delayHide={150}>
-              { anchor }
-            </OverlayTrigger>
-          ) : {anchor}
-        }
+        { (tooltipText) ? anchorWithTooltip : anchor}
         { filter }
         { filterPopover }
       </span>
