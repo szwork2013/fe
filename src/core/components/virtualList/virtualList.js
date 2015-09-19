@@ -10,6 +10,7 @@ var VirtualList = React.createClass({
     tagName: React.PropTypes.string.isRequired,
     scrollDelay: React.PropTypes.number,
     resizeDelay: React.PropTypes.number,
+    useRAF: React.PropTypes.bool,
     itemBuffer: React.PropTypes.number,
     header: React.PropTypes.object
   },
@@ -76,57 +77,65 @@ var VirtualList = React.createClass({
     console.log('virtualList#componentWillReceiveProps %o', nextProps);
     var state = this.getVirtualState(nextProps);
 
-    //if (this.props.scrollDelay != nextProps.scrollDelay) {
-    //  this.props.container.removeEventListener('scroll', this.onScrollDebounced);
-    //  this.onScrollDebounced = utils.debounce(this.onScroll, nextProps.scrollDelay, false);
-    //  nextProps.container.addEventListener('scroll', this.onScrollDebounced);
-    //}
-    //
-    //if (this.props.resizeDelay != nextProps.resizeDelay) {
-    //  window.removeEventListener('resize', this.onResizeDebounced);
-    //  this.onResizeDebounced = utils.debounce(this.onResize, nextProps.resizeDelay, false);
-    //  window.addEventListener('resize', this.onResizeDebounced);
-    //}
+    if (this.props.scrollDelay != nextProps.scrollDelay) {
+      this.props.container.removeEventListener('scroll', this.onScrollDebounced);
+      this.onScrollDebounced = utils.debounce(this.onScroll, nextProps.scrollDelay, false);
+      nextProps.container.addEventListener('scroll', this.onScrollDebounced);
+    }
+
+    if (this.props.resizeDelay != nextProps.resizeDelay) {
+      window.removeEventListener('resize', this.onResizeDebounced);
+      this.onResizeDebounced = utils.debounce(this.onResize, nextProps.resizeDelay, false);
+      window.addEventListener('resize', this.onResizeDebounced);
+    }
 
     this.setState(state);
   },
-  //componentWillMount: function() {
-  //  this.onScrollDebounced = utils.debounce(this.onScroll, this.props.scrollDelay, false);
-  //  this.onResizeDebounced = utils.debounce(this.onResize, this.props.resizeDelay, false);
-  //},
+  componentWillMount: function() {
+    this.onScrollDebounced = utils.debounce(this.onScroll, this.props.scrollDelay, false);
+    this.onResizeDebounced = utils.debounce(this.onResize, this.props.resizeDelay, false);
+  },
   componentDidMount: function() {
     var state = this.getVirtualState(this.props);
 
     this.setState(state);
 
-    //this.props.container.addEventListener('scroll', this.onScrollDebounced);
-    this.props.container.addEventListener('scroll', this.onScroll);
+    this.props.container.addEventListener('scroll', this.onScrollDebounced);
 
-    //window.addEventListener('resize', this.onResizeDebounced);
-    window.addEventListener('resize', this.onResize);
+    window.addEventListener('resize', this.onResizeDebounced);
+
   },
   componentWillUnmount: function() {
-    //this.props.container.removeEventListener('scroll', this.onScrollDebounced);
-    //window.removeEventListener('resize', this.onResizeDebounced);
-    this.props.container.removeEventListener('scroll', this.onScroll);
-    window.removeEventListener('resize', this.onResize);
+    this.props.container.removeEventListener('scroll', this.onScrollDebounced);
+    window.removeEventListener('resize', this.onResizeDebounced);
   },
   onScroll: function() {
-    window.requestAnimationFrame(() => {
+
+    var fn = () => {
       var state = this.getVirtualState(this.props);
-
       this.setState(state);
-
       // v pripade ze je header, posuneme ho do spravne pozice
       if (this.props.header) { this.props.header.style.left = -this.props.container.scrollLeft + 'px'; }
-    });
+    };
+
+    if (this.props.useRAF) {
+      window.requestAnimationFrame(fn);
+    } else {
+      fn();
+    }
   },
   onResize: function() {
-    window.requestAnimationFrame(() => {
+    var fn = () => {
       var state = this.getVirtualState(this.props);
       this.setState(state);
-    });
+    };
+    if (this.props.useRAF) {
+      window.requestAnimationFrame(fn);
+    } else {
+      fn();
+    }
   },
+
   // in case you need to get the currently visible items
   visibleItems: function() {
     return this.state.items;

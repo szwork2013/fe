@@ -300,7 +300,7 @@ export default class GridComp extends React.Component {
                   //this._tableRowsElement(_gridData.rows, columnWidths)) : ''
                   (<VirtualList ref="VirtualList" items={ _gridData.rows} renderItem={this.renderItem}
                                 itemHeight={28}
-                                container={this.container} scrollDelay={15} resizeDelay={100} header={this.gridHeader} /> )
+                                container={this.container} scrollDelay={15} resizeDelay={15} header={this.gridHeader} useRAF={true} /> )
               ) : ''
             }
           </div>
