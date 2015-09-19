@@ -65,21 +65,12 @@ export default class GridComp extends React.Component {
 
   componentWillReceiveProps(nextProps) {
     console.debug('componentWillReceiveProps oldProps: %o, nextProps: %o', this.props, nextProps);
-    var _cont = this.container;
-
     this.setState({
       loading: false,
       searchTerm: nextProps.grid.searchTerm
     });
-
-    // bez toho timeoutu to nechodi !
-    window.setTimeout(() => {
-      this.setState({
-        headerPaddingRight: (_cont.scrollHeight > _cont.clientHeight) ? 15 : 0
-      });
-    }, 0);
-
   }
+
 
   componentWillMount() {
     console.debug('componentWillMount');
@@ -107,7 +98,18 @@ export default class GridComp extends React.Component {
     let grid = this.props.grid;
     console.debug("running search with gridId = %s, searchTerm = %s", grid.activeGridConfig.gridId, grid.searchTerm);
     this.setState({loading: true});
-    GridActions.fetchData(grid);
+    GridActions.fetchData(grid)
+      .then(() => {
+        let _cont = this.container;
+        let oldHPR = this.state.headerPaddingRight;
+        let newHPR = (_cont.scrollHeight > _cont.clientHeight) ? 15 : 0;
+        console.debug('data received');
+        if (oldHPR !== newHPR) {
+          this.setState({
+            headerPaddingRight: (_cont.scrollHeight > _cont.clientHeight) ? 15 : 0
+          });
+        }
+      });
   }
 
 
