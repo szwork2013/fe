@@ -74,6 +74,7 @@ export default class GridComp extends React.Component {
 
   componentWillMount() {
     console.debug('componentWillMount');
+    this.onResizeDebounced = _.debounce(this.onResize, 100);
     this.search();
   }
 
@@ -81,10 +82,13 @@ export default class GridComp extends React.Component {
     console.debug('componentDidMount');
     this.container = React.findDOMNode(this.refs.rowContainer);
     this.gridHeader = React.findDOMNode(this.refs.gridHeader);
+    window.addEventListener('resize', this.onResizeDebounced);
   }
 
   componentWillUnmount() {
     console.debug('componentWillUnmount');
+    window.removeEventListener('resize', this.onResizeDebounced);
+
     let grid = this.props.grid;
     grid.reset();
     GridActions.updateGrid(grid);
@@ -100,17 +104,21 @@ export default class GridComp extends React.Component {
     this.setState({loading: true});
     GridActions.fetchData(grid)
       .then(() => {
-        let _cont = this.container;
-        let oldHPR = this.state.headerPaddingRight;
-        let newHPR = (_cont.scrollHeight > _cont.clientHeight) ? 15 : 0;
         console.debug('data received');
-        if (oldHPR !== newHPR) {
-          this.setState({
-            headerPaddingRight: (_cont.scrollHeight > _cont.clientHeight) ? 15 : 0
-          });
-        }
+        this.onResize();
       });
   }
+
+  onResize = () => {
+    let _cont = this.container;
+    let oldHPR = this.state.headerPaddingRight;
+    let newHPR = (_cont.scrollHeight > _cont.clientHeight) ? 15 : 0;
+    if (oldHPR !== newHPR) {
+      this.setState({
+        headerPaddingRight: (_cont.scrollHeight > _cont.clientHeight) ? 15 : 0
+      });
+    }
+  };
 
 
   /* *******   EVENT HENDLERS ************ */
