@@ -7,7 +7,7 @@
   "repository": "https://github.com/zauzoo/fe",
   "scripts": {
     "build": "set NODE_ENV=production&& rm -Rf build/* && webpack -p --progress --profile --colors --devtool source-map --optimize-dedupe",
-  "build-linux": "export NODE_ENV=production&& rm -Rf build/* && webpack -p --progress --profile --colors --devtool source-map --optimize-dedupe",
+    "build-linux": "export NODE_ENV=production&& rm -Rf build/* && webpack -p --progress --profile --colors --devtool source-map --optimize-dedupe",
     "lint": "eslint src",
     "test": "echo \"Error: no test specified\" && exit 1",
     "watch": "set NODE_ENV=development&& rm -Rf build/* && webpack-dev-server --hot --inline --progress --colors"
@@ -47,6 +47,7 @@
     "react-router": "^0.13.3",
     "react-router-bootstrap": "^0.18.1",
     "react-tap-event-plugin": "^0.1.7",
+    "react-toastr": "^1.5.1",
     "when": "^3.7.3"
   }
 }

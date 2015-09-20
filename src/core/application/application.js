@@ -1,15 +1,20 @@
 import React from 'react';
 import { RouteHandler } from 'react-router';
 
+import { ToastContainer, ToastMessage } from 'react-toastr';
+
 import {Styles} from 'material-ui';
 import injectTapEventPlugin from 'react-tap-event-plugin';
 
+import commonService from 'core/common/service/commonService';
 import MainMenu from 'core/mainmenu/mainMenu';
 
 import styles from 'core/application/application.less';
 
 const ThemeManager = new Styles.ThemeManager();
 const Colors = Styles.Colors;
+
+const ToastMessageFactory = React.createFactory(ToastMessage.animation);
 
 ThemeManager.setPalette({
   primary1Color: Colors.indigo500,
@@ -43,6 +48,9 @@ ThemeManager.setComponentThemes({
 
 injectTapEventPlugin();
 
+
+
+// detekce react modu
   try {
     React.createClass({});
   } catch(e) {
@@ -54,9 +62,14 @@ injectTapEventPlugin();
 
 export default class Application extends React.Component {
 
+  static contextTypes = {
+    router: React.PropTypes.func.isRequired
+  };
+
   static childContextTypes = {
     muiTheme: React.PropTypes.object
   };
+
 
   getChildContext() {
     return {
@@ -65,11 +78,21 @@ export default class Application extends React.Component {
   }
 
 
+  componentDidMount() {
+    // set our internal variable to a reference to an instance of the growler
+    commonService.toastr = this.refs.toastrRef;
+    commonService.router = this.context.router;
+  };
+
+
   render() {
     return (
       <div id="content">
         <MainMenu />
         <RouteHandler />
+        <ToastContainer ref="toastrRef"
+                        toastMessageFactory={ToastMessageFactory}
+                        className="toast-top-right" />
       </div>
     )
   }

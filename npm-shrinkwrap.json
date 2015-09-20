@@ -2354,6 +2354,11 @@
       "from": "react-tap-event-plugin@*",
       "resolved": "http://registry.npmjs.org/react-tap-event-plugin/-/react-tap-event-plugin-0.1.7.tgz"
     },
+    "react-toastr": {
+      "version": "1.5.1",
+      "from": "react-toastr@*",
+      "resolved": "http://registry.npmjs.org/react-toastr/-/react-toastr-1.5.1.tgz"
+    },
     "read-file-stdin": {
       "version": "0.2.0",
       "from": "read-file-stdin@>=0.2.0 <0.3.0",

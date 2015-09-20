@@ -106,6 +106,8 @@ export default class GridComp extends React.Component {
       .then(() => {
         console.debug('data received');
         this.onResize();
+      }, () => {
+        this.setState({loading: false});
       });
   }
 
@@ -141,7 +143,7 @@ export default class GridComp extends React.Component {
 
   onSelectGridManage = (evt) => {
     evt.preventDefault();
-    this.context.router.transitionTo('gridAdmin', {gridLocation: this.props.gridLocation})
+    this.context.router.transitionTo('gridAdmin', {gridLocation: this.props.gridLocation});
   };
 
   onSearchTermChange = evt => {
