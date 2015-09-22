@@ -58,8 +58,9 @@ export default class GridComp extends React.Component {
     this.state = {
       loading: false,
       showSelection: false,
+      selectedRows: new Map(),
       searchTerm: undefined,
-      headerPaddingRight: 0
+      headerPaddingRight: 0,
     }
   }
 
@@ -102,6 +103,7 @@ export default class GridComp extends React.Component {
     let grid = this.props.grid;
     console.debug("running search with gridId = %s, searchTerm = %s", grid.activeGridConfig.gridId, grid.searchTerm);
     this.setState({loading: true});
+    this.state.selectedRows.clear();
     GridActions.fetchData(grid)
       .then(() => {
         console.debug('data received');
@@ -122,6 +124,28 @@ export default class GridComp extends React.Component {
     }
   };
 
+  processRowSelection = (rowId, e) => {
+    console.debug("processRowSelection: %o", rowId);
+    if (this.state.showSelection) {
+      window.getSelection().removeAllRanges();
+      if (e.shiftKey && this.state.selectedRows.size > 0) {
+        let lastSelected = Array.from(this.state.selectedRows.keys())[this.state.selectedRows.size-1];
+        let startStop = false;
+        this.props.grid.data.rows.forEach(row => {
+          if (row.rowId === rowId || row.rowId === lastSelected) {
+            startStop = !startStop;
+            this.state.selectedRows.set(row.rowId, true);
+          } else if (startStop) {
+            this.state.selectedRows.set(row.rowId, true);
+          }
+        });
+      } else if (this.state.selectedRows.has(rowId)) {
+        this.state.selectedRows.delete(rowId);
+      } else {
+        this.state.selectedRows.set(rowId, true);
+      }
+    }
+  };
 
   /* *******   EVENT HENDLERS ************ */
 
@@ -183,6 +207,7 @@ export default class GridComp extends React.Component {
   onClickCheck = (evt) => {
     console.log('onCheckSquare %o', evt);
     this.setState({showSelection: !this.state.showSelection});
+    this.state.selectedRows.clear();
 
     if (this.refs.VirtualList) {
       this.refs.VirtualList.forceUpdate();
@@ -194,8 +219,31 @@ export default class GridComp extends React.Component {
     this.search();
   };
 
+  onClickRow = (rowId, e) => {
+    this.processRowSelection(rowId, e);
 
+    if (this.refs.VirtualList) {
+      this.refs.VirtualList.forceUpdate();
+    }
+    if (this.refs.selectAllCheckbox) {
+      console.log(this.refs.selectAllCheckbox);
+    }
+  }
 
+  onCheckCbxAll = (e) => {
+    if (this.state.selectedRows.size !== this.props.grid.data.totalCount) {
+      let keyValues = this.props.grid.data.rows.map(row => {
+        return [row.rowId, true];
+      });
+      // this.setState({selectedRows: new Map(keyValues)});
+      Object.assign(this.state.selectedRows, new Map(keyValues));
+    } else {
+      this.state.selectedRows.clear();
+    }
+    if (this.refs.VirtualList) {
+      this.refs.VirtualList.forceUpdate();
+    }
+  }
 
   /* *******   REACT METHODS ************ */
 
@@ -283,13 +331,17 @@ export default class GridComp extends React.Component {
 
               {
                 ( (this.state.showSelection) ? (
-                  <div className="md-grid-header-cell">
-                    <Checkbox name="selectAllCheckbox"/>
+                  <div className="md-grid-header-cell" style={{float: 'left', minWidth: '28px', width: '28px'}}>
+                    <Checkbox name="selectAllCheckbox"
+                      ref="selectAllCheckbox"
+                      onCheck={this.onCheckCbxAll}
+                      checked={this.state.selectedRows.size >= _gridData.totalCount}
+                    />
                   </div>
                 ) : '')
               }
 
-
+              <div className="md-grid-data-row" style={{marginRight: this.state.showSelection?'28px':'0px'}}>
               {
                 grid.activeGridConfig.$columnRefs.map((mdField, columnIndex) => {
                   return (
@@ -300,6 +352,7 @@ export default class GridComp extends React.Component {
                   );
                 })
               }
+              </div>
             </div>
           </div>
 
@@ -320,27 +373,39 @@ export default class GridComp extends React.Component {
 
 
   renderItem = (item) => {
+    let rowClass = "md-grid-row";
+    let selected = this.state.selectedRows.has(item.rowId);
+    if (selected) {rowClass += " md-grid-row-selected";}
+    let showRowHover = this.props.grid.activeGridConfig.showRowHower;
+    if (showRowHover) {rowClass += " md-grid-row-hover";}
     return (
-      <div key={item.rowId} className="md-grid-row">
-
+      <div key={item.rowId} className={rowClass}>
         {
           ( (this.state.showSelection) ? (
-            <div className="md-grid-cell">
-              <Checkbox name="selectRowCheckbox"/>
+            <div className="md-grid-cell" style={{float: 'left', minWidth: '28px', width: '28px'}}>
+              <Checkbox
+                  name="selectRowCheckbox"
+                  checked={selected}
+                  onClick={this.onClickRow.bind(this, item.rowId)}
+                  />
             </div>
           ) : '')
         }
 
+        <div className="md-grid-data-row" style={{marginRight: this.state.showSelection?'28px':'0px'}}>
         {
           item.cells.map( (gridCell, columnIndex) => {
 
             return (
-              <div key={columnIndex} className="md-grid-cell" style={{width: this.columnWidths[0][columnIndex]+'%', minWidth: this.columnWidths[1][columnIndex]+'px', maxWidth: this.columnWidths[2][columnIndex]+'px' }} >
+              <div key={columnIndex} className="md-grid-cell"
+                onClick={this.onClickRow.bind(this, item.rowId)}
+                style={{width: this.columnWidths[0][columnIndex]+'%', minWidth: this.columnWidths[1][columnIndex]+'px', maxWidth: this.columnWidths[2][columnIndex]+'px' }} >
                 {gridCell.value}
               </div>
             );
           })
         }
+        </div>
       </div>
     );
   }

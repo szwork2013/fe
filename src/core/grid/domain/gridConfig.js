@@ -34,6 +34,8 @@ export default class GridConfig {
     // pole sirek sloupcu, pouze pro tento gridConfig, bez dat
     this.gridWidths = null;
 
+    // priznak, zda se maji radky pod mysi obarvovat
+    this.showRowHover = false;
   }
 
 
