@@ -6,6 +6,12 @@ export default class Utils {
     return args.join('_');
   }
 
+  /**
+   * Parse id into string array<br>
+   *     e.g. 'party_Party_fullName' => ['party', 'Party', 'fullName']
+   * @param id
+   * @returns {*|Array}
+     */
   static parseId(id) {
     return id.split('_');
   }

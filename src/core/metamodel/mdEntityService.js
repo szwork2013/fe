@@ -1,9 +1,10 @@
 import Axios from 'core/common/config/axios-config';
-import When from 'when';
 
 import MdEntityActions from 'core/metamodel/mdEntityActions';
 import MdEntity from 'core/metamodel/mdEntity';
 import MdField from 'core/metamodel/mdField';
+
+import Utils from 'core/common/utils/utils';
 
 class MdEntityService {
 
@@ -24,6 +25,7 @@ class MdEntityService {
             for(let fieldName in entity.fields) {
               let field = entity.fields[fieldName];
               Object.setPrototypeOf(field, MdField.prototype);
+              field.fieldKey = Utils.formatId(entity.entityKey, fieldName);
             }
 
             entityObject[entity.id] = entity;

@@ -1,4 +1,6 @@
+import React from 'react';
 import Axios from 'axios';
+
 import Locales from 'core/common/config/locales';
 import commonService from 'core/common/service/commonService';
 import CurrentUserActions from 'core/security/currentUserActions';
@@ -40,17 +42,26 @@ Axios.interceptors.response.use(function (response) {
       _r.transitionTo('loginPage');
     }
   } else {
-    commonService.toastr.error(
-      "Server error " + error.status,
-      error.statusText, {
-        closeButton: true,
-        tapToDismiss: false,
-        showAnimation: 'animated fadeIn',
-        hideAnimation: '',
-        //hideDuration: 1000,
-        timeOut: 0,
-        extendedTimeOut: 0
-      });
+    let _t = commonService.toastr;
+    if (_t) {
+      let content = (error.data) ?
+        (  (typeof error.data === 'string') ? ( <p>{error.data}</p> ) :
+        (<div><p>'Error: ' + {error.data.error}</p><p><pre>{error.data.exception} + ' - ' + {error.data.message}</pre></p></div> )
+        ): ( <p>{error.statusText}</p> );
+      _t.error(
+        content,
+        "Server error " + error.status, {
+          closeButton: true,
+          tapToDismiss: false,
+          showAnimation: 'animated fadeIn',
+          hideAnimation: '',
+          //hideDuration: 1000,
+          timeOut: 0,
+          extendedTimeOut: 0
+        });
+    } else {
+      window.location.replace("/login");
+    }
   }
 
 

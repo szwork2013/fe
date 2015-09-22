@@ -5,13 +5,13 @@ export default class MdEntity {
 
   constructor () {
     // entityKey
-    this.id = null;
+    this.id;
 
     // objekt (mapa) (fieldName -> MdField)
-    this.fields = null;
+    this.fields;
 
     // list of lovItems for this entity (e.g. Country has list of countries: [{id:'CZ','Czech Republic'},...]
-    this.lovItems = null;
+    this.lovItems;
   }
 
 

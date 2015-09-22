@@ -5,6 +5,7 @@ import _ from 'lodash';
 import GridStore from 'core/grid/store/gridStore';
 import GridActions from 'core/grid/action/gridActions';
 import Grid from 'core/grid/domain/grid';
+import GridConfigCondition from 'core/grid/domain/gridConfigCondition';
 
 import MdEntityStore from 'core/metamodel/mdEntityStore';
 import MdEntityActions from 'core/metamodel/mdEntityActions';
@@ -71,6 +72,13 @@ class GridService {
             for(let gridConfig of grid.gridConfigs) {
               gridConfig.syncColumnRefs(grid.$entityRef);
               gridConfig.gridWidths = this.computeGridWidths(null, gridConfig);
+
+              // doplnime gridConfigCondition.$columnRef
+              for(let gcc of gridConfig.conditions) {
+                Object.setPrototypeOf(gcc, GridConfigCondition.prototype);
+                gcc.$columnRef = grid.$entityRef.fields[Utils.parseId(gcc.column).pop()];
+              }
+
             }
 
           }

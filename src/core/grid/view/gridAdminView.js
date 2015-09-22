@@ -1,6 +1,7 @@
 import React from 'react';
 //import {Input} from 'react-bootstrap';
 import { FlatButton, SelectField, TextField, RaisedButton } from 'material-ui';
+import Select  from 'react-select';
 import connectToStores from 'alt/utils/connectToStores';
 import reactMixin from 'react-mixin';
 import Router from 'react-router';
@@ -204,6 +205,10 @@ class GridAdminView extends PageAncestor {
     let toolMenu = this._createToolMenu();
     let addButtonStyle = {fontWeight: 'normal', marginTop: 10, marginBottom: 10};
 
+    let fieldOptions = _.values(grid.$entityRef.fields).filter(field => field.filterable).map(field => {
+      return {value: field.fieldKey, label: field.label};
+    });
+
     return (
       <main className="main-content">
         {toolMenu}
@@ -233,7 +238,7 @@ class GridAdminView extends PageAncestor {
             </BlockComp>
 
             <BlockComp header="2. Zvol sloupce sestavy">
-              <DualSelector allObjects={_.values(grid.$entityRef.fields)}
+              <DualSelector allObjects={_.values(grid.$entityRef.fields).filter(field => field.visible)}
                             selectedObjects={editedGridConfig.$columnRefs}
                             optionValuePropertyName="fieldName"
                             optionTextPropertyName="label"
@@ -254,8 +259,20 @@ class GridAdminView extends PageAncestor {
                     <td>Hodnota</td>
                   </tr>
                 </thead>
-                <tBody>
-                </tBody>
+                <tbody>
+                {
+                  editedGridConfig.conditions.map( (condition, index) => {
+                    return (
+                      <tr key={index}>
+                        <td>
+                          <Select name="ondition-fieldName" value={condition.column} options={fieldOptions}/>
+                        </td>
+
+                      </tr>
+                    );
+                  })
+                }
+                </tbody>
               </table>
               <RaisedButton style={addButtonStyle} onClick={this.onClickAddFilter}>
                 <span className="fa fa-plus"/> <span style={{lineHeight: '40px'}}> Přidat filtr </span>

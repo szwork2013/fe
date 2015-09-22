@@ -6,44 +6,17 @@ export default class GridConfigCondition {
 
   constructor () {
 
-    // list of fieldKeys
-    this.columns = null;
+    // fieldKey, e.g. party_Party_partyCategory
+    this.column;
+    this.$columnRef;
 
-    // array of MdField (doplneno pozdeji ve GridService#fetchGrids() )
-    this.$columnRefs = null;
+    // FILTEROPERATOR, e.g. EQUAL
+    this.operator;
 
-    // list of conditions
-    this.conditions = null;
-
-    // entity key
-    this.entity = null;
-
-    this.gridId = null;
-
-    this.gridLocation = null;
-
-    // PUBLIC vs PRIVATE vs SEARCH?
-    this.gridUse = null;
-
-    // lokalizovany nazev
-    this.label = null;
-
-    // [{field : fieldKey, fixed: true|false, sortOrder: ASC|DESC}, ...]
-    this.sortColumns = null;
-
-    // pole sirek sloupcu, pouze pro tento gridConfig, bez dat
-    this.gridWidths = null;
-
-  }
+    // list of values;
+    this.values;
 
 
-  syncColumnRefs(entityRef) {
-    this.$columnRefs = [];
-    for(let fieldKey of this.columns) {
-      let fk = Utils.parseId(fieldKey);
-      let mdField = entityRef.getField(fk[2]);
-      this.$columnRefs.push(mdField);
-    }
   }
 
 
