@@ -59,6 +59,7 @@ export default class GridComp extends React.Component {
       loading: false,
       showSelection: false,
       selectedRows: new Map(),
+      selectedAllRows: false,
       searchTerm: undefined,
       headerPaddingRight: 0,
     }
@@ -144,6 +145,7 @@ export default class GridComp extends React.Component {
       } else {
         this.state.selectedRows.set(rowId, true);
       }
+      this.state.selectedAllRows = this.state.selectedRows.size ===  this.props.grid.data.totalCount;
     }
   };
 
@@ -225,9 +227,6 @@ export default class GridComp extends React.Component {
     if (this.refs.VirtualList) {
       this.refs.VirtualList.forceUpdate();
     }
-    if (this.refs.selectAllCheckbox) {
-      console.log(this.refs.selectAllCheckbox);
-    }
   }
 
   onCheckCbxAll = (e) => {
@@ -235,11 +234,11 @@ export default class GridComp extends React.Component {
       let keyValues = this.props.grid.data.rows.map(row => {
         return [row.rowId, true];
       });
-      // this.setState({selectedRows: new Map(keyValues)});
       Object.assign(this.state.selectedRows, new Map(keyValues));
     } else {
       this.state.selectedRows.clear();
     }
+    this.state.selectedAllRows = this.state.selectedRows.size ===  this.props.grid.data.totalCount;
     if (this.refs.VirtualList) {
       this.refs.VirtualList.forceUpdate();
     }
@@ -333,9 +332,8 @@ export default class GridComp extends React.Component {
                 ( (this.state.showSelection) ? (
                   <div className="md-grid-header-cell" style={{float: 'left', minWidth: '28px', width: '28px'}}>
                     <Checkbox name="selectAllCheckbox"
-                      ref="selectAllCheckbox"
                       onCheck={this.onCheckCbxAll}
-                      checked={this.state.selectedRows.size >= _gridData.totalCount}
+                      checked={this.state.selectedAllRows}
                     />
                   </div>
                 ) : '')
