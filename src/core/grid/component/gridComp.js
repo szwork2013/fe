@@ -145,7 +145,7 @@ export default class GridComp extends React.Component {
       } else {
         this.state.selectedRows.set(rowId, true);
       }
-      this.state.selectedAllRows = this.state.selectedRows.size ===  this.props.grid.data.totalCount;
+      this.setState({selectedAllRows: (this.state.selectedRows.size ===  this.props.grid.data.totalCount)});
     }
   };
 
@@ -238,7 +238,7 @@ export default class GridComp extends React.Component {
     } else {
       this.state.selectedRows.clear();
     }
-    this.state.selectedAllRows = this.state.selectedRows.size ===  this.props.grid.data.totalCount;
+    this.setState({selectedAllRows: (this.state.selectedRows.size ===  this.props.grid.data.totalCount)});
     if (this.refs.VirtualList) {
       this.refs.VirtualList.forceUpdate();
     }
@@ -372,10 +372,13 @@ export default class GridComp extends React.Component {
 
   renderItem = (item) => {
     let rowClass = "md-grid-row";
+
     let selected = this.state.selectedRows.has(item.rowId);
     if (selected) {rowClass += " md-grid-row-selected";}
+
     let showRowHover = this.props.grid.activeGridConfig.showRowHower;
     if (showRowHover) {rowClass += " md-grid-row-hover";}
+
     return (
       <div key={item.rowId} className={rowClass}>
         {
