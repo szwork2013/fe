@@ -131,15 +131,19 @@ export default class GridComp extends React.Component {
       window.getSelection().removeAllRanges();
       if (e.shiftKey && this.state.selectedRows.size > 0) {
         let lastSelected = Array.from(this.state.selectedRows.keys())[this.state.selectedRows.size-1];
-        let startStop = false;
-        this.props.grid.data.rows.forEach(row => {
-          if (row.rowId === rowId || row.rowId === lastSelected) {
-            startStop = !startStop;
-            this.state.selectedRows.set(row.rowId, true);
-          } else if (startStop) {
-            this.state.selectedRows.set(row.rowId, true);
-          }
-        });
+        if (lastSelected !== rowId) {
+          let startStop = false;
+          this.props.grid.data.rows.every(row => {
+            if (row.rowId === rowId || row.rowId === lastSelected) {
+              startStop = !startStop;
+              this.state.selectedRows.set(row.rowId, true);
+              if (!startStop) {return false;}
+            } else if (startStop) {
+              this.state.selectedRows.set(row.rowId, true);
+            }
+            return true;
+          });
+        }
       } else if (this.state.selectedRows.has(rowId)) {
         this.state.selectedRows.delete(rowId);
       } else {
