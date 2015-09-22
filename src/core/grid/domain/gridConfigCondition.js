@@ -4,10 +4,12 @@ import Utils from 'core/common/utils/utils';
 
 export default class GridConfigCondition {
 
-  constructor () {
+  constructor (gridConfig) {
+
+    this.$gridConfigRef = gridConfig;
 
     // fieldKey, e.g. party_Party_partyCategory
-    this.column;
+    this._column;
     this.$columnRef;
 
     // FILTEROPERATOR, e.g. EQUAL
@@ -16,8 +18,17 @@ export default class GridConfigCondition {
     // list of values;
     this.values;
 
-
   }
+
+  get column() {
+    return this._column;
+  }
+
+  set column(column) {
+    this._column = column;
+    this.$columnRef = grid.$gridRef.$entityRef.fields[Utils.parseId(column).pop()];
+  }
+
 
 
 }

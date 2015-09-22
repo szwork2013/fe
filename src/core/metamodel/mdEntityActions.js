@@ -14,7 +14,6 @@ import {createActions} from 'alt/utils/decorators';
 
 
 
-
 }
 
 export default MdEntityActions;

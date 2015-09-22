@@ -6,6 +6,7 @@ import connectToStores from 'alt/utils/connectToStores';
 import reactMixin from 'react-mixin';
 import Router from 'react-router';
 import _ from 'lodash';
+import When from 'when';
 
 import hoistNonReactStatics from 'core/common/utils/hoistNonReactStatics';
 import PageAncestor from 'core/common/page/pageAncestor';
@@ -20,6 +21,8 @@ import GridConfigCondition from 'core/grid/domain/gridConfigCondition';
 import GridService from 'core/grid/service/gridService';
 import Utils from 'core/common/utils/utils';
 import ArrayUtils from 'core/common/utils/arrayUtils';
+import MdEntityService from 'core/metamodel/mdEntityService';
+import MdEntityStore from 'core/metamodel/mdEntityStore';
 
 
 import Toolmenu from 'core/components/toolmenu/toolmenu';
@@ -29,10 +32,16 @@ import DualSelector from 'core/components/dualSelector/dualSelector';
 
 class GridAdminView extends PageAncestor {
 
+  static title = 'Manage Grid';
+  static icon = 'wrench';
+
 
   static fetchData(routerParams) {
-    console.log("GridAdminPage#fetchData(%o)", routerParams);
-    return GridService.fetchGrids(routerParams.gridLocation);
+    console.log("GridAdminView#fetchData(%o)", routerParams);
+    return When.join(
+      GridService.fetchGrids(routerParams.gridLocation),
+      MdEntityService.fetchEntities(['core_FILTEROPERATOR'], {}, [true])
+    );
   }
 
   static propTypes = {
@@ -187,11 +196,20 @@ class GridAdminView extends PageAncestor {
     editedGridConfig.conditions.push(condition);
   };
 
+  onChangeConditionColumn(condition, newColKey) {
+    console.log('onChangeConditionColumn: ', newColKey, condition);
+    let editedGridConfig = this.props.editedGridConfig;
+    condition.column = newColKey;
+    GridActions.updateEditedGridConfig(editedGridConfig);
+  };
+
+  onChangeConditionOperator = (column) => {
+    console.log('onChangeConditionOperator: ' + column);
+  };
 
   /* ****************   REACT METHODS ************************************************************ */
 
   render() {
-
     let {
       grid,
       editedGridConfig,
@@ -200,7 +218,7 @@ class GridAdminView extends PageAncestor {
 
     let inputStyle = {fontSize: 14};
 
-    console.debug('editedGridConfig %o', editedGridConfig);
+    console.debug('render - editedGridConfig %o', editedGridConfig);
 
     let toolMenu = this._createToolMenu();
     let addButtonStyle = {fontWeight: 'normal', marginTop: 10, marginBottom: 10};
@@ -208,6 +226,8 @@ class GridAdminView extends PageAncestor {
     let fieldOptions = _.values(grid.$entityRef.fields).filter(field => field.filterable).map(field => {
       return {value: field.fieldKey, label: field.label};
     });
+
+    let allOperators = MdEntityStore.getEntity('core_FILTEROPERATOR').lovItems;
 
     return (
       <main className="main-content">
@@ -262,10 +282,22 @@ class GridAdminView extends PageAncestor {
                 <tbody>
                 {
                   editedGridConfig.conditions.map( (condition, index) => {
+
+                    let operatorOptions = allOperators
+                      .filter(li => _.includes(condition.$columnRef.availableOperators, li.id))
+                      .map(li => {return {value: li.id, label: li.label};});
+
+                    console.debug('operatorOptions %o', operatorOptions);
+
+
+
                     return (
                       <tr key={index}>
                         <td>
-                          <Select name="ondition-fieldName" value={condition.column} options={fieldOptions}/>
+                          <Select name="conditionColumn" value={condition.column} options={fieldOptions} onChange={this.onChangeConditionColumn.bind(this,condition)}/>
+                        </td>
+                        <td>
+                          <Select name="conditionOperator" value={condition.operator} options={operatorOptions} onChange={this.onChangeConditionOperator}/>
                         </td>
 
                       </tr>
@@ -312,4 +344,5 @@ class GridAdminView extends PageAncestor {
 
 }
 
+// pokud ma "connectToStores" componenta fetchData nebo jinou statickou metodu musi se patchnout pomoci hoistNonReactStatics, protoze connectToStores by ji vyrusila...
 export default hoistNonReactStatics(connectToStores(GridAdminView), GridAdminView);

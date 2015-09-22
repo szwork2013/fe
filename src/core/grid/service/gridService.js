@@ -23,12 +23,15 @@ class GridService {
    * @returns {*}
    */
   fetchGrids(...gridLocations) {
+    var gridObject = {};
 
     // pripravime pole Promise<Grid) pro gridy ktere nejsou v GridStore
     let promises = [];
     for (let gl of gridLocations) {
       let grid = GridStore.getGrid(gl);
-      if (!grid) {
+      if (grid) {
+        gridObject[gl] = grid;
+      } else {
         promises.push(Axios.get('/core/grid-config', {params: {gridLocation: gl}})
           .then((response) => {
             return new Grid(gl, response.data);
@@ -38,30 +41,13 @@ class GridService {
 
     // pokud nejaky takovy existuje
     if (promises.length > 0) {
-      var gridObject = {};
-
       return When.all(promises).then(gridArray => {
-
-        var unresolvedEntities = [];
-        var entityObject = {};
-
+        var entities = [];
         for(let grid of gridArray) {
-          let mdEntity = MdEntityStore.getEntity(grid.entityKey);
-          if (mdEntity) {
-            entityObject[grid.entityKey] = mdEntity;
-          } else {
-            unresolvedEntities.push(grid.entityKey);
-          }
+          entities.push(grid.entityKey);
           gridObject[grid.gridLocation] = grid;
         }
-
-
-        if (unresolvedEntities.length > 0) {
-          return MdEntityService.fetchEntities(unresolvedEntities, entityObject);
-        } else {
-          return When(entityObject);
-        }
-
+        return MdEntityService.fetchEntities(_.uniq(entities), {});
       })
         .then( (entityObject) => {
           for(let gridLocation in gridObject) {
@@ -77,16 +63,17 @@ class GridService {
               for(let gcc of gridConfig.conditions) {
                 Object.setPrototypeOf(gcc, GridConfigCondition.prototype);
                 gcc.$columnRef = grid.$entityRef.fields[Utils.parseId(gcc.column).pop()];
+                gcc.$gridConfigRef = gridConfig;
               }
 
             }
-
           }
           console.log("fetchGrids promise resolved: %o", gridObject);
           return GridActions.updateGrids(gridObject);
         });
+    } else {
+      return When(gridObject);
     }
-
   }
 
 /*

@@ -128,7 +128,7 @@ export default class LoginPage extends React.Component {
 
           <div className="row">
             <div className="col-xs-offset-1 col-xs-10" style={{display:'flex'}}>
-              <TextField value={this.state.user} hintText="username" errorText={this.state.userError} ref="userField"
+              <TextField  hintText="username" errorText={this.state.userError} ref="userField"
                          style={{maxWidth:200}}
                          autoFocus fullWidth onChange={this.onChangeUsername} autoComplete="off" tabIndex="1"/>
               <SelectField

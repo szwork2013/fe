@@ -4,7 +4,9 @@ import Utils from 'core/common/utils/utils';
 
 export default class GridConfig {
 
-  constructor () {
+  constructor (grid) {
+
+    this.$gridRef = grid;
 
     // list of fieldKeys
     this.columns = null;

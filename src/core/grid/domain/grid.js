@@ -24,6 +24,7 @@ export default class Grid {
       this.entityKey = gridConfigs[0].entity;
       for(let gc of gridConfigs) {
         Object.setPrototypeOf(gc, GridConfig.prototype);
+        gc.$gridRef = this;
       }
     }
 
