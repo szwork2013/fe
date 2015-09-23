@@ -55,16 +55,13 @@ class GridService {
             grid.$entityRef = entityObject[grid.entityKey];
 
             // doplnime gridConfig.$columnRefs: MdField[]
+
             for(let gridConfig of grid.gridConfigs) {
               gridConfig.syncColumnRefs(grid.$entityRef);
               gridConfig.gridWidths = this.computeGridWidths(null, gridConfig);
 
-              // doplnime gridConfigCondition.$columnRef
-              for(let gcc of gridConfig.conditions) {
-                Object.setPrototypeOf(gcc, GridConfigCondition.prototype);
-                gcc.$columnRef = grid.$entityRef.fields[Utils.parseId(gcc.column).pop()];
-                gcc.$gridConfigRef = gridConfig;
-              }
+              // premapujeme na objekt
+              gridConfig.conditions = gridConfig.conditions.map(gcc => Object.assign(new GridConfigCondition(gridConfig), gcc));
 
             }
           }

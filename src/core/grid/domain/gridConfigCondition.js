@@ -6,6 +6,7 @@ export default class GridConfigCondition {
 
   constructor (gridConfig) {
 
+    // zpetna reference na parenta
     this.$gridConfigRef = gridConfig;
 
     // fieldKey, e.g. party_Party_partyCategory
@@ -15,7 +16,7 @@ export default class GridConfigCondition {
     // FILTEROPERATOR, e.g. EQUAL
     this.operator;
 
-    // list of values;
+    // array of values;
     this.values;
 
   }
@@ -26,7 +27,7 @@ export default class GridConfigCondition {
 
   set column(column) {
     this._column = column;
-    this.$columnRef = grid.$gridRef.$entityRef.fields[Utils.parseId(column).pop()];
+    this.$columnRef = this.$gridConfigRef.$gridRef.$entityRef.fields[Utils.parseId(column).pop()];
   }
 
 

@@ -23,6 +23,7 @@ import Utils from 'core/common/utils/utils';
 import ArrayUtils from 'core/common/utils/arrayUtils';
 import MdEntityService from 'core/metamodel/mdEntityService';
 import MdEntityStore from 'core/metamodel/mdEntityStore';
+import ConditionValue from 'core/grid/component/conditionValue';
 
 
 import Toolmenu from 'core/components/toolmenu/toolmenu';
@@ -81,7 +82,7 @@ class GridAdminView extends PageAncestor {
     console.log('onChangeGridConfig gridId = %s', gridId);
     this.setState({gridId});
     let gridConfig = this.props.grid.getGridConfig(gridId);
-    let clonedGridConfig = _.cloneDeep(gridConfig);
+    let clonedGridConfig = gridConfig.clone();
     Object.setPrototypeOf(clonedGridConfig, GridConfig.prototype);
     GridActions.updateEditedGridConfig(clonedGridConfig);
   };
@@ -200,11 +201,16 @@ class GridAdminView extends PageAncestor {
     console.log('onChangeConditionColumn: ', newColKey, condition);
     let editedGridConfig = this.props.editedGridConfig;
     condition.column = newColKey;
+    condition.operator = null;
     GridActions.updateEditedGridConfig(editedGridConfig);
   };
 
-  onChangeConditionOperator = (column) => {
-    console.log('onChangeConditionOperator: ' + column);
+  onChangeConditionOperator(condition, newOperator) {
+    console.log('onChangeConditionOperator: ', newOperator, condition);
+    let editedGridConfig = this.props.editedGridConfig;
+    condition.operator = newColKey;
+    condition.values = [];
+    GridActions.updateEditedGridConfig(editedGridConfig);
   };
 
   /* ****************   REACT METHODS ************************************************************ */
@@ -294,10 +300,13 @@ class GridAdminView extends PageAncestor {
                     return (
                       <tr key={index}>
                         <td>
-                          <Select name="conditionColumn" value={condition.column} options={fieldOptions} onChange={this.onChangeConditionColumn.bind(this,condition)}/>
+                          <Select name="conditionColumn" value={condition.column} options={fieldOptions} onChange={this.onChangeConditionColumn.bind(this, condition)}/>
                         </td>
                         <td>
-                          <Select name="conditionOperator" value={condition.operator} options={operatorOptions} onChange={this.onChangeConditionOperator}/>
+                          <Select name="conditionOperator" value={condition.operator} options={operatorOptions} onChange={this.onChangeConditionOperator.bind(this, condition)}/>
+                        </td>
+                        <td>
+                          <ConditionValue condition={condition}/>
                         </td>
 
                       </tr>
