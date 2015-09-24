@@ -154,14 +154,14 @@ export default class GridComp extends React.Component {
           this.props.grid.data.rows.every(row => {
             // pokud jsme nasli zacatek nebo konec oznaceni
             if (row.rowId === clickedRowId || row.rowId === lastSelected) {
-              // priznak, zda jsme uvnitr oznaceneho bloku
-              startStop = !startStop;
-              // zastaveni cylku pokud jsme na konci oznaceni
-              if (!startStop) {return false;}
+              // pokud jsme narazili na zacatek oznaceni - nastavime startStop na true
+              // zastaveni cylku pokud jsme na konci oznaceni (startStop == false)
+              return startStop = !startStop;
             } else if (startStop) {
               // pokud jsme uprostred oznaceneho bloku - invertujeme oznaceni radku
               clonedMap.has(row.rowId) ? clonedMap.delete(row.rowId) : clonedMap.set(row.rowId, true);
             }
+            // true, aby cyklus pokracoval dal
             return true;
           });
       }
