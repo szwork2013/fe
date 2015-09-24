@@ -46,7 +46,7 @@ Axios.interceptors.response.use(function (response) {
     if (_t) {
       let content = (error.data) ?
         (  (typeof error.data === 'string') ? ( <p>{error.data}</p> ) :
-        (<div><p>'Error: ' + {error.data.error}</p><p><pre>{error.data.exception} + ' - ' + {error.data.message}</pre></p></div> )
+        (<div><p>'{error.data.error}</p><p><pre>{error.data.exception} + ' - ' + {error.data.message}</pre></p></div> )
         ): ( <p>{error.statusText}</p> );
       _t.error(
         content,

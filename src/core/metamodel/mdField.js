@@ -37,6 +37,9 @@ export default class MdField {
     // available operators for grid filter conditions
     this.availableOperators;
 
+    // filter operator for rendering when selected operator is exists
+    this.existsFilterOperator;
+
   }
 
 
