@@ -60,6 +60,7 @@ export default class GridComp extends React.Component {
       showSelection: false,
       selectedRows: new Map(),
       selectedAllRows: false,
+      lastClickedRow: undefined,
       searchTerm: undefined,
       headerPaddingRight: 0,
     }
@@ -103,8 +104,10 @@ export default class GridComp extends React.Component {
   search() {
     let grid = this.props.grid;
     console.debug("running search with gridId = %s, searchTerm = %s", grid.activeGridConfig.gridId, grid.searchTerm);
-    this.setState({loading: true});
-    this.state.selectedRows.clear();
+    this.setState({
+      selectedRows: new Map(),
+      selectedAllRows: false,
+      loading: true});
     GridActions.fetchData(grid)
       .then(() => {
         console.debug('data received');
@@ -125,31 +128,49 @@ export default class GridComp extends React.Component {
     }
   };
 
-  processRowSelection = (rowId, e) => {
-    console.debug("processRowSelection: %o", rowId);
+  processRowSelection = (clickedRowId, e) => {
+    console.debug("processRowSelection: %o", clickedRowId);
+    // provedeme pouze pokud je zapnuto oznacovani radku
     if (this.state.showSelection) {
+      // odstranime vsechny oznaceni
       window.getSelection().removeAllRanges();
-      if (e.shiftKey && this.state.selectedRows.size > 0) {
-        let lastSelected = Array.from(this.state.selectedRows.keys())[this.state.selectedRows.size-1];
-        if (lastSelected !== rowId) {
+      // zkopirujeme si mapu oznacenych radku
+      let clonedMap = new Map(this.state.selectedRows);
+      let lastSelected = this.state.lastClickedRow;
+
+      if (clonedMap.has(clickedRowId)) {
+        // pokud jsme klikli na oznaceny radek, odebereme ho z oznaceni
+        clonedMap.delete(clickedRowId);
+      } else {
+        // pokud jsme klikli na neoznaceny radek, pridame ho do oznaceni
+        clonedMap.set(clickedRowId, true);
+      }
+
+      // pokud byl pri kliknuti drzen shift a zaroven existoval klik predtim
+      // a zaroven se nekliklo na jeden a ten samy radek
+      if (e.shiftKey && lastSelected && lastSelected !== clickedRowId) {
           let startStop = false;
+          // Projedeme vsechny radky
           this.props.grid.data.rows.every(row => {
-            if (row.rowId === rowId || row.rowId === lastSelected) {
+            // pokud jsme nasli zacatek nebo konec oznaceni
+            if (row.rowId === clickedRowId || row.rowId === lastSelected) {
+              // priznak, zda jsme uvnitr oznaceneho bloku
               startStop = !startStop;
-              this.state.selectedRows.set(row.rowId, true);
+              // zastaveni cylku pokud jsme na konci oznaceni
               if (!startStop) {return false;}
             } else if (startStop) {
-              this.state.selectedRows.set(row.rowId, true);
+              // pokud jsme uprostred oznaceneho bloku - invertujeme oznaceni radku
+              clonedMap.has(row.rowId) ? clonedMap.delete(row.rowId) : clonedMap.set(row.rowId, true);
             }
             return true;
           });
-        }
-      } else if (this.state.selectedRows.has(rowId)) {
-        this.state.selectedRows.delete(rowId);
-      } else {
-        this.state.selectedRows.set(rowId, true);
       }
-      this.setState({selectedAllRows: (this.state.selectedRows.size ===  this.props.grid.data.totalCount)});
+      // nastavime stav
+      this.setState({
+        selectedRows: clonedMap,
+        selectedAllRows: (clonedMap.size ===  this.props.grid.data.totalCount),
+        lastClickedRow: clickedRowId
+      });
     }
   };
 
@@ -212,8 +233,11 @@ export default class GridComp extends React.Component {
 
   onClickCheck = (evt) => {
     console.log('onCheckSquare %o', evt);
-    this.setState({showSelection: !this.state.showSelection});
-    this.state.selectedRows.clear();
+    this.setState({
+      selectedRows: new Map(),
+      selectedAllRows: false,
+      showSelection: !this.state.showSelection
+    });
 
     if (this.refs.VirtualList) {
       this.refs.VirtualList.forceUpdate();
@@ -238,11 +262,17 @@ export default class GridComp extends React.Component {
       let keyValues = this.props.grid.data.rows.map(row => {
         return [row.rowId, true];
       });
-      Object.assign(this.state.selectedRows, new Map(keyValues));
+      this.setState({
+        selectedRows: new Map(keyValues),
+        selectedAllRows: (this.state.selectedRows.size ===  this.props.grid.data.totalCount)
+      });
     } else {
-      this.state.selectedRows.clear();
+      this.setState({
+        selectedRows: new Map(),
+        selectedAllRows: false
+      });
     }
-    this.setState({selectedAllRows: (this.state.selectedRows.size ===  this.props.grid.data.totalCount)});
+
     if (this.refs.VirtualList) {
       this.refs.VirtualList.forceUpdate();
     }
