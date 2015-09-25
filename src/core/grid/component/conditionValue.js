@@ -57,9 +57,9 @@ export default class ConditionValue extends React.Component {
       );
 
     } else if ( _.includes(['IS_TRUE', 'IS_FALSE'], operator) ) {
-      return ('');
+      return null;
     } else {
-      return ('');
+      return null;
     }
 
   }

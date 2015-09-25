@@ -100,7 +100,7 @@ export default class FilterFieldComp extends React.Component {
             <TextField value={value} hintText={label}/>
           );
         default :
-              return '';
+              return null;
       }
     }
   }
