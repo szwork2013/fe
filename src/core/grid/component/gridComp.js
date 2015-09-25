@@ -58,8 +58,11 @@ export default class GridComp extends React.Component {
     this.state = {
       loading: false,
       showSelection: false,
+      selectedRows: new Map(),
+      selectedAllRows: false,
+      lastClickedRow: undefined,
       searchTerm: undefined,
-      headerPaddingRight: 0
+      headerPaddingRight: 0,
     }
   }
 
@@ -101,7 +104,10 @@ export default class GridComp extends React.Component {
   search() {
     let grid = this.props.grid;
     console.debug("running search with gridId = %s, searchTerm = %s", grid.activeGridConfig.gridId, grid.searchTerm);
-    this.setState({loading: true});
+    this.setState({
+      selectedRows: new Map(),
+      selectedAllRows: false,
+      loading: true});
     GridActions.fetchData(grid)
       .then(() => {
         console.debug('data received');
@@ -122,6 +128,51 @@ export default class GridComp extends React.Component {
     }
   };
 
+  processRowSelection = (clickedRowId, e) => {
+    console.debug("processRowSelection: %o", clickedRowId);
+    // provedeme pouze pokud je zapnuto oznacovani radku
+    if (this.state.showSelection) {
+      // odstranime vsechny oznaceni
+      window.getSelection().removeAllRanges();
+      // zkopirujeme si mapu oznacenych radku
+      let clonedMap = new Map(this.state.selectedRows);
+      let lastSelected = this.state.lastClickedRow;
+
+      if (clonedMap.has(clickedRowId)) {
+        // pokud jsme klikli na oznaceny radek, odebereme ho z oznaceni
+        clonedMap.delete(clickedRowId);
+      } else {
+        // pokud jsme klikli na neoznaceny radek, pridame ho do oznaceni
+        clonedMap.set(clickedRowId, true);
+      }
+
+      // pokud byl pri kliknuti drzen shift a zaroven existoval klik predtim
+      // a zaroven se nekliklo na jeden a ten samy radek
+      if (e.shiftKey && lastSelected && lastSelected !== clickedRowId) {
+          let startStop = false;
+          // Projedeme vsechny radky
+          this.props.grid.data.rows.every(row => {
+            // pokud jsme nasli zacatek nebo konec oznaceni
+            if (row.rowId === clickedRowId || row.rowId === lastSelected) {
+              // priznak, zda jsme uvnitr oznaceneho bloku
+              startStop = !startStop;
+              // zastaveni cylku pokud jsme na konci oznaceni
+              if (!startStop) {return false;}
+            } else if (startStop) {
+              // pokud jsme uprostred oznaceneho bloku - invertujeme oznaceni radku
+              clonedMap.has(row.rowId) ? clonedMap.delete(row.rowId) : clonedMap.set(row.rowId, true);
+            }
+            return true;
+          });
+      }
+      // nastavime stav
+      this.setState({
+        selectedRows: clonedMap,
+        selectedAllRows: (clonedMap.size ===  this.props.grid.data.totalCount),
+        lastClickedRow: clickedRowId
+      });
+    }
+  };
 
   /* *******   EVENT HENDLERS ************ */
 
@@ -182,7 +233,11 @@ export default class GridComp extends React.Component {
 
   onClickCheck = (evt) => {
     console.log('onCheckSquare %o', evt);
-    this.setState({showSelection: !this.state.showSelection});
+    this.setState({
+      selectedRows: new Map(),
+      selectedAllRows: false,
+      showSelection: !this.state.showSelection
+    });
 
     if (this.refs.VirtualList) {
       this.refs.VirtualList.forceUpdate();
@@ -194,8 +249,34 @@ export default class GridComp extends React.Component {
     this.search();
   };
 
+  onClickRow = (rowId, e) => {
+    this.processRowSelection(rowId, e);
 
+    if (this.refs.VirtualList) {
+      this.refs.VirtualList.forceUpdate();
+    }
+  }
 
+  onCheckCbxAll = (e) => {
+    if (this.state.selectedRows.size !== this.props.grid.data.totalCount) {
+      let keyValues = this.props.grid.data.rows.map(row => {
+        return [row.rowId, true];
+      });
+      this.setState({
+        selectedRows: new Map(keyValues),
+        selectedAllRows: (this.state.selectedRows.size ===  this.props.grid.data.totalCount)
+      });
+    } else {
+      this.setState({
+        selectedRows: new Map(),
+        selectedAllRows: false
+      });
+    }
+
+    if (this.refs.VirtualList) {
+      this.refs.VirtualList.forceUpdate();
+    }
+  }
 
   /* *******   REACT METHODS ************ */
 
@@ -283,13 +364,16 @@ export default class GridComp extends React.Component {
 
               {
                 ( (this.state.showSelection) ? (
-                  <div className="md-grid-header-cell">
-                    <Checkbox name="selectAllCheckbox"/>
+                  <div className="md-grid-header-cell" style={{float: 'left', minWidth: '28px', width: '28px'}}>
+                    <Checkbox name="selectAllCheckbox"
+                      onCheck={this.onCheckCbxAll}
+                      checked={this.state.selectedAllRows}
+                    />
                   </div>
                 ) : '')
               }
 
-
+              <div className="md-grid-data-row" style={{marginRight: this.state.showSelection?'28px':'0px'}}>
               {
                 grid.activeGridConfig.$columnRefs.map((mdField, columnIndex) => {
                   return (
@@ -300,6 +384,7 @@ export default class GridComp extends React.Component {
                   );
                 })
               }
+              </div>
             </div>
           </div>
 
@@ -320,27 +405,42 @@ export default class GridComp extends React.Component {
 
 
   renderItem = (item) => {
-    return (
-      <div key={item.rowId} className="md-grid-row">
+    let rowClass = "md-grid-row";
 
+    let selected = this.state.selectedRows.has(item.rowId);
+    if (selected) {rowClass += " md-grid-row-selected";}
+
+    let showRowHover = this.props.grid.activeGridConfig.showRowHower;
+    if (showRowHover) {rowClass += " md-grid-row-hover";}
+
+    return (
+      <div key={item.rowId} className={rowClass}>
         {
           ( (this.state.showSelection) ? (
-            <div className="md-grid-cell">
-              <Checkbox name="selectRowCheckbox"/>
+            <div className="md-grid-cell" style={{float: 'left', minWidth: '28px', width: '28px'}}>
+              <Checkbox
+                  name="selectRowCheckbox"
+                  checked={selected}
+                  onClick={this.onClickRow.bind(this, item.rowId)}
+                  />
             </div>
           ) : '')
         }
 
+        <div className="md-grid-data-row" style={{marginRight: this.state.showSelection?'28px':'0px'}}>
         {
           item.cells.map( (gridCell, columnIndex) => {
 
             return (
-              <div key={columnIndex} className="md-grid-cell" style={{width: this.columnWidths[0][columnIndex]+'%', minWidth: this.columnWidths[1][columnIndex]+'px', maxWidth: this.columnWidths[2][columnIndex]+'px' }} >
+              <div key={columnIndex} className="md-grid-cell"
+                onClick={this.onClickRow.bind(this, item.rowId)}
+                style={{width: this.columnWidths[0][columnIndex]+'%', minWidth: this.columnWidths[1][columnIndex]+'px', maxWidth: this.columnWidths[2][columnIndex]+'px' }} >
                 {gridCell.value}
               </div>
             );
           })
         }
+        </div>
       </div>
     );
   }
