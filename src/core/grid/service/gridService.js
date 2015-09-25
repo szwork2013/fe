@@ -44,7 +44,7 @@ class GridService {
       return When.all(promises).then(gridArray => {
         var entities = [];
         for(let grid of gridArray) {
-          entities.push(grid.entityKey);
+          entities.push(grid.entityName);
           gridObject[grid.gridLocation] = grid;
         }
         return MdEntityService.fetchEntities(_.uniq(entities), {});
@@ -52,7 +52,7 @@ class GridService {
         .then( (entityObject) => {
           for(let gridLocation in gridObject) {
             let grid = gridObject[gridLocation];
-            grid.$entityRef = entityObject[grid.entityKey];
+            grid.$entityRef = entityObject[grid.entityName];
 
             // doplnime gridConfig.$columnRefs: MdField[]
 

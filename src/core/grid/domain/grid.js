@@ -21,7 +21,7 @@ export default class Grid {
     this.gridWidths = null;
 
     if (gridConfigs && gridConfigs.length > 0) {
-      this.entityKey = gridConfigs[0].entity;
+      this.entityName = gridConfigs[0].entity;
       for(let gc of gridConfigs) {
         Object.setPrototypeOf(gc, GridConfig.prototype);
         gc.$gridRef = this;

@@ -41,7 +41,7 @@ class GridAdminView extends PageAncestor {
     console.log("GridAdminView#fetchData(%o)", routerParams);
     return When.join(
       GridService.fetchGrids(routerParams.gridLocation),
-      MdEntityService.fetchEntities(['core_FILTEROPERATOR'], {}, [true])
+      MdEntityService.fetchEntities(['FILTEROPERATOR'], {}, [true])
     );
   }
 
@@ -233,7 +233,7 @@ class GridAdminView extends PageAncestor {
       return {value: field.fieldKey, label: field.label};
     });
 
-    let allOperators = MdEntityStore.getEntity('core_FILTEROPERATOR').lovItems;
+    let allOperators = MdEntityStore.getEntity('FILTEROPERATOR').lovItems;
 
     return (
       <main className="main-content">

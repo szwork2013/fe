@@ -28,7 +28,7 @@ export default class MdField {
     // column can be used in grid filter
     this.filterable;
 
-    // entityKey of entity providing values
+    // entityName of entity providing values
     this.valueSource;
 
     // LOCAL x ASYNC

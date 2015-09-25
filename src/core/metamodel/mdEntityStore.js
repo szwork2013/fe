@@ -11,14 +11,14 @@ class MdEntityStore {
 
   constructor() {
 
-    // [entityKey] -> MdEntity
+    // [entityName] -> MdEntity
     this.state = {
     };
 
   }
 
-  static getEntity(entityKey) {
-    return this.getState()[entityKey];
+  static getEntity(entityName) {
+    return this.getState()[entityName];
   }
 
 

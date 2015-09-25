@@ -9,7 +9,7 @@ export default class GridConfigCondition {
     // zpetna reference na parenta
     this.$gridConfigRef = gridConfig;
 
-    // fieldKey, e.g. party_Party_partyCategory
+    // fieldKey, e.g. Party_partyCategory
     this._column;
     this.$columnRef;
 

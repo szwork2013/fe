@@ -45,7 +45,7 @@ export default class GridConfig {
     this.$columnRefs = [];
     for(let fieldKey of this.columns) {
       let fk = Utils.parseId(fieldKey);
-      let mdField = entityRef.getField(fk[2]);
+      let mdField = entityRef.getField(fk[1]);
       this.$columnRefs.push(mdField);
     }
   }

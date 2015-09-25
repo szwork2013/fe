@@ -14,39 +14,39 @@ class MdEntityService {
 
 
   /**
-   * Dotahne ze serveru entity ze zadanych entityKeys, ktere neexistuji v MdEntityStore
+   * Dotahne ze serveru entity ze zadanych entityNames, ktere neexistuji v MdEntityStore
    * Pokud je zadane pole withLovs, tak k nim jeste dotahne lovItems, pokud nejsou jeste dotazene (lovitems === undefined)
    * Pokud se neco dotahovalo aktualizuje MdEntityStore
    *  Vrati promise resolvovany do (doplneneho) entityObject
-   * @param entityKeys - pole [party_Party, ...]
-   * @param entityObject - objekt {entityKey: MdEntity, ...}
-   * @param withLovs - pole [true, false..] o stejne delce jako entityKeys, kde pokud je true tak se dotahnou i lov do mdEntity.lovItems
+   * @param entityNames - pole [Party, ...]
+   * @param entityObject - objekt {entityName: MdEntity, ...}
+   * @param withLovs - pole [true, false..] o stejne delce jako entityNames, kde pokud je true tak se dotahnou i lov do mdEntity.lovItems
    * @returns Promise<entityObject>
      */
-  fetchEntities(entityKeys, entityObject, withLovs) {
+  fetchEntities(entityNames, entityObject, withLovs) {
 
-    let unresolvedEntityKeys = [];
+    let unresolvedEntityNames = [];
 
-    for(let entityKey of entityKeys) {
-      let mdEntity = MdEntityStore.getEntity(entityKey);
+    for(let entityName of entityNames) {
+      let mdEntity = MdEntityStore.getEntity(entityName);
       if (mdEntity) {
-        entityObject[entityKey] = mdEntity;
+        entityObject[entityName] = mdEntity;
       } else {
-        unresolvedEntityKeys.push(entityKey);
+        unresolvedEntityNames.push(entityName);
       }
     }
     var promise;
     var asyncFetch = false;
-    if (unresolvedEntityKeys.length > 0) {
+    if (unresolvedEntityNames.length > 0) {
       asyncFetch = true;
-      promise = this.fetchMissingEntities(unresolvedEntityKeys, entityObject);
+      promise = this.fetchMissingEntities(unresolvedEntityNames, entityObject);
     } else {
       promise = When(entityObject);
     }
 
     var finalPromise = promise.then((entityObject) => {
-      if (withLovs && withLovs.length === entityKeys.length) {
-        var keyWithLovs = entityKeys.filter( (k,i) => withLovs[i]);
+      if (withLovs && withLovs.length === entityNames.length) {
+        var keyWithLovs = entityNames.filter( (k,i) => withLovs[i]);
         let unresolvedLovs = [];
         for(let k of keyWithLovs) {
           let mdEntity = entityObject[k];
@@ -77,8 +77,8 @@ class MdEntityService {
   }
 
 
-  fetchMissingEntities(entityKeys, entityObject) {
-    return Axios.get('/core/metamodel/entity', {params: {entityKey: entityKeys}})
+  fetchMissingEntities(entityNames, entityObject) {
+    return Axios.get('/core/metamodel/entity', {params: {entityName: entityNames}})
       .then((response) => {
         if (response.data.length  > 0) {
           for(let entity of response.data) {
@@ -98,11 +98,11 @@ class MdEntityService {
       });
   }
 
-  fetchMissingEntityLovs(entityKeys, entityObject) {
-    return Axios.get('/core/metamodel/lovitem', {params: {entityKey: entityKeys}})
+  fetchMissingEntityLovs(entityNames, entityObject) {
+    return Axios.get('/core/metamodel/lovitem', {params: {entityName: entityNames}})
       .then((response) => {
         var mapa = response.data;
-        for(let ek of entityKeys) {
+        for(let ek of entityNames) {
           entityObject[ek].lovItems = mapa[ek];
         }
         return entityObject;

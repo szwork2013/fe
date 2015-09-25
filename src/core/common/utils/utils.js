@@ -8,7 +8,7 @@ export default class Utils {
 
   /**
    * Parse id into string array<br>
-   *     e.g. 'party_Party_fullName' => ['party', 'Party', 'fullName']
+   *     e.g. 'Party_fullName' => ['Party', 'fullName']
    * @param id
    * @returns {*|Array}
      */

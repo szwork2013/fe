@@ -4,7 +4,7 @@ import _ from 'lodash';
 export default class MdEntity {
 
   constructor () {
-    // entityKey
+    // entityName
     this.id;
 
     // objekt (mapa) (fieldName -> MdField)

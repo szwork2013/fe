@@ -19,7 +19,7 @@ class GridStore {
 
   /**
    * Vrati Grid objekt pro danou gridLocation
-   * @param entityKey
+   * @param gridLocation
    * @param route - nepovinny parametr
    * @returns {*}
      */
