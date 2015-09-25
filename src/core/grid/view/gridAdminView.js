@@ -74,6 +74,10 @@ class GridAdminView extends PageAncestor {
   };
 
 
+  componentWillUnmount() {
+    GridActions.updateEditedGridConfig(null);
+  }
+
 
   /* ****************   EVENT HENDLERS ************************************************************ */
 
