@@ -87,9 +87,18 @@ class GridAdminView extends PageAncestor {
     this.setState({gridId});
     let gridConfig = this.props.grid.getGridConfig(gridId);
     let clonedGridConfig = gridConfig.clone();
-    Object.setPrototypeOf(clonedGridConfig, GridConfig.prototype);
-    GridActions.updateEditedGridConfig(clonedGridConfig);
+
+    // dotahny vsechny existujici seznamy
+    let valueSources = _.uniq(clonedGridConfig.conditions
+      .filter(condition => (condition.$columnRef && condition.$columnRef.valueSource) )
+      .map(condition => (condition.$columnRef.valueSource)));
+
+    MdEntityService.fetchEntities(valueSources, {}, valueSources.map(v => true) )
+    .then(() => {
+      GridActions.updateEditedGridConfig(clonedGridConfig);
+    });
   };
+
 
   onClickSave = (evt) => {
     console.log('onClickSave');
@@ -97,6 +106,9 @@ class GridAdminView extends PageAncestor {
 
   onClickAdd = (evt) => {
     console.log('onClickAdd');
+
+    this.setState({gridId: 0});
+
     let grid = this.props.grid;
 
     let gridConfig = new GridConfig();
@@ -197,8 +209,9 @@ class GridAdminView extends PageAncestor {
     console.log('onClickAddFilter');
     let editedGridConfig = this.props.editedGridConfig;
 
-    let condition = new GridConfigCondition();
+    let condition = new GridConfigCondition(editedGridConfig);
     editedGridConfig.conditions.push(condition);
+    GridActions.updateEditedGridConfig(editedGridConfig);
   };
 
   onChangeConditionColumn(condition, newColKey) {
@@ -206,16 +219,30 @@ class GridAdminView extends PageAncestor {
     let editedGridConfig = this.props.editedGridConfig;
     condition.column = newColKey;
     condition.operator = null;
+    condition.values = [];
+
+    let field = condition.$columnRef;
+    if (field && field.valueSource) {
+      MdEntityService.fetchEntities([field.valueSource], {}, [true]);
+    }
+
     GridActions.updateEditedGridConfig(editedGridConfig);
   };
 
   onChangeConditionOperator(condition, newOperator) {
     console.log('onChangeConditionOperator: ', newOperator, condition);
     let editedGridConfig = this.props.editedGridConfig;
-    condition.operator = newColKey;
+    condition.operator = newOperator;
     condition.values = [];
     GridActions.updateEditedGridConfig(editedGridConfig);
   };
+
+  onDeleteCondition(index) {
+    console.log('onDeleteCondition: ', index);
+    let editedGridConfig = this.props.editedGridConfig;
+    editedGridConfig.conditions.splice(index, 1);
+    GridActions.updateEditedGridConfig(editedGridConfig);
+  }
 
   /* ****************   REACT METHODS ************************************************************ */
 
@@ -245,19 +272,24 @@ class GridAdminView extends PageAncestor {
 
         <h4 className="zauzoo" style={{marginTop: 20}} >Průvodce správou sestav</h4>
 
-        <SelectField
-          value={this.state.gridId}
-          style={Object.assign(inputStyle, {marginLeft: 10})}
-          menuItemStyle={inputStyle}
-          onChange={this.onChangeGridConfig}
-          hintText="Vyber Sestavu"
-          menuItems={grid.gridConfigs} displayMember="label" valueMember="gridId" autocomplete="off"/>
+        { (this.state.gridId !== 0) ? (
+          <SelectField
+            value={this.state.gridId}
+            style={Object.assign(inputStyle, {marginLeft: 10})}
+            menuItemStyle={inputStyle}
+            onChange={this.onChangeGridConfig}
+            hintText="Vyber Sestavu"
+            menuItems={grid.gridConfigs} displayMember="label" valueMember="gridId" autocomplete="off"/>
+
+        ) : ''}
 
         <hr/>
 
         { (editedGridConfig) ? (
           <div>
-            <h4 style={{marginTop: 20}}>Edituj sestavu</h4>
+            <h4 style={{marginTop: 20}}>
+              {(this.state.gridId !== 0) ? 'Edituj sestavu' : 'Nová sestava' }
+            </h4>
 
             <BlockComp header="1. Změna názvu sestavy">
               <TextField
@@ -284,21 +316,21 @@ class GridAdminView extends PageAncestor {
               <table className="table">
                 <thead>
                   <tr>
-                    <td>Název sloupce</td>
-                    <td>Operátor</td>
-                    <td>Hodnota</td>
+                    <td style={{width: '31%'}}>Název sloupce</td>
+                    <td style={{width: '16%'}}>Operátor</td>
+                    <td style={{width: '51%'}}>Hodnota</td>
+                    <td style={{width: '3%'}}></td>
                   </tr>
                 </thead>
                 <tbody>
                 {
                   editedGridConfig.conditions.map( (condition, index) => {
 
-                    let operatorOptions = allOperators
+                    let operatorOptions = (condition.$columnRef) ? allOperators
                       .filter(li => _.includes(condition.$columnRef.availableOperators, li.id))
-                      .map(li => {return {value: li.id, label: li.label};});
+                      .map(li => {return {value: li.id, label: li.label};}) : [];
 
                     console.debug('operatorOptions %o', operatorOptions);
-
 
 
                     return (
@@ -311,6 +343,9 @@ class GridAdminView extends PageAncestor {
                         </td>
                         <td>
                           <ConditionValue condition={condition}/>
+                        </td>
+                        <td>
+                          <a className="font-button-link" onClick={this.onDeleteCondition.bind(this, index)}><span className="fa fa-trash"/></a>
                         </td>
 
                       </tr>
@@ -344,9 +379,11 @@ class GridAdminView extends PageAncestor {
           <FlatButton onClick={this.onClickSave}>
             <span className="fa fa-save"/><span> Uložit sestavu</span>
           </FlatButton>
-          <FlatButton onClick={this.onClickAdd}>
-            <span className="fa fa-file"/><span> Vytvořit novou sestavu</span>
-          </FlatButton>
+          { (this.state.gridId !== 0) ? (
+            <FlatButton onClick={this.onClickAdd}>
+              <span className="fa fa-file"/><span> Vytvořit novou sestavu</span>
+            </FlatButton>
+          ) : <div/>}
           <FlatButton onClick={this.onClickDelete}>
             <span className="fa fa-trash"/><span> Smazat sestavu</span>
           </FlatButton>

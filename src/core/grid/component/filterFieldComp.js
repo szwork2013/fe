@@ -45,12 +45,6 @@ export default class FilterFieldComp extends React.Component {
   state = {
   };
 
-  componentWillReceiveProps (nextProps) {
-    let field = nextProps.field;
-    if (field.valueSource) {
-      MdEntityService.fetchEntities([field.valueSource], {}, [true]);
-    }
-  }
 
 
 

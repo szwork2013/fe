@@ -12,7 +12,7 @@ import InvoiceList from 'invoicing/page/invoiceList';
 
 import LoginPage from 'core/security/loginPage';
 
-import GridAdminView from 'core/grid/view/gridAdminView';
+import GridAdminView from 'core/grid/component/gridAdminView';
 
 
 const routes = (
