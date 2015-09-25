@@ -264,7 +264,7 @@ export default class GridComp extends React.Component {
       });
       this.setState({
         selectedRows: new Map(keyValues),
-        selectedAllRows: (this.state.selectedRows.size ===  this.props.grid.data.totalCount)
+        selectedAllRows: true
       });
     } else {
       this.setState({
