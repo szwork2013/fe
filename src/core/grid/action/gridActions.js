@@ -32,11 +32,6 @@ import GridService from 'core/grid/service/gridService';
       });
   }
 
-  updateEditedGridConfig(gridConfig) {
-    return gridConfig;
-  }
-
-
 }
 
 export default GridActions;

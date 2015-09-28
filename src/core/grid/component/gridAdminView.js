@@ -13,7 +13,6 @@ import PageAncestor from 'core/common/page/pageAncestor';
 
 
 import GridStore from 'core/grid/store/gridStore';
-import GridAdminStore from 'core/grid/store/gridAdminStore';
 import GridActions from 'core/grid/action/gridActions';
 import Grid from 'core/grid/domain/grid';
 import GridConfig from 'core/grid/domain/gridConfig';
@@ -54,34 +53,27 @@ class GridAdminView extends PageAncestor {
     params: React.PropTypes.object.isRequired,
 
     // from store
-    grid: React.PropTypes.instanceOf(Grid),
-    editedGridConfig: React.PropTypes.instanceOf(GridConfig)
+    grid: React.PropTypes.instanceOf(Grid)
   };
-
-  //static defaultProps = {
-  //  editedGridConfig: {}
-  //}
 
 
   static getStores(props) {
-    return [GridStore, GridAdminStore];
+    return [GridStore];
   }
 
   // multiple stores @see https://github.com/goatslacker/alt/issues/420
   static getPropsFromStores(props) {
     let grid = GridStore.getGrid(props.params.gridLocation);
-    let adminState = GridAdminStore.getState();
-    return {grid, ...adminState};
+    return {grid};
   }
 
   state = {
-    gridId: null
+    gridId: null,
+    editedGridConfig: null
   };
 
 
-  componentWillUnmount() {
-    GridActions.updateEditedGridConfig(null);
-  }
+
 
 
   /* ****************   EVENT HENDLERS ************************************************************ */
@@ -100,7 +92,7 @@ class GridAdminView extends PageAncestor {
 
     MdEntityService.fetchEntities(valueSources, {}, valueSources.map(v => true) )
     .then(() => {
-      GridActions.updateEditedGridConfig(clonedGridConfig);
+      this.setState({editedGridConfig: clonedGridConfig});
     });
   };
 
@@ -112,8 +104,6 @@ class GridAdminView extends PageAncestor {
   onClickAdd = (evt) => {
     console.log('onClickAdd');
 
-    this.setState({gridId: 0});
-
     let grid = this.props.grid;
 
     let gridConfig = new GridConfig(grid);
@@ -121,7 +111,7 @@ class GridAdminView extends PageAncestor {
     gridConfig.conditions = [];
     gridConfig.sortColumns = [];
     gridConfig.entity = grid.$entityRef.id;
-    GridActions.updateEditedGridConfig(gridConfig);
+    this.setState({gridId: 0, editedGridConfig: gridConfig});
   };
 
   onClickDelete = (evt) => {
@@ -130,9 +120,8 @@ class GridAdminView extends PageAncestor {
     let grid = this.props.grid;
     if (gridId) {
       grid.deleteGridConfig(gridId);
-      this.setState({gridId: null});
     }
-    GridActions.updateEditedGridConfig(null);
+    this.setState({gridId: null, editedGridConfig: null});
   };
 
   onClickBack = () => {
@@ -146,28 +135,28 @@ class GridAdminView extends PageAncestor {
 
   onChangeGridConfigLabel = (evt) => {
     let gridConfigLabel = evt.target.value;
-    let editedGridConfig = this.props.editedGridConfig;
+    let editedGridConfig = this.state.editedGridConfig;
     editedGridConfig.label = gridConfigLabel;
-    GridActions.updateEditedGridConfig(editedGridConfig);
+    this.setState({editedGridConfig});
   };
 
   onAddColumn = (fieldNames) => {
     console.log('onAddColumn FieldNames: ' + fieldNames);
     let grid = this.props.grid;
-    let editedGridConfig = this.props.editedGridConfig;
+    let editedGridConfig = this.state.editedGridConfig;
 
     fieldNames.forEach(v => {
       editedGridConfig.columns.push(Utils.formatId(editedGridConfig.entity, v));
     });
     editedGridConfig.syncColumnRefs(grid.$entityRef);
 
-    GridActions.updateEditedGridConfig(editedGridConfig);
+    this.setState({editedGridConfig});
   };
 
   onDeleteColumn = (fieldNames) => {
     console.log('onDeleteColumn FieldNames: ' + fieldNames);
     let grid = this.props.grid;
-    let editedGridConfig = this.props.editedGridConfig;
+    let editedGridConfig = this.state.editedGridConfig;
 
     fieldNames.forEach(v => {
       let fieldKey = Utils.formatId(editedGridConfig.entity, v);
@@ -176,13 +165,13 @@ class GridAdminView extends PageAncestor {
 
     editedGridConfig.syncColumnRefs(grid.$entityRef);
 
-    GridActions.updateEditedGridConfig(editedGridConfig);
+    this.setState({editedGridConfig});
   };
 
   onUpColumn = (fieldNames) => {
     console.log('onUpColumn FieldNames: ' + fieldNames);
     let grid = this.props.grid;
-    let editedGridConfig = this.props.editedGridConfig;
+    let editedGridConfig = this.state.editedGridConfig;
 
     for(let v of fieldNames) {
       let fieldKey = Utils.formatId(editedGridConfig.entity, v);
@@ -195,13 +184,13 @@ class GridAdminView extends PageAncestor {
 
     editedGridConfig.syncColumnRefs(grid.$entityRef);
 
-    GridActions.updateEditedGridConfig(editedGridConfig);
+    this.setState({editedGridConfig});
   };
 
   onDownColumn = (fieldNames) => {
     console.log('onDownColumn FieldNames: ' + fieldNames);
     let grid = this.props.grid;
-    let editedGridConfig = this.props.editedGridConfig;
+    let editedGridConfig = this.state.editedGridConfig;
 
     let iLen = fieldNames.length;
     for (let i=iLen-1; i>=0; i--) {
@@ -216,21 +205,21 @@ class GridAdminView extends PageAncestor {
 
     editedGridConfig.syncColumnRefs(grid.$entityRef);
 
-    GridActions.updateEditedGridConfig(editedGridConfig);
+    this.setState({editedGridConfig});
   };
 
   onClickAddFilter = (evt) => {
     console.log('onClickAddFilter');
-    let editedGridConfig = this.props.editedGridConfig;
+    let editedGridConfig = this.state.editedGridConfig;
 
     let condition = new GridConfigCondition(editedGridConfig);
     editedGridConfig.conditions.push(condition);
-    GridActions.updateEditedGridConfig(editedGridConfig);
+    this.setState({editedGridConfig});
   };
 
   onChangeConditionColumn(condition, newColKey) {
     console.log('onChangeConditionColumn: ', newColKey, condition);
-    let editedGridConfig = this.props.editedGridConfig;
+    let editedGridConfig = this.state.editedGridConfig;
     condition.column = newColKey;
     condition.operator = null;
     condition.values = [];
@@ -240,12 +229,12 @@ class GridAdminView extends PageAncestor {
       MdEntityService.fetchEntities([field.valueSource], {}, [true]);
     }
 
-    GridActions.updateEditedGridConfig(editedGridConfig);
+    this.setState({editedGridConfig});
   };
 
   onChangeConditionOperator(condition, newOperator) {
     console.log('onChangeConditionOperator: ', newOperator, condition);
-    let editedGridConfig = this.props.editedGridConfig;
+    let editedGridConfig = this.state.editedGridConfig;
     condition.operator = newOperator;
 
     if (newOperator) {
@@ -261,52 +250,52 @@ class GridAdminView extends PageAncestor {
       condition.values = [];
     }
 
-    GridActions.updateEditedGridConfig(editedGridConfig);
+    this.setState({editedGridConfig});
   };
 
   onChangeConditionValues = (condition) => {
     console.log('onChangeConditionValues: condition %o', condition);
-    GridActions.updateEditedGridConfig(this.props.editedGridConfig);
+    this.setState({editedGridConfig: this.state.editedGridConfig});
   };
 
   onDeleteCondition(index) {
     console.log('onDeleteCondition: ', index);
-    let editedGridConfig = this.props.editedGridConfig;
+    let editedGridConfig = this.state.editedGridConfig;
     editedGridConfig.conditions.splice(index, 1);
-    GridActions.updateEditedGridConfig(editedGridConfig);
+    this.setState({editedGridConfig});
   }
 
   onChangeSortField(sort, newColKey) {
     console.log('onChangeSortField: ', newColKey, sort);
     sort.field = newColKey;
-    GridActions.updateEditedGridConfig(this.props.editedGridConfig);
+    this.setState({editedGridConfig: this.state.editedGridConfig});
   };
 
   onChangeSortOrder(sort, newOrder) {
     console.log('onChangeSortOrder: ', newOrder, sort);
     sort.sortOrder = newOrder;
-    GridActions.updateEditedGridConfig(this.props.editedGridConfig);
+    this.setState({editedGridConfig: this.state.editedGridConfig});
   }
 
   onCheckSortFixed = (evt, checked) => {
     console.log('onCheckSortFixed: checked = ' + checked);
-    GridActions.updateEditedGridConfig(this.props.editedGridConfig);
+    this.setState({editedGridConfig: this.state.editedGridConfig});
   };
 
   onClickAddSort = (evt) => {
     console.log('onClickAddSort');
-    let editedGridConfig = this.props.editedGridConfig;
+    let editedGridConfig = this.state.editedGridConfig;
 
     let sort = new GridConfigSort(editedGridConfig);
     editedGridConfig.sortColumns.push(sort);
-    GridActions.updateEditedGridConfig(editedGridConfig);
+    this.setState({editedGridConfig});
   };
 
   onDeleteSort(index) {
     console.log('onDeleteSort: ', index);
-    let editedGridConfig = this.props.editedGridConfig;
+    let editedGridConfig = this.state.editedGridConfig;
     editedGridConfig.sortColumns.splice(index, 1);
-    GridActions.updateEditedGridConfig(editedGridConfig);
+    this.setState({editedGridConfig});
   }
 
   /* ****************   REACT METHODS ************************************************************ */
@@ -314,9 +303,10 @@ class GridAdminView extends PageAncestor {
   render() {
     let {
       grid,
-      editedGridConfig,
       ...other,
       } = this.props;
+
+    let editedGridConfig = this.state.editedGridConfig;
 
     let inputStyle = {fontSize: 14};
 

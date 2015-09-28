@@ -18,11 +18,5 @@ export default class GridAdminStore {
 
   }
 
-  @bind(actions.updateEditedGridConfig)
-  updateEditedGridConfig(gridConfig) {
-    console.debug("updateEditedGridConfig: ", gridConfig);
-    this.setState({ editedGridConfig: gridConfig });
-  }
-
 
 }
