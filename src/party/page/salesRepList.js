@@ -6,16 +6,16 @@ import PageAncestor from 'core/common/page/pageAncestor';
 import GridService from 'core/grid/service/gridService';
 import GridCompConnected from 'core/grid/component/gridCompConnected';
 
-var gridLocation = 'partyContacts';
+var gridLocation = 'partySalesReps';
 
 @reactMixin.decorate(State)
-export default class ContactPersonList extends PageAncestor {
+export default class SalesRepList extends PageAncestor {
 
-  static title = 'Contact persons';
-  static icon = 'female';
+  static title = 'Sales Representative';
+  static icon = 'male';
 
   static fetchData(params) {
-    console.log("ContactPersonList#fetchData(%s)", gridLocation);
+    console.log("SalesRepList#fetchData(%s)", gridLocation);
     return GridService.fetchGrids(gridLocation);
   }
 

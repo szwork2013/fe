@@ -7,8 +7,8 @@ import classNames from 'classnames';
 
 import VirtualList from 'core/components/virtualList/virtualList';
 
-import {Navbar, Nav, NavDropdown, MenuItem, CollapsibleNav, Input} from 'react-bootstrap';
-import {Checkbox, FlatButton, IconButton, FontIcon} from 'material-ui';
+import {Navbar, Nav, NavItem, NavDropdown, MenuItem, CollapsibleNav, Input} from 'react-bootstrap';
+import {Checkbox, IconButton, FontIcon} from 'material-ui';
 
 import GridStore from 'core/grid/store/gridStore';
 import GridActions from 'core/grid/action/gridActions';
@@ -78,7 +78,9 @@ export default class GridComp extends React.Component {
   componentWillMount() {
     console.debug('componentWillMount');
     this.onResizeDebounced = _.debounce(this.onResize, 100);
-    this.search();
+    if (this.props.grid.activeGridConfig) {
+      this.search();
+    }
   }
 
   componentDidMount() {
@@ -293,11 +295,19 @@ export default class GridComp extends React.Component {
     let dropdownId = this.props.gridLocation + "_dropdown";
 
 
-
+    if (!grid.activeGridConfig) {
+      return (
+        <div className="md-grid">
+          <Navbar fluid style={{marginBottom: 10, minHeight: 'initial'}}>
+            <Nav>
+              <NavItem eventKey={3} href={this.context.router.makeHref('gridAdmin', {gridLocation: this.props.gridLocation})} onClick={this.onSelectGridManage}>Create Grid</NavItem>
+            </Nav>
+          </Navbar>
+        </div>
+      )
+    }
 
     let gridConfigMenu = (
-      (grid.activeGridConfig) ?
-        (
           <NavDropdown id={dropdownId} eventKey={3} title={grid.activeGridConfig.label}>
             {
               grid.gridConfigs.map((gc) => {
@@ -309,9 +319,6 @@ export default class GridComp extends React.Component {
             <MenuItem divider/>
             <MenuItem href={this.context.router.makeHref('gridAdmin', {gridLocation: this.props.gridLocation})} onSelect={this.onSelectGridManage}> Manage </MenuItem>
           </NavDropdown>
-        )
-        : (<span>No Grid Config defined</span>)
-
     );
 
     let loadingElement = (

@@ -4,12 +4,20 @@ import GridConfig from 'core/grid/domain/gridConfig';
 
 export default class Grid {
 
-  constructor (gridLocation, gridConfigs) {
+  constructor (gridLocationDto) {
     // string gridLocation
-    this.gridLocation = gridLocation;
+    this.gridLocation = gridLocationDto.gridLocation;
+    this.entityName = gridLocationDto.entityName;
 
     // array of GridConfig
-    this.gridConfigs = gridConfigs;
+    this.gridConfigs = gridLocationDto.gridConfigs;
+
+    if (this.gridConfigs) {
+      for(let gc of this.gridConfigs) {
+        Object.setPrototypeOf(gc, GridConfig.prototype);
+        gc.$gridRef = this;
+      }
+    }
 
     // navratova hodnota Grid ze serveru
     this.data = null;
@@ -19,14 +27,6 @@ export default class Grid {
 
     // pole sirek sloupcu, spocitane na zaklade aktivniho gridConfigu a dat
     this.gridWidths = null;
-
-    if (gridConfigs && gridConfigs.length > 0) {
-      this.entityName = gridConfigs[0].entity;
-      for(let gc of gridConfigs) {
-        Object.setPrototypeOf(gc, GridConfig.prototype);
-        gc.$gridRef = this;
-      }
-    }
 
     // searchTerm
     this.searchTerm = null;

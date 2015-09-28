@@ -96,6 +96,7 @@ export default class MainMenu extends React.Component {
 
           { this._menuItem("partyList") }
           { this._menuItem("contactPersonList") }
+          { this._menuItem("salesRepList") }
 
           { /*  dokud bude rozbity react-router-bootstrap po update react-bootstrap na 0.25
            <MenuItemLink to="partyList" eventKey='1'>Customers</MenuItemLink>

@@ -19,7 +19,8 @@ export default class FilterFieldComp extends React.Component {
     field: React.PropTypes.instanceOf(MdField).isRequired,
     value: React.PropTypes.any.isRequired,
     label: React.PropTypes.string,
-    multi: React.PropTypes.bool
+    multi: React.PropTypes.bool,
+    onChange: React.PropTypes.func.isRequired,
   };
 
   static getStores(props) {
@@ -29,24 +30,29 @@ export default class FilterFieldComp extends React.Component {
   // multiple stores @see https://github.com/goatslacker/alt/issues/420
   static getPropsFromStores(props) {
     let valueSource = props.field.valueSource;
-
     let fieldOptions;
 
     if (valueSource) {
       let entity = MdEntityStore.getEntity(valueSource);
-      if (entity && entity.lovItems) {
-        fieldOptions = entity.lovItems.map(li => {return {value: li.id, label: li.label};});
+      if (entity) {
+        fieldOptions = entity.lovItems;
       }
     }
     return {fieldOptions};
   }
 
 
-  state = {
+  onChangeText = (e) => {
+    this.props.onChange(e.target.value);
   };
 
-
-
+  onChangeMultiSelect = (newValue, newValuesArray) => {
+    //this.props.onChange(newValuesArray);
+    this.props.onChange(newValue.split('|'));
+  };
+  onChangeSelect = (newValue) => {
+    this.props.onChange(newValue);
+  };
 
   render() {
 
@@ -63,13 +69,13 @@ export default class FilterFieldComp extends React.Component {
     if (field.valueSource) {
 
       if (multi) {
-        let concatedValue = value.join('|');
         return (
-          <Select name={name} value={concatedValue} multi={true} delimiter="|" options={fieldOptions}/>
+          <Select name={name} value={value} multi={true} delimiter="|" options={fieldOptions}
+                  onChange={this.onChangeMultiSelect}  clearable={false}/>
         );
       } else {
         return (
-          <Select name={name} value={value} options={fieldOptions}/>
+          <Select name={name} value={value} options={fieldOptions} onChange={this.onChangeSelect}  clearable={false}/>
         );
       }
 
@@ -79,19 +85,19 @@ export default class FilterFieldComp extends React.Component {
       switch (field.dataType) {
         case 'NUMBER':
           return (
-            <TextField value={value} hintText={label}/>
+            <TextField value={value} hintText={label} onChange={this.onChangeText} />
           );
         case 'STRING':
           return (
-            <TextField value={value} hintText={label}/>
+            <TextField value={value} hintText={label} onChange={this.onChangeText} />
           );
         case 'DATE':
           return (
-            <TextField value={value} hintText={label}/>
+            <TextField value={value} hintText={label} onChange={this.onChangeText} />
           );
         case 'DATETIM':
           return (
-            <TextField value={value} hintText={label}/>
+            <TextField value={value} hintText={label} onChange={this.onChangeText} />
           );
         default :
               return null;

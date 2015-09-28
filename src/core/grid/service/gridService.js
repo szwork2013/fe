@@ -6,6 +6,7 @@ import GridStore from 'core/grid/store/gridStore';
 import GridActions from 'core/grid/action/gridActions';
 import Grid from 'core/grid/domain/grid';
 import GridConfigCondition from 'core/grid/domain/gridConfigCondition';
+import GridConfigSort from 'core/grid/domain/gridConfigSort';
 
 import MdEntityStore from 'core/metamodel/mdEntityStore';
 import MdEntityActions from 'core/metamodel/mdEntityActions';
@@ -15,6 +16,13 @@ import MdEntityService from 'core/metamodel/mdEntityService';
 import Utils from 'core/common/utils/utils';
 
 class GridService {
+
+  defaultRoutes = {
+    partyCustomers: 'partyList',
+    partyContacts: 'contactPersonList',
+    partySalesReps: 'salesRepList'
+
+  };
 
 
   /**
@@ -34,7 +42,7 @@ class GridService {
       } else {
         promises.push(Axios.get('/core/grid-config', {params: {gridLocation: gl}})
           .then((response) => {
-            return new Grid(gl, response.data);
+            return new Grid(response.data);
           }));
       }
     }
@@ -62,6 +70,8 @@ class GridService {
 
               // premapujeme na objekt
               gridConfig.conditions = gridConfig.conditions.map(gcc => Object.assign(new GridConfigCondition(gridConfig), gcc));
+              gridConfig.sortColumns = gridConfig.sortColumns.map(gcc => Object.assign(new GridConfigSort(gridConfig), gcc));
+
 
             }
           }

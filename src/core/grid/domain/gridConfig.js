@@ -3,6 +3,7 @@ import _ from 'lodash';
 import Utils from 'core/common/utils/utils';
 import MdField from 'core/metamodel/mdField';
 import GridConfigCondition from 'core/grid/domain/gridConfigCondition';
+import GridConfigSort from 'core/grid/domain/gridConfigSort';
 
 export default class GridConfig {
 
@@ -16,7 +17,7 @@ export default class GridConfig {
     // array of MdField (doplneno pozdeji ve GridService#fetchGrids() )
     this.$columnRefs = null;
 
-    // list of conditions
+    // array of GridConfigCondition
     this.conditions = null;
 
     // entity key
@@ -32,7 +33,7 @@ export default class GridConfig {
     // lokalizovany nazev
     this.label = null;
 
-    // [{field : fieldKey, fixed: true|false, sortOrder: ASC|DESC}, ...]
+    // array of GridConfigSort
     this.sortColumns = null;
 
     // pole sirek sloupcu, pouze pro tento gridConfig, bez dat
@@ -78,7 +79,7 @@ export default class GridConfig {
     if (this.sortColumns) {
       newGridConfig.sortColumns = [];
       for(let s of this.sortColumns) {
-        newGridConfig.sortColumns.push(Object.assign({}, s));
+        newGridConfig.sortColumns.push(Object.assign(new GridConfigSort(), s));
       }
     }
 
