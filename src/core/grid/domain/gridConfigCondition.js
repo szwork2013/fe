@@ -30,6 +30,13 @@ export default class GridConfigCondition {
     this.$columnRef = this.$gridConfigRef.$gridRef.$entityRef.fields[Utils.parseId(column).pop()];
   }
 
-
+  // musi byt kvuli https://github.com/babel/babel/issues/1469
+  toJSON() {
+    return {
+      column: this.column,
+      operator: this.operator,
+      values: this.values
+    };
+  }
 
 }

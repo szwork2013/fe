@@ -4,21 +4,34 @@ import Utils from 'core/common/utils/utils';
 import MdField from 'core/metamodel/mdField';
 import GridConfigCondition from 'core/grid/domain/gridConfigCondition';
 import GridConfigSort from 'core/grid/domain/gridConfigSort';
+import GridService from 'core/grid/service/gridService';
 
 export default class GridConfig {
+
+  static clasifyJson(gridConfig, grid) {
+    Object.setPrototypeOf(gridConfig, GridConfig.prototype);
+    gridConfig.$gridRef = grid;
+
+    gridConfig.syncColumnRefs(grid.$entityRef);
+    gridConfig.gridWidths = GridService.computeGridWidths(null, gridConfig);
+
+    // premapujeme na objekt
+    gridConfig.conditions = gridConfig.conditions.map(gcc => Object.assign(new GridConfigCondition(gridConfig), gcc));
+    gridConfig.sortColumns = gridConfig.sortColumns.map(gcc => Object.assign(new GridConfigSort(gridConfig), gcc));
+  }
 
   constructor (grid) {
 
     this.$gridRef = grid;
 
     // list of fieldKeys
-    this.columns = null;
+    this.columns = [];
 
     // array of MdField (doplneno pozdeji ve GridService#fetchGrids() )
-    this.$columnRefs = null;
+    this.$columnRefs = [];
 
     // array of GridConfigCondition
-    this.conditions = null;
+    this.conditions = [];
 
     // entity key
     this.entity = null;
@@ -33,8 +46,11 @@ export default class GridConfig {
     // lokalizovany nazev
     this.label = null;
 
+    // vlastni nazev;
+    this.gridName;
+
     // array of GridConfigSort
-    this.sortColumns = null;
+    this.sortColumns = [];
 
     // pole sirek sloupcu, pouze pro tento gridConfig, bez dat
     this.gridWidths = null;
@@ -56,31 +72,23 @@ export default class GridConfig {
   clone() {
     let newGridConfig = new GridConfig(this.$gridRef);
     Object.assign(newGridConfig, this);
+    newGridConfig.conditions = [];
+    newGridConfig.sortColumns = [];
 
-    // copy $columnRefs
-    if (this.$columnRefs) {
-      newGridConfig.$columnRefs = [];
-      for(let f of this.$columnRefs) {
-        newGridConfig.$columnRefs.push(Object.assign(new MdField(), f));
-      }
-    }
+    // copy columns
+    newGridConfig.columns = this.columns.slice(0);
+    newGridConfig.syncColumnRefs(this.$gridRef.$entityRef);
 
     // copy conditions
-    if (this.conditions) {
-      newGridConfig.conditions = [];
-      for(let c of this.conditions) {
-        let newGcc = Object.assign(new GridConfigCondition(), c);
-        if (c.values) newGcc.values = c.values.slice(0); // clone value array if exists
-        newGridConfig.conditions.push(newGcc);
-      }
+    for(let c of this.conditions) {
+      let newGcc = Object.assign(new GridConfigCondition(), c);
+      if (c.values) newGcc.values = c.values.slice(0); // clone value array if exists
+      newGridConfig.conditions.push(newGcc);
     }
 
     // copy sortColumns
-    if (this.sortColumns) {
-      newGridConfig.sortColumns = [];
-      for(let s of this.sortColumns) {
-        newGridConfig.sortColumns.push(Object.assign(new GridConfigSort(), s));
-      }
+    for(let s of this.sortColumns) {
+      newGridConfig.sortColumns.push(Object.assign(new GridConfigSort(), s));
     }
 
     return newGridConfig;

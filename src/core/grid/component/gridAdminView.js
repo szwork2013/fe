@@ -10,7 +10,7 @@ import When from 'when';
 
 import hoistNonReactStatics from 'core/common/utils/hoistNonReactStatics';
 import PageAncestor from 'core/common/page/pageAncestor';
-
+import Axios from 'core/common/config/axios-config';
 
 import GridStore from 'core/grid/store/gridStore';
 import GridActions from 'core/grid/action/gridActions';
@@ -98,7 +98,21 @@ class GridAdminView extends PageAncestor {
 
 
   onClickSave = (evt) => {
-    console.log('onClickSave');
+    console.log('onClickSave %o', this.state.editedGridConfig);
+    let grid = this.props.grid;
+    // ulozim, na navrat musim aktualizovat editedGridConfig a grid v gridstoru
+    Axios.post('/core/grid-config', this.state.editedGridConfig)
+      .then(response => {
+        let editedGridConfig = response.data;
+        GridConfig.clasifyJson(editedGridConfig, grid);
+        grid.replaceGridConfig(editedGridConfig);
+        GridActions.updateGrid(grid);
+
+        this.setState({
+          gridId: editedGridConfig.gridId,
+          editedGridConfig: editedGridConfig
+        });
+      });
   };
 
   onClickAdd = (evt) => {
@@ -107,6 +121,8 @@ class GridAdminView extends PageAncestor {
     let grid = this.props.grid;
 
     let gridConfig = new GridConfig(grid);
+    gridConfig.gridUse = 'PRIVATE';
+    gridConfig.gridLocation = this.props.params.gridLocation;
     gridConfig.columns = [];
     gridConfig.conditions = [];
     gridConfig.sortColumns = [];
@@ -133,10 +149,17 @@ class GridAdminView extends PageAncestor {
   }
 
 
-  onChangeGridConfigLabel = (evt) => {
-    let gridConfigLabel = evt.target.value;
+  onChangeGridConfigName = (evt) => {
+    let gridName = evt.target.value;
     let editedGridConfig = this.state.editedGridConfig;
-    editedGridConfig.label = gridConfigLabel;
+    editedGridConfig.gridName = gridName;
+    this.setState({editedGridConfig});
+  };
+
+  onCheckGridUse = (evt, checked) => {
+    console.log('onCheckGridUse checked: ' + checked);
+    let editedGridConfig = this.state.editedGridConfig;
+    editedGridConfig.gridUse = (checked) ? 'PUBLIC' : 'PRIVATE';
     this.setState({editedGridConfig});
   };
 
@@ -349,11 +372,18 @@ class GridAdminView extends PageAncestor {
             </h4>
 
             <BlockComp header="1. Změna názvu sestavy">
-              <TextField
-                floatingLabelText="Název sestavy"
-                style={inputStyle}
-                value={editedGridConfig.label} onChange={this.onChangeGridConfigLabel}/>
-              <LocalizeField/>
+              <div style={{display: 'flex', whiteSpace: 'nowrap'}}>
+                <div>
+                  <TextField name="gridName"
+                             floatingLabelText="Název sestavy"
+                             style={inputStyle}
+                             value={editedGridConfig.gridName} onChange={this.onChangeGridConfigName}/>
+                  <LocalizeField/>
+                </div>
+                <div style={{marginLeft: 30, alignSelf: 'flex-end', marginBottom: 5}}>
+                  <Checkbox name="gridUse" defaultChecked={editedGridConfig.gridUse == 'PUBLIC'} value={editedGridConfig.gridUse == 'PUBLIC'} label="Public Grid" onCheck={this.onCheckGridUse}/>
+                </div>
+              </div>
             </BlockComp>
 
             <BlockComp header="2. Zvol sloupce sestavy">
@@ -438,7 +468,7 @@ class GridAdminView extends PageAncestor {
                           <Select name="sortOrder" value={sort.sortOrder} options={sortOrderOptions} onChange={this.onChangeSortOrder.bind(this, sort)}  clearable={false}/>
                         </td>
                         <td>
-                          <Checkbox name="sortFixed" value={sort.fixed} label="Fixní řazení" onCheck={this.onCheckSortFixed}/>
+                          <Checkbox name="sortFixed" value={sort.fixed} defaultChecked={sort.fixed} label="Fixní řazení" onCheck={this.onCheckSortFixed}/>
                         </td>
                         <td>
                           <a className="font-button-link" onClick={this.onDeleteSort.bind(this, index)}><span className="fa fa-trash"/></a>

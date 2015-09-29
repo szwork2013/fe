@@ -20,22 +20,8 @@ export default class ConditionValue extends React.Component {
 
   constructor(props) {
     super(props);
-    this.state = this.deriveState(props);
   }
 
-  deriveState(props) {
-    let value2 = (props.values && props.values.length >= 2) ? values[1] : null;
-    let values = (props.values) ? props.values.slice() : null;
-    return {
-      value1: _.first(props.values),
-      value2: value2,
-      values: values
-    };
-  }
-
-  componentWillReceiveProps(nextProps) {
-    this.setState(this.deriveState(nextProps));
-  }
 
   onChangeValue1 = (v) => {
     this.props.condition.values[0] = v;

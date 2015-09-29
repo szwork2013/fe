@@ -5,6 +5,7 @@ import _ from 'lodash';
 import GridStore from 'core/grid/store/gridStore';
 import GridActions from 'core/grid/action/gridActions';
 import Grid from 'core/grid/domain/grid';
+import GridConfig from 'core/grid/domain/gridConfig';
 import GridConfigCondition from 'core/grid/domain/gridConfigCondition';
 import GridConfigSort from 'core/grid/domain/gridConfigSort';
 
@@ -65,14 +66,7 @@ class GridService {
             // doplnime gridConfig.$columnRefs: MdField[]
 
             for(let gridConfig of grid.gridConfigs) {
-              gridConfig.syncColumnRefs(grid.$entityRef);
-              gridConfig.gridWidths = this.computeGridWidths(null, gridConfig);
-
-              // premapujeme na objekt
-              gridConfig.conditions = gridConfig.conditions.map(gcc => Object.assign(new GridConfigCondition(gridConfig), gcc));
-              gridConfig.sortColumns = gridConfig.sortColumns.map(gcc => Object.assign(new GridConfigSort(gridConfig), gcc));
-
-
+              GridConfig.clasifyJson(gridConfig, grid);
             }
           }
           console.log("fetchGrids promise resolved: %o", gridObject);

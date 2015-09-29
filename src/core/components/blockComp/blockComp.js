@@ -46,7 +46,7 @@ export default class BlockComp extends React.Component {
 
     <Paper className="block-comp" zDepth={zDepth}>
       <h5>{header}</h5>
-      <p>{children}</p>
+      <div>{children}</div>
     </Paper>
 
 

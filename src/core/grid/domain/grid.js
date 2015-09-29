@@ -12,13 +12,6 @@ export default class Grid {
     // array of GridConfig
     this.gridConfigs = gridLocationDto.gridConfigs;
 
-    if (this.gridConfigs) {
-      for(let gc of this.gridConfigs) {
-        Object.setPrototypeOf(gc, GridConfig.prototype);
-        gc.$gridRef = this;
-      }
-    }
-
     // navratova hodnota Grid ze serveru
     this.data = null;
 
@@ -47,6 +40,12 @@ export default class Grid {
   deleteGridConfig(gridId) {
     _.remove(this.gridConfigs, gc => gc.gridId == gridId);
   }
+
+  replaceGridConfig(gridConfig) {
+    let index = _.findIndex(this.gridConfigs, gc => gc.gridId === gridConfig.gridId);
+    this.gridConfigs.splice(index, 1, gridConfig);
+  }
+
 
   /**
    * Vrati aktivni gridConfig, pokud je zadany gridId, zkousi hledat ten

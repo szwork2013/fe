@@ -4,8 +4,10 @@ import Axios from 'axios';
 import Locales from 'core/common/config/locales';
 import commonService from 'core/common/service/commonService';
 import CurrentUserActions from 'core/security/currentUserActions';
+import {stringify} from 'core/common/utils/jsonUtils';
 
 console.debug('axios init');
+
 
 // Add a request interceptor
 Axios.interceptors.request.use((config) => {
@@ -17,6 +19,11 @@ Axios.interceptors.request.use((config) => {
     'Accept': 'application/json',
     'Accept-Language': Locales.lang
   });
+
+  config.transformRequest = [stringify];
+
+  // vyhodim $ properties (obsahuji circular references)
+  //removeSystemProperties(config.data);
 
 
   if (!config.url.startsWith("/api")) config.url = '/api' + config.url;
@@ -44,10 +51,28 @@ Axios.interceptors.response.use(function (response) {
   } else {
     let _t = commonService.toastr;
     if (_t) {
-      let content = (error.data) ?
-        (  (typeof error.data === 'string') ? ( <p>{error.data}</p> ) :
-        (<div><p>'{error.data.error}</p><p><pre>{error.data.exception} + ' - ' + {error.data.message}</pre></p></div> )
-        ): ( <p>{error.statusText}</p> );
+
+      let content = 'Error';
+      if (error.data) {
+        if (typeof error.data === 'string') {
+          content = ( <p>{error.data}</p> );
+        } else if (error.data.severity) {
+          content = (
+            <ul>
+              { error.data.messages.map((err) => (<li> {err.propertyPath + ' ' + err.message + ( (err.rootBeanClass)? " ( on " + err.rootBeanClass + ')' : '' )} </li>) ) }
+            </ul>
+          );
+        } else {
+          content = (<div><p>'{error.data.error}</p>
+            <p>
+              <pre>{error.data.exception} + ' - ' + {error.data.message}</pre>
+            </p>
+          </div> );
+        }
+      } else {
+        content = ( <p>{error.statusText}</p> );
+      }
+
       _t.error(
         content,
         "Server error " + error.status, {

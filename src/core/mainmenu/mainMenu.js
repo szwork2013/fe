@@ -4,6 +4,7 @@ import {Navbar, Nav, NavItem, NavDropdown, MenuItem, CollapsibleNav } from 'reac
 import {NavItemLink, MenuItemLink} from 'react-router-bootstrap';
 import Router from 'react-router';
 import connectToStores from 'alt/utils/connectToStores';
+import alt from 'core/common/config/alt-config';
 
 import routes from 'routes';
 import SecurityService from 'core/security/securityService';
@@ -43,7 +44,7 @@ export default class MainMenu extends React.Component {
       }, (err) => {
         console.log('logout error');
       });
-  }
+  };
 
 
   onSelectWithTransition = (event, eventKey) => {
@@ -57,6 +58,10 @@ export default class MainMenu extends React.Component {
     event.preventDefault();
     Locales.lang = eventKey;
     window.location.reload();
+  };
+
+  printAppState = (e) => {
+    console.debug(alt.takeSnapshot());
   }
 
 
@@ -111,6 +116,10 @@ export default class MainMenu extends React.Component {
 
           <MenuItem divider/>
           <MenuItem eventKey='3'>Administration</MenuItem>
+        </NavDropdown>
+
+        <NavDropdown id="administration_dropdown"  title='Administration'>
+          <MenuItem eventKey='3' onSelect={this.printAppState}>Print App state</MenuItem>
         </NavDropdown>
 
 

@@ -30,6 +30,13 @@ export default class GridConfigSort {
     this.$fieldRef = this.$gridConfigRef.$gridRef.$entityRef.fields[Utils.parseId(field).pop()];
   }
 
-
+  // musi byt kvuli https://github.com/babel/babel/issues/1469
+  toJSON() {
+    return {
+      field: this.field,
+      fixed: this.fixed,
+      sortOrder: this.sortOrder
+    };
+  }
 
 }
