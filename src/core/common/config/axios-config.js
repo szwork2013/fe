@@ -20,13 +20,15 @@ Axios.interceptors.request.use((config) => {
     'Accept-Language': Locales.lang
   });
 
+  // vyhodim $ properties (obsahuji circular references)
   config.transformRequest = [stringify];
 
-  // vyhodim $ properties (obsahuji circular references)
-  //removeSystemProperties(config.data);
-
-
-  if (!config.url.startsWith("/api")) config.url = '/api' + config.url;
+  if (config.url.startsWith("api")) {
+    config.url = '/' + config.url;
+  }
+  if (!config.url.startsWith("/api")) {
+    config.url = (config.url.startsWith('/')) ? ('/api' + config.url) : ('/api/' + config.url);
+  }
 
   return config;
 }, function (error) {

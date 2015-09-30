@@ -131,13 +131,18 @@ class GridAdminView extends PageAncestor {
   };
 
   onClickDelete = (evt) => {
-    console.log('onClickDelete');
     let gridId = this.state.gridId;
     let grid = this.props.grid;
-    if (gridId) {
+    console.log('onClickDelete ' + gridId);
+
+    Axios.delete('/core/grid-config/' + gridId)
+    .then(response => {
       grid.deleteGridConfig(gridId);
-    }
-    this.setState({gridId: null, editedGridConfig: null});
+      GridActions.updateGrid(grid);
+      this.setState({
+        gridId: null,
+        editedGridConfig: null});
+    });
   };
 
   onClickBack = () => {

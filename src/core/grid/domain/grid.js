@@ -43,7 +43,11 @@ export default class Grid {
 
   replaceGridConfig(gridConfig) {
     let index = _.findIndex(this.gridConfigs, gc => gc.gridId === gridConfig.gridId);
-    this.gridConfigs.splice(index, 1, gridConfig);
+    if (index >= 0) {
+      this.gridConfigs.splice(index, 1, gridConfig);
+    } else {
+      this.gridConfigs.push(gridConfig);
+    }
   }
 
 
