@@ -7,6 +7,23 @@ class CommonService {
     this.emitter = new EventEmitter();
   }
 
+
+  toastSuccess(content) {
+    this.toastr.success(
+      content,
+      null, {
+        tapToDismiss: true,
+        showAnimation: 'animated fadeIn',
+        hideAnimation: '',
+        positionClass: 'toast-bottom-right',
+        className: 'toast-bottom-right',
+        //hideDuration: 1000,
+        timeOut: 3000,
+        extendedTimeOut: 1000
+      });
+  }
+
+
   get toastr() {
     return this._toastr;
   }

@@ -21,6 +21,7 @@ export default class FilterFieldComp extends React.Component {
     label: React.PropTypes.string,
     multi: React.PropTypes.bool,
     onChange: React.PropTypes.func.isRequired,
+    disabled: React.PropTypes.bool
   };
 
   static getStores(props) {
@@ -63,6 +64,7 @@ export default class FilterFieldComp extends React.Component {
       label,
       fieldOptions,
       multi,
+      disabled,
       ...other,
       } = this.props;
 
@@ -71,11 +73,11 @@ export default class FilterFieldComp extends React.Component {
       if (multi) {
         return (
           <Select name={name} value={value} multi={true} delimiter="|" options={fieldOptions}
-                  onChange={this.onChangeMultiSelect}  clearable={false}/>
+                  onChange={this.onChangeMultiSelect}  clearable={false} disabled={disabled}/>
         );
       } else {
         return (
-          <Select name={name} value={value} options={fieldOptions} onChange={this.onChangeSelect}  clearable={false}/>
+          <Select name={name} value={value} options={fieldOptions} onChange={this.onChangeSelect}  clearable={false}  disabled={disabled}/>
         );
       }
 
@@ -85,19 +87,19 @@ export default class FilterFieldComp extends React.Component {
       switch (field.dataType) {
         case 'NUMBER':
           return (
-            <TextField value={value} hintText={label} onChange={this.onChangeText} />
+            <TextField value={value} hintText={label} onChange={this.onChangeText} disabled={disabled}/>
           );
         case 'STRING':
           return (
-            <TextField value={value} hintText={label} onChange={this.onChangeText} />
+            <TextField value={value} hintText={label} onChange={this.onChangeText} disabled={disabled}/>
           );
         case 'DATE':
           return (
-            <TextField value={value} hintText={label} onChange={this.onChangeText} />
+            <TextField value={value} hintText={label} onChange={this.onChangeText} disabled={disabled} />
           );
-        case 'DATETIM':
+        case 'DATETIME':
           return (
-            <TextField value={value} hintText={label} onChange={this.onChangeText} />
+            <TextField value={value} hintText={label} onChange={this.onChangeText} disabled={disabled} />
           );
         default :
               return null;

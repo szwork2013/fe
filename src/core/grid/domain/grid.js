@@ -8,6 +8,7 @@ export default class Grid {
     // string gridLocation
     this.gridLocation = gridLocationDto.gridLocation;
     this.entityName = gridLocationDto.entityName;
+    this.implicitConditions = gridLocationDto.implicitConditions;
 
     // array of GridConfig
     this.gridConfigs = gridLocationDto.gridConfigs;
