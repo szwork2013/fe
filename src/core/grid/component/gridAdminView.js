@@ -30,6 +30,7 @@ import Toolmenu from 'core/components/toolmenu/toolmenu';
 import BlockComp from 'core/components/blockComp/blockComp';
 import LocalizeField from 'core/components/localizeField/localizeField';
 import DualSelector from 'core/components/dualSelector/dualSelector';
+import StyledSelect from 'core/components/styledSelect/styledSelect';
 
 class GridAdminView extends PageAncestor {
 
@@ -427,10 +428,10 @@ class GridAdminView extends PageAncestor {
                     return (
                       <tr key={index}>
                         <td>
-                          <Select name="conditionColumn" value={condition.column} options={fieldOptions} onChange={this.onChangeConditionColumn.bind(this, condition)} clearable={false}/>
+                          <StyledSelect name="conditionColumn" value={condition.column} options={fieldOptions} onChange={this.onChangeConditionColumn.bind(this, condition)} clearable={false}/>
                         </td>
                         <td>
-                          <Select name="conditionOperator" value={condition.operator} options={operatorOptions} onChange={this.onChangeConditionOperator.bind(this, condition)}  clearable={false}/>
+                          <StyledSelect name="conditionOperator" value={condition.operator} options={operatorOptions} onChange={this.onChangeConditionOperator.bind(this, condition)}  clearable={false}/>
                         </td>
                         <td>
                           <ConditionValue condition={condition} onChange={this.onChangeConditionValues}/>
@@ -499,7 +500,6 @@ class GridAdminView extends PageAncestor {
 
     );
   }
-
 
   /* ****************   NORMAL METHODS ************************************************************ */
 

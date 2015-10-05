@@ -1,0 +1,56 @@
+.StyledSelect {
+
+  .Select {
+
+    .Select-control {
+      background-color: transparent;
+      border: initial;
+      border-color: initial;
+      border-radius: initial;
+      font-family: Roboto, sans-serif;
+      font-size: 16px;
+      color: rgba(0, 0, 0, 0.87);
+      padding: 8px 0px 8px 0px;
+      border-color: initial !important;
+      box-shadow: initial !important;
+    }
+
+    .Select-value {
+      padding: 8px 0px 8px 0px;
+    }
+
+    .Select-menu-outer {
+      //position: absolute;
+      //top: -7px;
+      box-sizing: border-box;
+      box-shadow: rgba(0, 0, 0, 0.117647) 0px 1px 6px, rgba(0, 0, 0, 0.239216) 0px 1px 4px;
+      border-radius: 2px;
+      padding-top: 8px;
+      padding-bottom: 8px;
+      overflow: visible;
+      z-index: 6;
+      outline: none !important;
+      opacity: 1;
+      visibility: visible;
+      background-color: rgb(255, 255, 255);
+    }
+
+    .Select-placeholder {
+      padding-left: 0px;
+    }
+
+    .underscore {
+      margin: 0px;
+      width: 100%;
+    }
+  }
+
+  .Select.is-focused {
+
+    border: initial !important;
+
+    .underscore {
+      transform: scaleX(1) !important;
+    }
+  }
+}
