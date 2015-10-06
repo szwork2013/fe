@@ -124,10 +124,10 @@ class GridService {
     // horni hranice pro min-width je MAXIMAL_COLUMN_MAX_WIDTH_PX
     let gridMinWidthsPX = matrix.map(v => {
       let elemDiv = document.createElement('div');
-      elemDiv.style.cssText = 'position:absolute;left:0;top:0;z-index:20;';
+      elemDiv.style.cssText = 'font-family:\'Roboto\',\'Helvetica Neue\',Helvetica,Arial,sans-serif;font-size:12px;position:absolute;left:0px;top:0px;z-index:0;visibility:hidden;';
       elemDiv.textContent = v;
       document.body.appendChild(elemDiv);
-      let elemWidth = elemDiv.clientWidth;
+      let elemWidth = elemDiv.clientWidth + 5;
       document.body.removeChild(elemDiv);
       return elemWidth < MAXIMAL_COLUMN_MIN_WIDTH_PX ? elemWidth : MAXIMAL_COLUMN_MIN_WIDTH_PX;
     });
