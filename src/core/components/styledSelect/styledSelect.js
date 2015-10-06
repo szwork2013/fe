@@ -141,6 +141,7 @@ export default class StyledSelect extends React.Component {
             multi={multi}
             delimiter={delimiter}
             placeholder={placeholder}
+            disabled={disabled}
           />
           <hr className="underscore1" style={{
             display: 'inline-block',

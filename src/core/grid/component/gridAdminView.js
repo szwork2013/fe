@@ -516,19 +516,20 @@ class GridAdminView extends PageAncestor {
 
                     console.debug('operatorOptions %o', operatorOptions);
 
+                    let borderStyle = (index > 0) ? {borderTop: 'inherit'} : {};
 
                     return (
                       <tr key={index}>
-                        <td>
+                        <td style={borderStyle}>
                           <StyledSelect name="conditionColumn" value={condition.column} options={fieldOptions} onChange={this.onChangeConditionColumn.bind(this, condition)} clearable={false} disabled={condition.implicit}/>
                         </td>
-                        <td>
+                        <td style={borderStyle}>
                           <StyledSelect name="conditionOperator" value={condition.operator} options={operatorOptions} onChange={this.onChangeConditionOperator.bind(this, condition)}  clearable={false} disabled={condition.implicit}/>
                         </td>
-                        <td>
+                        <td style={borderStyle}>
                           <ConditionValue condition={condition} onChange={this.onChangeConditionValues} disabled={condition.implicit}/>
                         </td>
-                        <td>
+                        <td style={borderStyle}>
                           {
                             (condition.implicit) ? '' : (
                               <a className="font-button-link" onClick={this.onDeleteCondition.bind(this, index)}>
@@ -563,18 +564,20 @@ class GridAdminView extends PageAncestor {
                 {
                   editedGridConfig.sortColumns.map( (sort, index) => {
 
+                    let borderStyle = (index > 0) ? {borderTop: 'inherit'} : {};
+
                     return (
                       <tr key={index}>
-                        <td>
-                          <Select name="sortColumn" value={sort.field} options={fieldOptions} onChange={this.onChangeSortField.bind(this, sort)} clearable={false}/>
+                        <td style={borderStyle}>
+                          <StyledSelect name="sortColumn" value={sort.field} options={fieldOptions} onChange={this.onChangeSortField.bind(this, sort)} clearable={false}/>
                         </td>
-                        <td>
-                          <Select name="sortOrder" value={sort.sortOrder} options={sortOrderOptions} onChange={this.onChangeSortOrder.bind(this, sort)}  clearable={false}/>
+                        <td style={borderStyle}>
+                          <StyledSelect name="sortOrder" value={sort.sortOrder} options={sortOrderOptions} onChange={this.onChangeSortOrder.bind(this, sort)}  clearable={false}/>
                         </td>
-                        <td>
+                        <td style={borderStyle}>
                           <Checkbox name="sortFixed" value={sort.fixed} defaultChecked={sort.fixed} label="Fixní řazení" onCheck={this.onCheckSortFixed}/>
                         </td>
-                        <td>
+                        <td style={borderStyle}>
                           <a className="font-button-link" onClick={this.onDeleteSort.bind(this, index)}><span className="fa fa-trash"/></a>
                         </td>
 
