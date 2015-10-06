@@ -40,6 +40,9 @@ export default class MdField {
     // filter operator for rendering when selected operator is exists
     this.existsFilterOperator;
 
+    // route pro kliknuti na policko v gridu
+    this.detailRoute;
+
   }
 
 

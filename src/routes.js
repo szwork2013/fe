@@ -29,7 +29,7 @@ const routes = (
     <Route name="contactPersonList" path="party/contact-person/list/:gridId?"  handler={ContactPersonList}/>
     <Route name="salesRepList" path="party/sales-rep/list/:gridId?"  handler={SalesRepList}/>
 
-    <Route name="partyDetail" path="party/customer/list/:gridId?"  handler={PartyDetail}/>
+    <Route name="partyDetail" path="party/:id"  handler={PartyDetail}/>
 
 
     <Route name="invoiceList" path="invoice/list/:gridId?"  handler={InvoiceList}/>

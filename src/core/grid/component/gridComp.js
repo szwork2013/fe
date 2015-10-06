@@ -343,7 +343,7 @@ export default class GridComp extends React.Component {
     };
     let iconStyle = {fontSize: 15};
 
-
+    let detailRoutes = [];
 
     return (
 
@@ -387,6 +387,7 @@ export default class GridComp extends React.Component {
               <div className="md-grid-data-row" style={{marginRight: this.state.showSelection?'28px':'0px'}}>
               {
                 grid.activeGridConfig.$columnRefs.map((mdField, columnIndex) => {
+                  detailRoutes.push(mdField.detailRoute);
                   return (
                     <div key={columnIndex} className="md-grid-header-cell"
                          style={{width: this.columnWidths[0][columnIndex]+'%', minWidth: this.columnWidths[1][columnIndex]+'px', maxWidth: this.columnWidths[2][columnIndex]+'px'}}>
@@ -404,7 +405,7 @@ export default class GridComp extends React.Component {
               ( _gridData) ? (( _gridData.totalCount === 0) ? 'No data found'
                   :
                   //this._tableRowsElement(_gridData.rows, columnWidths)) : ''
-                  (<VirtualList ref="VirtualList" items={ _gridData.rows} renderItem={this.renderItem}
+                  (<VirtualList ref="VirtualList" items={ _gridData.rows} renderItem={this.renderItem.bind(this, detailRoutes)}
                                 itemHeight={28}
                                 container={this.container} scrollDelay={15} resizeDelay={15} header={this.gridHeader} useRAF={true} /> )
               ) : ''
@@ -415,7 +416,7 @@ export default class GridComp extends React.Component {
   }
 
 
-  renderItem = (item) => {
+  renderItem(detailRoutes, item) {
     let rowClass = "md-grid-row";
 
     let selected = this.state.selectedRows.has(item.rowId);
@@ -442,11 +443,20 @@ export default class GridComp extends React.Component {
         {
           item.cells.map( (gridCell, columnIndex) => {
 
+            let detailRoute = detailRoutes[columnIndex];
+
             return (
               <div key={columnIndex} className="md-grid-cell"
-                onClick={this.onClickRow.bind(this, item.rowId)}
                 style={{width: this.columnWidths[0][columnIndex]+'%', minWidth: this.columnWidths[1][columnIndex]+'px', maxWidth: this.columnWidths[2][columnIndex]+'px' }} >
-                {gridCell.value}
+
+                {
+                  (detailRoute) ?
+                    (
+                      <a href={this.context.router.makeHref(detailRoute, {id: item.rowId})}> {gridCell.value} </a>
+                    )
+                    : gridCell.value
+                }
+
               </div>
             );
           })
