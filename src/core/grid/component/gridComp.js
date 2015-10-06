@@ -103,7 +103,7 @@ export default class GridComp extends React.Component {
   /* *******   PRIVATE METHODS ************ */
 
 
-  search() {
+  search(scrollToTop) {
     let grid = this.props.grid;
     console.debug("running search with gridId = %s, searchTerm = %s", grid.activeGridConfig.gridId, grid.searchTerm);
     this.setState({
@@ -113,6 +113,10 @@ export default class GridComp extends React.Component {
     GridActions.fetchData(grid)
       .then(() => {
         console.debug('data received');
+        if (scrollToTop) {
+          this.refs.VirtualList.scrollTop();
+          this.refs.VirtualList.forceUpdate();
+        }
         this.onResize();
       }, () => {
         this.setState({loading: false});
@@ -191,7 +195,7 @@ export default class GridComp extends React.Component {
       this.props.onGridChange(grid);
     }
 
-    this.search();
+    this.search(true);
   };
 
   onSelectGridManage = (evt) => {
@@ -214,7 +218,7 @@ export default class GridComp extends React.Component {
       this.props.onGridChange(grid);
     }
 
-    this.search();
+    this.search(true);
   };
 
 
@@ -228,7 +232,7 @@ export default class GridComp extends React.Component {
       this.props.onGridChange(grid);
     }
 
-    this.search();
+    this.search(true);
 
   }
 

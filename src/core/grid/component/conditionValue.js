@@ -15,7 +15,8 @@ export default class ConditionValue extends React.Component {
 
   static propTypes = {
     condition: React.PropTypes.instanceOf(GridConfigCondition),
-    onChange: React.PropTypes.func.isRequired
+    onChange: React.PropTypes.func.isRequired,
+    disabled: React.PropTypes.bool
   };
 
   constructor(props) {
@@ -42,6 +43,7 @@ export default class ConditionValue extends React.Component {
 
     let {
         condition,
+        disabled,
         ...other
         } = this.props;
 
@@ -51,18 +53,18 @@ export default class ConditionValue extends React.Component {
           'LESS_THAN', 'LESS_OR_EQUAL_THAN', 'CONTAINS', 'NOT_CONTAINS', 'LAST_X_DAYS', 'NEXT_X_DAYS'],
         operator) ) {
       return (
-        <FilterFieldComp name={condition.column} label="Vypln hodnotu" field={condition.$columnRef} value={condition.values[0]} onChange={this.onChangeValue1} />
+        <FilterFieldComp name={condition.column} label="Vypln hodnotu" field={condition.$columnRef} value={condition.values[0]} onChange={this.onChangeValue1} disabled={disabled} />
       );
     } else if ( _.includes(['IN', 'NOT_IN'], operator) ) {
       return (
-        <FilterFieldComp name={condition.column} label="Vyber hodnoty" field={condition.$columnRef} value={condition.values} multi={true} onChange={this.onChangeValues} />
+        <FilterFieldComp name={condition.column} label="Vyber hodnoty" field={condition.$columnRef} value={condition.values} multi={true} onChange={this.onChangeValues} disabled={disabled} />
       );
     } else if (operator === 'FROM_TO') {
       return (
         <div>
-          <FilterFieldComp name={condition.column + 'From'} label="od" field={condition.$columnRef} value={condition.values[0]} onChange={this.onChangeValue1} />
+          <FilterFieldComp name={condition.column + 'From'} label="od" field={condition.$columnRef} value={condition.values[0]} onChange={this.onChangeValue1} disabled={disabled} />
           -
-          <FilterFieldComp name={condition.column + 'To'} label="do" field={condition.$columnRef} value={condition.values[1]} onChange={this.onChangeValue2} />
+          <FilterFieldComp name={condition.column + 'To'} label="do" field={condition.$columnRef} value={condition.values[1]} onChange={this.onChangeValue2} disabled={disabled} />
         </div>
       );
 

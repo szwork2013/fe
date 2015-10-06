@@ -1,5 +1,5 @@
 import React from 'react';
-//import {Input} from 'react-bootstrap';
+import {Alert} from 'react-bootstrap';
 import { FlatButton, SelectField, TextField, RaisedButton, Checkbox } from 'material-ui';
 import Select  from 'react-select';
 import connectToStores from 'alt/utils/connectToStores';
@@ -24,6 +24,7 @@ import ArrayUtils from 'core/common/utils/arrayUtils';
 import MdEntityService from 'core/metamodel/mdEntityService';
 import MdEntityStore from 'core/metamodel/mdEntityStore';
 import ConditionValue from 'core/grid/component/conditionValue';
+import CommonService from 'core/common/service/commonService';
 
 
 import Toolmenu from 'core/components/toolmenu/toolmenu';
@@ -70,7 +71,8 @@ class GridAdminView extends PageAncestor {
 
   state = {
     gridId: null,
-    editedGridConfig: null
+    editedGridConfig: null,
+    errorMessages: []
   };
 
 
@@ -102,19 +104,80 @@ class GridAdminView extends PageAncestor {
     console.log('onClickSave %o', this.state.editedGridConfig);
     let grid = this.props.grid;
     // ulozim, na navrat musim aktualizovat editedGridConfig a grid v gridstoru
-    Axios.post('/core/grid-config', this.state.editedGridConfig)
-      .then(response => {
-        let editedGridConfig = response.data;
-        GridConfig.clasifyJson(editedGridConfig, grid);
-        grid.replaceGridConfig(editedGridConfig);
-        GridActions.updateGrid(grid);
 
-        this.setState({
-          gridId: editedGridConfig.gridId,
-          editedGridConfig: editedGridConfig
+    if (this.validate()) {
+      CommonService.loading(true);
+      Axios.post('/core/grid-config', this.state.editedGridConfig)
+        .then(response => {
+          let editedGridConfig = response.data;
+          GridConfig.clasifyJson(editedGridConfig, grid);
+          grid.replaceGridConfig(editedGridConfig);
+          GridActions.updateGrid(grid);
+
+          CommonService.loading(false);
+
+          this.setState({
+            gridId: editedGridConfig.gridId,
+            editedGridConfig: editedGridConfig
+          });
+          CommonService.toastSuccess("Grid byl úspěšně uložen");
         });
-      });
+    }
+
   };
+
+  validate() {
+    let errorMessages = this.state.errorMessages;
+    let editedGridConfig = this.state.editedGridConfig;
+
+    errorMessages = [];
+    let e1 = this.validateGridConfigName();
+    if (e1) errorMessages.push(e1);
+
+    if (_.isEmpty(editedGridConfig.columns)) {
+      errorMessages.push("Musí být vybrán alespoň 1 sloupec");
+    }
+
+    editedGridConfig.conditions.forEach((condition, index) => this.validationCondition(condition, errorMessages, index));
+    editedGridConfig.sortColumns.forEach((sortColumn, index) => this.validationSortColumn(editedGridConfig.sortColumns, sortColumn, errorMessages, index));
+
+    this.setState({editedGridConfig, errorMessages});
+
+    return _.isEmpty(errorMessages);
+  }
+
+  validationCondition(condition, errorMessages, index) {
+    if (!condition.column || !condition.operator) {
+      errorMessages.push( (index+1) + ". výběrový filtr musí mít vyplněn sloupec a operátor");
+      return;
+    }
+    let allOperators = MdEntityStore.getEntity('FILTEROPERATOR').lovItems;
+    let operator = allOperators.find(li => li.value === condition.operator);
+    let cardinality = operator.params[0];
+    if (cardinality == 1 || cardinality == "N") {
+      if (_.isEmpty(condition.values) || !condition.values[0]) {
+        errorMessages.push( (index+1) + ". výběrový filtr musí mít vyplněnou hodnotu");
+      }
+    }  else if (cardinality == 2) {
+      if (_.isEmpty(condition.values) || condition.values.length < 2 || !condition.values[0] || !condition.values[1]) {
+        errorMessages.push( (index+1) + ". výběrový filtr musí mít vyplněné obě hodnoty");
+      }
+    }
+  }
+
+  validationSortColumn(sortColumns, sortColumn, errorMessages, index) {
+    if (!sortColumn.field || !sortColumn.sortOrder) {
+      errorMessages.push( (index+1) + ". řazení v sestavě musí mít vyplněno sloupec a volbu řazení");
+      return;
+    }
+
+    if (sortColumn.fixed) {
+      if (sortColumns.filter( (v,i) =>  ( !v.fixed && i < index ) ).length > 0) {
+        errorMessages.push("Uzamknutá řazení musí být na začátku seznamu řazení (tj. nemůže být například první řazení odemčené a druhé zamčené.")
+      }
+    }
+
+  }
 
   onClickAdd = (evt) => {
     console.log('onClickAdd');
@@ -125,9 +188,12 @@ class GridAdminView extends PageAncestor {
     gridConfig.gridUse = 'PRIVATE';
     gridConfig.gridLocation = this.props.params.gridLocation;
     gridConfig.columns = [];
-    gridConfig.conditions = [];
+    gridConfig.conditions = (grid.implicitConditions) ? grid.implicitConditions.map(gcc => Object.assign(new GridConfigCondition(gridConfig), gcc)) : [];
     gridConfig.sortColumns = [];
     gridConfig.entity = grid.$entityRef.id;
+
+    this.fetchLovItems(gridConfig.conditions);
+
     this.setState({gridId: 0, editedGridConfig: gridConfig});
   };
 
@@ -136,10 +202,13 @@ class GridAdminView extends PageAncestor {
     let grid = this.props.grid;
     console.log('onClickDelete ' + gridId);
 
+    CommonService.loading(true);
+
     Axios.delete('/core/grid-config/' + gridId)
     .then(response => {
       grid.deleteGridConfig(gridId);
       GridActions.updateGrid(grid);
+      CommonService.loading(false);
       this.setState({
         gridId: null,
         editedGridConfig: null});
@@ -152,7 +221,7 @@ class GridAdminView extends PageAncestor {
     if (!ok) {
       this.context.router.transitionTo(GridService.defaultRoutes[this.props.params.gridLocation]);
     }
-  }
+  };
 
 
   onChangeGridConfigName = (evt) => {
@@ -161,6 +230,19 @@ class GridAdminView extends PageAncestor {
     editedGridConfig.gridName = gridName;
     this.setState({editedGridConfig});
   };
+
+  onBlurGridConfigName = (evt) => {
+    this.validateGridConfigName();
+    this.setState({editedGridConfig: this.state.editedGridConfig});
+  };
+
+  validateGridConfigName() {
+    let editedGridConfig = this.state.editedGridConfig;
+    editedGridConfig.$error_gridName = (editedGridConfig.gridName) ? undefined : "Název sestavy je povinný";
+    return editedGridConfig.$error_gridName;
+  }
+
+
 
   onCheckGridUse = (evt, checked) => {
     console.log('onCheckGridUse checked: ' + checked);
@@ -253,13 +335,20 @@ class GridAdminView extends PageAncestor {
     condition.operator = null;
     condition.values = [];
 
-    let field = condition.$columnRef;
-    if (field && field.valueSource) {
-      MdEntityService.fetchEntities([field.valueSource], {}, [true]);
-    }
+    this.fetchLovItems([condition]);
 
     this.setState({editedGridConfig});
   };
+
+  fetchLovItems(conditions) {
+    if (_.isEmpty(conditions)) return;
+
+    let valueSources = _.uniq(conditions.filter(c => (c.$columnRef && c.$columnRef.valueSource)).map(c => c.$columnRef.valueSource));
+
+    if (valueSources.length > 0) {
+      MdEntityService.fetchEntities(valueSources, {}, [true]);
+    }
+  }
 
   onChangeConditionOperator(condition, newOperator) {
     console.log('onChangeConditionOperator: ', newOperator, condition);
@@ -336,6 +425,7 @@ class GridAdminView extends PageAncestor {
       } = this.props;
 
     let editedGridConfig = this.state.editedGridConfig;
+    let errorMessages = this.state.errorMessages;
 
     let inputStyle = {fontSize: 14};
 
@@ -353,7 +443,7 @@ class GridAdminView extends PageAncestor {
     let allOperators = MdEntityStore.getEntity('FILTEROPERATOR').lovItems;
 
     return (
-      <main className="main-content">
+      <main className="main-content container">
         {toolMenu}
 
         <h4 className="zauzoo" style={{marginTop: 20}} >Průvodce správou sestav</h4>
@@ -372,18 +462,20 @@ class GridAdminView extends PageAncestor {
         <hr/>
 
         { (editedGridConfig) ? (
-          <div>
+          <form onValidSubmit={this.submit}>
             <h4 style={{marginTop: 20}}>
               {(this.state.gridId !== 0) ? 'Edituj sestavu' : 'Nová sestava' }
             </h4>
 
+            { (_.isEmpty(errorMessages)) ? '' : this._createErrorMessagesElement(errorMessages) }
+
             <BlockComp header="1. Změna názvu sestavy">
               <div style={{display: 'flex', whiteSpace: 'nowrap'}}>
-                <div>
+                <div style={{display: 'flex', alignItems: 'baseline'}}>
                   <TextField name="gridName"
                              floatingLabelText="Název sestavy"
-                             style={inputStyle}
-                             value={editedGridConfig.gridName} onChange={this.onChangeGridConfigName}/>
+                             style={inputStyle} required errorText={editedGridConfig.$error_gridName}
+                             value={editedGridConfig.gridName} onChange={this.onChangeGridConfigName} onBlur={this.onBlurGridConfigName}  />
                   <LocalizeField/>
                 </div>
                 <div style={{marginLeft: 30, alignSelf: 'flex-end', marginBottom: 5}}>
@@ -428,16 +520,22 @@ class GridAdminView extends PageAncestor {
                     return (
                       <tr key={index}>
                         <td>
-                          <StyledSelect name="conditionColumn" value={condition.column} options={fieldOptions} onChange={this.onChangeConditionColumn.bind(this, condition)} clearable={false}/>
+                          <StyledSelect name="conditionColumn" value={condition.column} options={fieldOptions} onChange={this.onChangeConditionColumn.bind(this, condition)} clearable={false} disabled={condition.implicit}/>
                         </td>
                         <td>
-                          <StyledSelect name="conditionOperator" value={condition.operator} options={operatorOptions} onChange={this.onChangeConditionOperator.bind(this, condition)}  clearable={false}/>
+                          <StyledSelect name="conditionOperator" value={condition.operator} options={operatorOptions} onChange={this.onChangeConditionOperator.bind(this, condition)}  clearable={false} disabled={condition.implicit}/>
                         </td>
                         <td>
-                          <ConditionValue condition={condition} onChange={this.onChangeConditionValues}/>
+                          <ConditionValue condition={condition} onChange={this.onChangeConditionValues} disabled={condition.implicit}/>
                         </td>
                         <td>
-                          <a className="font-button-link" onClick={this.onDeleteCondition.bind(this, index)}><span className="fa fa-trash"/></a>
+                          {
+                            (condition.implicit) ? '' : (
+                              <a className="font-button-link" onClick={this.onDeleteCondition.bind(this, index)}>
+                                <span className="fa fa-trash"/>
+                              </a>
+                            )
+                          }
                         </td>
 
                       </tr>
@@ -491,7 +589,7 @@ class GridAdminView extends PageAncestor {
               </RaisedButton>
             </BlockComp>
 
-          </div>
+          </form>
         ) : ''}
 
 
@@ -526,6 +624,23 @@ class GridAdminView extends PageAncestor {
             <span className="fa fa-chevron-left"/><span> Zpět</span>
           </FlatButton>
         </Toolmenu>
+    );
+  }
+
+  _createErrorMessagesElement(errorMessages) {
+    return (
+      <Alert bsStyle='danger'>
+        <ul>
+          {
+            errorMessages.map(str => {
+              return (
+                <li>{str}</li>
+              );
+            })
+          }
+          {this.state.errorMessage}
+        </ul>
+      </Alert>
     );
   }
 

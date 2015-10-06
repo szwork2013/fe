@@ -81,7 +81,7 @@ export default class GridConfig {
 
     // copy conditions
     for(let c of this.conditions) {
-      let newGcc = Object.assign(new GridConfigCondition(), c);
+      let newGcc = Object.assign(new GridConfigCondition(newGridConfig), c);
       if (c.values) newGcc.values = c.values.slice(0); // clone value array if exists
       newGridConfig.conditions.push(newGcc);
     }

@@ -77,17 +77,43 @@ export default class Application extends React.Component {
     };
   }
 
+  state = {
+    loading: false
+  };
+
 
   componentDidMount() {
     // set our internal variable to a reference to an instance of the growler
     commonService.toastr = this.refs.toastrRef;
     commonService.router = this.context.router;
+    commonService.emitter.on('LOADING', (isOn) => {
+      let [loading] = isOn;
+      console.log('LOADING listener: ', loading );
+      this.setState({loading});
+    });
   };
+
+  componentWillUnmount() {
+    commonService.emmiter.removeAllListeners('LOADING');
+  }
 
 
   render() {
     return (
       <div id="content">
+
+        {
+          (this.state.loading) ? (
+            <div className="loading loading--overlay">
+              <div className="loading__content loading__content--overlay">
+                <p className="sr-only">Loading the view...</p>
+                <i className="fa fa-4x fa-spinner fa-spin"></i>
+              </div>
+            </div>
+          ) : ''
+        }
+
+
         <MainMenu />
         <RouteHandler />
         <ToastContainer ref="toastrRef"

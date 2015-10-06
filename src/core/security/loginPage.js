@@ -21,7 +21,8 @@ export default class LoginPage extends React.Component {
     userError: null,
     passwordError: null,
     tenants: [],
-    tenantId: null
+    tenantId: null,
+    tenantError: null
   };
 
 
@@ -59,7 +60,12 @@ export default class LoginPage extends React.Component {
       this.setState({passwordError: "This Field is required."});
     }
 
-    if (!this.state.user || !this.state.password) {
+    if (this.state.tenantId == null) {
+      this.setState({tenantError: "This Field is required."});
+    }
+
+
+    if (!this.state.user || !this.state.password || this.state.tenantId == null) {
       return;
     }
 
@@ -77,7 +83,8 @@ export default class LoginPage extends React.Component {
           user: '',
           password: '',
           userError: null,
-          passwordError: null
+          passwordError: null,
+          tenantError: null
         }, () => {
           React.findDOMNode(this.refs.userField).getElementsByTagName("input")[0].focus();
         });
@@ -134,7 +141,7 @@ export default class LoginPage extends React.Component {
               <SelectField
                 style={{marginLeft:15, maxWidth:200}}
                 value={this.state.tenantId} onChange={this.onChangeTenantId} disabled={tenantIdDisabled}
-                hintText="Client" fullWidth
+                hintText="Client" fullWidth errorText={this.state.tenantError}
                 menuItems={this.state.tenants} displayMember="label" valueMember="id" autocomplete="off"/>
             </div>
           </div>

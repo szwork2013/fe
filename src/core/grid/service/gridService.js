@@ -77,11 +77,11 @@ class GridService {
     }
   }
 
-/*
- * Spocita width, min-width a max-width pro sloupce gridu.
- *
- * return Array[widths, min-widths, max-widths]
- */
+  /*
+   * Spocita width, min-width a max-width pro sloupce gridu.
+   *
+   * return Array[widths, min-widths, max-widths]
+   */
   computeGridWidths(gridData, gridConfig) {
     console.time("computeGridWidths");
     // maximalni hodnota, kterou muze nabyvat min-width
@@ -92,21 +92,28 @@ class GridService {
     var PATTERN_LETTER = 'C';
 
     let matrix = [];
-    matrix.push(gridConfig.$columnRefs.map( (mdField) => {
+    let headers = gridConfig.$columnRefs.map( (mdField) => {
       let v = mdField.gridHeaderLabelActive;
-      return (v) ? ( (typeof v == 'string') ? v.trim().length : v.toString().trim().length ) : 0;
-    }));
+      return (v) ? ( (typeof v == 'string') ? v.trim() : v.toString().trim() ) : "";
+    });
+
+    matrix.push.apply(matrix, headers);
+    console.log("Array: %o", matrix);
 
     if (gridData) {
       for(let row of gridData.rows) {
-        matrix.push(row.cells.map((cell) => {
-          let v = cell.value;
-          return (v) ? ( (typeof v == 'string') ? v.trim().length : v.toString().trim().length ) : 0;
-        }));
+        for (let i = 0; i < row.cells.length; i++) {
+          let str = (row.cells[i].value) ? ( (typeof row.cells[i].value == 'string') ? row.cells[i].value.trim() : row.cells[i].value.toString().trim() ) : "";
+          if (matrix[i].length < str.length) {
+            matrix[i] = str;
+          }
+        }
       }
     }
 
-    let absoluteLengths = _.zip(...matrix).map(col => _.max(col));
+    console.log("Array: %o", matrix);
+
+    //let absoluteLengths = _.zip(...matrix).map(col => _.max(col));
 
     // let absoluteMax = _.sum(absoluteLengths);
 
@@ -115,10 +122,10 @@ class GridService {
 
     // vypocet min-width pro sloupce - pomoci fiktivnich DIVu
     // horni hranice pro min-width je MAXIMAL_COLUMN_MAX_WIDTH_PX
-    let gridMinWidthsPX = absoluteLengths.map(v => {
+    let gridMinWidthsPX = matrix.map(v => {
       let elemDiv = document.createElement('div');
       elemDiv.style.cssText = 'position:absolute;left:0;top:0;z-index:20;';
-      elemDiv.textContent = Array(v).join(PATTERN_LETTER);
+      elemDiv.textContent = v;
       document.body.appendChild(elemDiv);
       let elemWidth = elemDiv.clientWidth;
       document.body.removeChild(elemDiv);

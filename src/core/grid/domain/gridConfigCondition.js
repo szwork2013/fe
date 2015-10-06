@@ -19,6 +19,9 @@ export default class GridConfigCondition {
     // array of values;
     this.values;
 
+    // implicit;
+    this.implicit;
+
   }
 
   get column() {
@@ -35,7 +38,8 @@ export default class GridConfigCondition {
     return {
       column: this.column,
       operator: this.operator,
-      values: this.values
+      values: this.values,
+      implicit: this.implicit
     };
   }
 
