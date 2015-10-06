@@ -9,6 +9,7 @@ import Select  from 'react-select';
 import MdField from 'core/metamodel/mdField';
 import MdEntityService from 'core/metamodel/mdEntityService';
 import MdEntityStore from 'core/metamodel/mdEntityStore';
+import StyledSelect from 'core/components/styledSelect/styledSelect';
 
 
 @connectToStores
@@ -72,12 +73,12 @@ export default class FilterFieldComp extends React.Component {
 
       if (multi) {
         return (
-          <Select name={name} value={value} multi={true} delimiter="|" options={fieldOptions}
+          <StyledSelect name={name}  value={value} multi={true} delimiter="|" options={fieldOptions}
                   onChange={this.onChangeMultiSelect}  clearable={false} disabled={disabled}/>
         );
       } else {
         return (
-          <Select name={name} value={value} options={fieldOptions} onChange={this.onChangeSelect}  clearable={false}  disabled={disabled}/>
+          <StyledSelect name={name} value={value} options={fieldOptions} onChange={this.onChangeSelect}  clearable={false} disabled={disabled}/>
         );
       }
 
