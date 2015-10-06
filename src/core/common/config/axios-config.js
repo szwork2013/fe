@@ -51,6 +51,7 @@ Axios.interceptors.response.use(function (response) {
       _r.transitionTo('loginPage');
     }
   } else {
+    commonService.loading(false);
     let _t = commonService.toastr;
     if (_t) {
 

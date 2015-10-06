@@ -7,6 +7,15 @@ class CommonService {
     this.emitter = new EventEmitter();
   }
 
+  emit(event, ...params) {
+    this.emitter.emit(event, params);
+  }
+
+  loading(isOn) {
+    this.emit("LOADING", isOn);
+  }
+
+
 
   toastSuccess(content) {
     this.toastr.success(

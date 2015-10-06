@@ -289,9 +289,11 @@
   order: 1;
 }
 
-@media only screen and (min-width: 48em) {
+@media only screen and (min-width: @screen-sm-min) {
   .container {
-    width: 46rem;
+    width: @container-sm;
+    margin-right: auto;
+    margin-left: auto;
   }
 
   .col-sm,
@@ -533,9 +535,11 @@
   }
 }
 
-@media only screen and (min-width: 62em) {
+@media only screen and (min-width: @screen-md-min) {
   .container {
-    width: 61rem;
+    width: @container-md;
+    margin-right: auto;
+    margin-left: auto;
   }
 
   .col-md,
@@ -773,9 +777,11 @@
   }
 }
 
-@media only screen and (min-width: 75em) {
+@media only screen and (min-width: @screen-lg-min) {
   .container {
-    width: 71rem;
+    width: @container-lg;
+    margin-right: auto;
+    margin-left: auto;
   }
 
   .col-lg,

@@ -105,12 +105,15 @@ class GridAdminView extends PageAncestor {
     // ulozim, na navrat musim aktualizovat editedGridConfig a grid v gridstoru
 
     if (this.validate()) {
+      CommonService.loading(true);
       Axios.post('/core/grid-config', this.state.editedGridConfig)
         .then(response => {
           let editedGridConfig = response.data;
           GridConfig.clasifyJson(editedGridConfig, grid);
           grid.replaceGridConfig(editedGridConfig);
           GridActions.updateGrid(grid);
+
+          CommonService.loading(false);
 
           this.setState({
             gridId: editedGridConfig.gridId,
@@ -198,10 +201,13 @@ class GridAdminView extends PageAncestor {
     let grid = this.props.grid;
     console.log('onClickDelete ' + gridId);
 
+    CommonService.loading(true);
+
     Axios.delete('/core/grid-config/' + gridId)
     .then(response => {
       grid.deleteGridConfig(gridId);
       GridActions.updateGrid(grid);
+      CommonService.loading(false);
       this.setState({
         gridId: null,
         editedGridConfig: null});
@@ -436,7 +442,7 @@ class GridAdminView extends PageAncestor {
     let allOperators = MdEntityStore.getEntity('FILTEROPERATOR').lovItems;
 
     return (
-      <main className="main-content">
+      <main className="main-content container">
         {toolMenu}
 
         <h4 className="zauzoo" style={{marginTop: 20}} >Průvodce správou sestav</h4>

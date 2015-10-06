@@ -1,0 +1,51 @@
+@import "../../assets/less/bootstrap-custom-variables";
+
+/**
+ * Loading blocks
+ */
+
+.loading {
+  /*display: flex;
+  align-items: center;
+  justify-content: center;*/
+  text-align: center;
+}
+
+.loading__content {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+
+  margin: auto;
+
+  transform: translate(-50%, -50%);
+
+}
+
+.loading__content--overlay {
+  padding: (@modal-inner-padding - 5px) @modal-inner-padding;
+
+  //    background-color: @modal-content-bg;
+  //    border: 1px solid @modal-content-fallback-border-color; //old browsers fallback (ie8 etc)
+  //    border: 1px solid @modal-content-border-color;
+  //    border-radius: @border-radius-large;
+  //    box-shadow: 0 3px 9px rgba(0, 0, 0, .5);
+  //    background-clip: padding-box;
+  // Remove focus outline from opened modal
+  outline: none;
+}
+
+.loading--overlay {
+  overflow: auto;
+  overflow-y: scroll;
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: @zindex-modal;
+  -webkit-overflow-scrolling: touch;
+
+  background-color: rgba(158, 158, 174, 0.6);
+}
+
