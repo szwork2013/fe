@@ -2,6 +2,8 @@
 
   .Select {
 
+    min-height: 48px;
+
     .Select-control {
       background-color: transparent;
       border: initial;
@@ -10,18 +12,27 @@
       font-family: Roboto, sans-serif;
       font-size: 16px;
       color: rgba(0, 0, 0, 0.87);
-      padding: 8px 0px 8px 0px;
+      padding: 18px 52px 8px 0px;
+      min-height: 48px;
       border-color: initial !important;
       box-shadow: initial !important;
+      display: block;
+      min-width: 100%;
+      width: 1px;
+      line-height: 100%;
+      /*white-space: nowrap;*/
+
+      input {
+
+      }
     }
 
     .Select-value {
-      padding: 8px 0px 8px 0px;
+      padding: 18px 0px 0px 0px;
+      height: 100%;
     }
 
     .Select-menu-outer {
-      //position: absolute;
-      //top: -7px;
       box-sizing: border-box;
       box-shadow: rgba(0, 0, 0, 0.117647) 0px 1px 6px, rgba(0, 0, 0, 0.239216) 0px 1px 4px;
       border-radius: 2px;
@@ -33,13 +44,34 @@
       opacity: 1;
       visibility: visible;
       background-color: rgb(255, 255, 255);
+
+      .Select-menu {
+        max-height: 184px;
+
+        .Select-option {
+          color: rgba(0, 0, 0, 0.87);
+        }
+
+        .Select-option.is-focused {
+          color: rgba(0, 0, 0, 0.87);
+          background-color: rgba(0, 0, 0, 0.0313726);
+        }
+      }
     }
 
     .Select-placeholder {
-      padding-left: 0px;
+      padding: 8px 0px 0px 0px;
+      height: 100%;
+      top: 11px;
     }
 
-    .underscore {
+    .Select-input {
+      overflow: hidden;
+      margin: 0 0 0 0;
+      padding: 0;
+    }
+
+    .underscore2 {
       margin: 0px;
       width: 100%;
     }
@@ -49,8 +81,48 @@
 
     border: initial !important;
 
-    .underscore {
+    .underscore2 {
       transform: scaleX(1) !important;
     }
+  }
+
+  .Select.is-multi {
+
+    .Select-input {
+      position: absolute;
+      bottom: 12px;
+    }
+
+    .Select-control {
+      padding-top: 10px;
+    }
+
+    .Select-item {
+      background-color: transparent;
+      border-color: #e0e0e0;
+      color: rgba(0, 0, 0, 0.87);
+      margin-top: 0px;
+      margin-bottom: 6px;
+    }
+  }
+}
+
+.StyledSelect.is-error {
+  .underscore1 {
+    border-color: #F44336 !important;
+    transform: scaleX(1) !important;
+    border-bottom-width: 2px !important;
+  }
+
+  .underscore2 {
+    visibility: hidden !important;
+  }
+
+  .errorText {
+    display: block;
+    margin-top: -6px;
+    font-size: 12px;
+    color: #F44336;
+    line-height: 120%;
   }
 }

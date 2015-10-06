@@ -7,6 +7,7 @@ import styles from 'core/components/styledSelect/styledSelect.less';
 export default class StyledSelect extends React.Component {
 
   static propTypes = {
+    errorText: React.PropTypes.string,
     addLabelText: React.PropTypes.string,      // placeholder displayed when you want to add a label on a multi-value input
     allowCreate: React.PropTypes.bool,         // whether to allow creation of new entries
     asyncOptions: React.PropTypes.func,        // function to call to get options
@@ -53,6 +54,7 @@ export default class StyledSelect extends React.Component {
   render() {
 
     let {
+      errorText,
       addLabelText,
       allowCreate,
       asyncOptions,
@@ -98,46 +100,63 @@ export default class StyledSelect extends React.Component {
       } = this.props;
 
     let selectValueRenderer = (selectValue) => {
-      return (
-        <div style={{width: '100%'}}>
-          <div style={{paddingRight: '52px'}}>{valueRenderer?valueRenderer(selectValue):selectValue.label}</div>
-          <hr className="underscore" style={{
-            borderStyle: 'none none solid',
-              borderBottomWidth: '2px',
-              position: 'absolute',
-              width: '100%',
-              bottom: '6px',
-              margin: '0px',
-              boxSizing: 'content-box',
-              height: '0px',
-              borderColor: 'rgb(63, 81, 181)',
-              transform: 'scaleX(0)',
-              transition: 'all 450ms cubic-bezier(0.23, 1, 0.32, 1) 0ms'}} />
+      return (multi) ?
+      (
+        valueRenderer?valueRenderer(selectValue):selectValue.label
+      ) : (
+      <div style={{width: '100%'}}>
+      <div style={{paddingRight: '52px'}}>{valueRenderer?valueRenderer(selectValue):selectValue.label}</div>
+      <hr className="underscore2" style={{
+        borderStyle: 'none none solid',
+          borderBottomWidth: '2px',
+          position: 'absolute',
+          width: '100%',
+          bottom: '8px',
+          margin: 0,
+          boxSizing: 'content-box',
+          height: '0px',
+          borderColor: 'rgb(63, 81, 181)',
+          transform: 'scaleX(0)',
+          transition: 'all 450ms cubic-bezier(0.23, 1, 0.32, 1) 0ms',
+          zIndex: 2}} />
       </div>
-      )
+      );
     }
 
+    let selectClassName = "StyledSelect";
+    if (errorText) {selectClassName += " is-error";}
+
     return (
-        <div className="StyledSelect" style={{position: 'relative', paddingBottom: '1px'}}>
+        <div className={selectClassName} style={{position: 'relative', paddingBottom: '1px'}}>
+          <div style={{position: 'relative', minHeight: '48px'}}>
           <Select
             name={name}
             valueRenderer={selectValueRenderer}
             value={value}
             options={options}
+            onBlur={onBlur}
             onChange={onChange}
+            onFocus={onFocus}
             clearable={clearable}
+            multi={multi}
+            delimiter={delimiter}
+            placeholder={placeholder}
           />
-          <hr style={{
+          <hr className="underscore1" style={{
             display: 'inline-block',
             border: 'none',
             borderBottom: 'solid 1px #e0e0e0',
             position: 'absolute',
             width: '100%',
-            bottom: '6px',
+            bottom: '8px',
             margin: 0,
             boxSizing: 'content-box',
             height: 0,
             marginRight: '5px'}} />
+          </div>
+          {
+            ( (errorText) ? (<span className="errorText">{errorText}</span>) : '' )
+          }
         </div>
     )
   }
