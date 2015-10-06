@@ -18,16 +18,15 @@ class CommonService {
 
 
   toastSuccess(content) {
-    this.toastr.success(
+    this.toastr.info(
       content,
       null, {
         tapToDismiss: true,
         showAnimation: 'animated fadeIn',
         hideAnimation: '',
-        positionClass: 'toast-bottom-right',
-        className: 'toast-bottom-right',
+        closeButton: true,
         //hideDuration: 1000,
-        timeOut: 3000,
+        timeOut: 2000,
         extendedTimeOut: 1000
       });
   }
