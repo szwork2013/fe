@@ -452,7 +452,7 @@ export default class GridComp extends React.Component {
                 {
                   (detailRoute) ?
                     (
-                      <a href={this.context.router.makeHref(detailRoute, {id: item.rowId})}> {gridCell.value} </a>
+                      <Link to={detailRoute} params={{id: item.rowId}}> {gridCell.value} </Link>
                     )
                     : gridCell.value
                 }
