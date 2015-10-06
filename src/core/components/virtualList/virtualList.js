@@ -140,6 +140,9 @@ var VirtualList = React.createClass({
   visibleItems: function() {
     return this.state.items;
   },
+  scrollTop: function() {
+    this.props.container.scrollTop = 0;
+  },
   render: function() {
     try {
       return (
