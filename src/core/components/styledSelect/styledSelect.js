@@ -142,6 +142,7 @@ export default class StyledSelect extends React.Component {
             delimiter={delimiter}
             placeholder={placeholder}
             disabled={disabled}
+            matchProp="label"
           />
           <hr className="underscore1" style={{
             display: 'inline-block',

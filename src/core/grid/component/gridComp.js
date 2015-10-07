@@ -452,7 +452,7 @@ export default class GridComp extends React.Component {
                 {
                   (detailRoute) ?
                     (
-                      <Link to={detailRoute} params={{id: item.rowId}}> {gridCell.value} </Link>
+                      <Link to={detailRoute} params={{id: (gridCell.dataId) ? gridCell.dataId : item.rowId}}> {gridCell.value} </Link>
                     )
                     : gridCell.value
                 }
