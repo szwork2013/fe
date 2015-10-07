@@ -1,5 +1,5 @@
 import _ from 'lodash';
-
+import moment from 'moment';
 
 export default class MdField {
 
@@ -43,6 +43,9 @@ export default class MdField {
     // route pro kliknuti na policko v gridu
     this.detailRoute;
 
+    //   BOOLEAN, NUMBER, STRING, DATE,DATETIME
+    this.dataType;
+
   }
 
 
@@ -52,6 +55,21 @@ export default class MdField {
 
   get gridHeaderTooltipActive() {
     return (this.gridHeaderTooltip) ? this.gridHeaderTooltip : this.tooltip;
+  }
+
+  formatValue(value) {
+    switch (this.dataType) {
+      case "DATE":
+        return moment(value).format('L');
+      case "DATETIME":
+        return moment(value).format('L LTS');
+      case "NUMBER":
+        return value;
+      case "BOOLEAN":
+        return value;
+      default:
+        return value;
+    }
   }
 
 }

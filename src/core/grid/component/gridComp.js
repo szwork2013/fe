@@ -343,8 +343,6 @@ export default class GridComp extends React.Component {
     };
     let iconStyle = {fontSize: 15};
 
-    let detailRoutes = [];
-
     return (
 
 
@@ -387,7 +385,6 @@ export default class GridComp extends React.Component {
               <div className="md-grid-data-row" style={{marginRight: this.state.showSelection?'28px':'0px'}}>
               {
                 grid.activeGridConfig.$columnRefs.map((mdField, columnIndex) => {
-                  detailRoutes.push(mdField.detailRoute);
                   return (
                     <div key={columnIndex} className="md-grid-header-cell"
                          style={{width: this.columnWidths[0][columnIndex]+'%', minWidth: this.columnWidths[1][columnIndex]+'px', maxWidth: this.columnWidths[2][columnIndex]+'px'}}>
@@ -405,7 +402,7 @@ export default class GridComp extends React.Component {
               ( _gridData) ? (( _gridData.totalCount === 0) ? 'No data found'
                   :
                   //this._tableRowsElement(_gridData.rows, columnWidths)) : ''
-                  (<VirtualList ref="VirtualList" items={ _gridData.rows} renderItem={this.renderItem.bind(this, detailRoutes)}
+                  (<VirtualList ref="VirtualList" items={ _gridData.rows} renderItem={this.renderItem}
                                 itemHeight={28}
                                 container={this.container} scrollDelay={15} resizeDelay={15} header={this.gridHeader} useRAF={true} /> )
               ) : ''
@@ -416,13 +413,14 @@ export default class GridComp extends React.Component {
   }
 
 
-  renderItem(detailRoutes, item) {
+  renderItem = (item) => {
+    let activeGridConfig = this.props.grid.activeGridConfig;
     let rowClass = "md-grid-row";
 
     let selected = this.state.selectedRows.has(item.rowId);
     if (selected) {rowClass += " md-grid-row-selected";}
 
-    let showRowHover = this.props.grid.activeGridConfig.showRowHower;
+    let showRowHover = activeGridConfig.showRowHower;
     if (showRowHover) {rowClass += " md-grid-row-hover";}
 
     return (
@@ -443,7 +441,10 @@ export default class GridComp extends React.Component {
         {
           item.cells.map( (gridCell, columnIndex) => {
 
-            let detailRoute = detailRoutes[columnIndex];
+            let field = activeGridConfig.$columnRefs[columnIndex];
+            let detailRoute = field.detailRoute;
+
+            let formattedValue = field.formatValue(gridCell.value);
 
             return (
               <div key={columnIndex} className="md-grid-cell"
@@ -452,9 +453,9 @@ export default class GridComp extends React.Component {
                 {
                   (detailRoute) ?
                     (
-                      <Link to={detailRoute} params={{id: (gridCell.dataId) ? gridCell.dataId : item.rowId}}> {gridCell.value} </Link>
+                      <Link to={detailRoute} params={{id: (gridCell.dataId) ? gridCell.dataId : item.rowId}}> {formattedValue} </Link>
                     )
-                    : gridCell.value
+                    : formattedValue
                 }
 
               </div>
