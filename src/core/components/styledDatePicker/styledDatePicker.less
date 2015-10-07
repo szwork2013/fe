@@ -1,0 +1,87 @@
+.StyledDatePicker {
+  display: inline-block;
+  height: 48px;
+  line-height: 24px;
+  font-size: 16px;
+
+  .rw-datetimepicker {
+    background-color: transparent;
+    border: initial;
+    border-radius: initial;
+    box-shadow: initial !important;
+    border-color: initial!important;
+    height: 100%;
+
+    .rw-input {
+      -webkit-box-shadow: initial;
+      color: rgba(0, 0, 0, 0.87);
+      background-color: transparent;
+      box-shadow: initial;
+      border-color: initial!important;
+      border-radius: initial;
+      padding-left: 0;
+      height: 100%;
+    }
+
+    .rw-select {
+      border: initial;
+      background-color: transparent;
+    }
+  }
+
+  .rw-datetimepicker:hover {
+    background-color: transparent;
+  }
+
+  .underscore {
+    position: absolute;
+    width: 100%;
+    bottom: 8px;
+    margin: 0;
+    box-sizing: content-box;
+    height: 0;
+  }
+
+  .underscore-grey {
+    display: inline-block;
+    border: none;
+    border-bottom: solid 1px #e0e0e0;
+  }
+
+  .underscore-blue {
+    border-style: none none solid;
+    border-bottom-width: 2px;
+    border-color: rgb(63, 81, 181);
+    transform: scaleX(0);
+    transition: all 450ms cubic-bezier(0.23, 1, 0.32, 1) 0ms;
+  }
+}
+
+.StyledDatePicker.is-focused {
+
+  .underscore-blue {
+    transform: scaleX(1);
+    z-index: 2;
+  }
+}
+
+.StyledDatePicker.is-error {
+  .underscore-grey {
+    border-color: #F44336 !important;
+    transform: scaleX(1) !important;
+    border-bottom-width: 2px !important;
+  }
+
+  .underscore-blue {
+    visibility: hidden !important;
+  }
+
+  .errorText {
+    position: relative;
+    bottom: 5px;
+    font-size: 12px;
+    line-height: 12px;
+    color: #f44336;
+    transition: all 450ms cubic-bezier(0.23, 1, 0.32, 1) 0ms;
+  }
+}
