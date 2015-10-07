@@ -31,15 +31,18 @@ export default class LoginPage extends React.Component {
   /* *******   EVENT HENDLERS ************ */
 
   onChangeUsername = (e) => {
-    this.setState({user: e.target.value});
+    let username = e.target.value;
+    this.setState({user: username});
 
-    SecurityService.getTenants(e.target.value)
-      .then(data => {
-        this.setState({
-          tenants: data,
-          tenantId: (data.length > 0) ? data[0].id : null
+    if (username) {
+      SecurityService.getTenants(e.target.value)
+        .then(data => {
+          this.setState({
+            tenants: data,
+            tenantId: (data.length > 0) ? data[0].id : null
+          });
         });
-      });
+    }
   };
 
   onChangeTenantId = (e) => {
