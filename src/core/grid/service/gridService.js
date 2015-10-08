@@ -88,13 +88,15 @@ class GridService {
     var MAXIMAL_COLUMN_MIN_WIDTH_PX = 350;
     // hodnata pro max-width sloupcu
     var MAXIMAL_COLUMN_WIDTH_PX = 7000;
-    // pismeno, jimz se vyplnuji divy, podle kterych se pocita min-width
-    var PATTERN_LETTER = 'C';
+    // retezec, ktery se doplni z text headeru pro vypocet sirky (zastupuje symobl razeni a filtru)
+    var HEADER_ADDITIONAL_STRING = 'AA';
+    // sirka pripocitavana ke spocitane sirce sloupce (aby text nebyl od uplneho kraje k uplnemu kraji)
+    var CELL_PADDING_PX = 5;
 
     let matrix = [];
     let headers = gridConfig.$columnRefs.map( (mdField) => {
       let v = mdField.gridHeaderLabelActive;
-      return (v) ? ( (typeof v == 'string') ? v.trim() : v.toString().trim() ) : "";
+      return ((v) ? ( (typeof v == 'string') ? v.trim() : v.toString().trim() ) : "") + HEADER_ADDITIONAL_STRING;
     });
 
     matrix.push.apply(matrix, headers);
@@ -127,7 +129,7 @@ class GridService {
       elemDiv.style.cssText = 'font-family:\'Roboto\',\'Helvetica Neue\',Helvetica,Arial,sans-serif;font-size:12px;position:absolute;left:0px;top:0px;z-index:0;visibility:hidden;';
       elemDiv.textContent = v;
       document.body.appendChild(elemDiv);
-      let elemWidth = elemDiv.clientWidth + 5;
+      let elemWidth = elemDiv.clientWidth + CELL_PADDING_PX;
       document.body.removeChild(elemDiv);
       return elemWidth < MAXIMAL_COLUMN_MIN_WIDTH_PX ? elemWidth : MAXIMAL_COLUMN_MIN_WIDTH_PX;
     });
