@@ -28,9 +28,19 @@ export default class GridConfigCondition {
     return this._column;
   }
 
+  get columnName() {
+    return this.$columnRef.fieldName;
+  }
+
+
   set column(column) {
     this._column = column;
     this.$columnRef = this.$gridConfigRef.$gridRef.$entityRef.fields[Utils.parseId(column).pop()];
+  }
+
+  setColumnRef(mdField) {
+    this._column = mdField.fieldKey;
+    this.$columnRef = mdField;
   }
 
   // musi byt kvuli https://github.com/babel/babel/issues/1469

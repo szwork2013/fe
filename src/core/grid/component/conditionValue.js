@@ -49,17 +49,17 @@ export default class ConditionValue extends React.Component {
 
     let operator = condition.operator;
 
-    if ( _.includes(['EQUAL', 'NOT_EQUAL', 'STARTS_WITH', 'NOT_STARTS_WITH', 'ENDS_WITH', 'NOT_ENDS_WITH', 'GREATER_THAN', 'GREATER_OR_EQUAL_THAN',
-          'LESS_THAN', 'LESS_OR_EQUAL_THAN', 'CONTAINS', 'NOT_CONTAINS', 'LAST_X_DAYS', 'NEXT_X_DAYS'],
+    if ( _.includes(['EQUAL', 'NOTEQUAL', 'STARTSWITH', 'NOTSTARTSWITH', 'ENDSWITH', 'NOTENDSWITH', 'GREATERTHAN', 'GREATEROREQUALTHAN',
+          'LESSTHAN', 'LESSOREQUALTHAN', 'CONTAINS', 'NOTCONTAINS', 'LASTXDAYS', 'NEXTXDAYS'],
         operator) ) {
       return (
         <FilterFieldComp name={condition.column} label="Vypln hodnotu" field={condition.$columnRef} value={condition.values[0]} onChange={this.onChangeValue1} disabled={disabled} />
       );
-    } else if ( _.includes(['IN', 'NOT_IN'], operator) ) {
+    } else if ( _.includes(['IN', 'NOTIN'], operator) ) {
       return (
         <FilterFieldComp name={condition.column} label="Vyber hodnoty" field={condition.$columnRef} value={condition.values} multi={true} onChange={this.onChangeValues} disabled={disabled} />
       );
-    } else if (operator === 'FROM_TO') {
+    } else if (operator === 'FROMTO') {
       return (
         <div>
           <FilterFieldComp name={condition.column + 'From'} label="od" field={condition.$columnRef} value={condition.values[0]} onChange={this.onChangeValue1} disabled={disabled} />
@@ -68,7 +68,7 @@ export default class ConditionValue extends React.Component {
         </div>
       );
 
-    } else if ( _.includes(['IS_TRUE', 'IS_FALSE'], operator) ) {
+    } else if ( _.includes(['ISTRUE', 'ISFALSE'], operator) ) {
       return null;
     } else {
       return null;

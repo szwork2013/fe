@@ -42,7 +42,7 @@ Axios.interceptors.response.use(function (response) {
   return response;
 }, function (error) {
   // Do something with response error
-  console.log('Error %o', error);
+  console.log('Error %s', JSON.stringify(error));
 
   if (error.status == 401) {
     let _r = commonService.router;

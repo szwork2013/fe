@@ -150,6 +150,45 @@ class GridService {
   }
 
 
+
+  validateCondition(condition, errorMessages, index, allOperators) {
+    if (!condition.column || !condition.operator) {
+      errorMessages.push( (index+1) + ". výběrový filtr musí mít vyplněn sloupec a operátor");
+      return false;
+    }
+    let operatorLov = allOperators.find(li => li.value === condition.operator);
+    let cardinality = operatorLov.params[0];
+    if (cardinality == 1 || cardinality == "N") {
+      if (_.isEmpty(condition.values) || !condition.values[0]) {
+        errorMessages.push( (index+1) + ". výběrový filtr musí mít vyplněnou hodnotu");
+        return false;
+      }
+    }  else if (cardinality == 2) {
+      if (_.isEmpty(condition.values) || condition.values.length < 2 || !condition.values[0] || !condition.values[1]) {
+        errorMessages.push( (index+1) + ". výběrový filtr musí mít vyplněné obě hodnoty");
+        return false;
+      }
+    }
+    return true;
+  }
+
+  validateSortColumn(sortColumns, sortColumn, errorMessages, index) {
+    if (!sortColumn.field || !sortColumn.sortOrder) {
+      errorMessages.push( (index+1) + ". řazení v sestavě musí mít vyplněno sloupec a volbu řazení");
+      return false;
+    }
+
+    if (sortColumn.fixed) {
+      if (sortColumns.filter( (v,i) =>  ( !v.fixed && i < index ) ).length > 0) {
+        errorMessages.push("Uzamknutá řazení musí být na začátku seznamu řazení (tj. nemůže být například první řazení odemčené a druhé zamčené.")
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+
 }
 
 export default new GridService();

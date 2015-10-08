@@ -36,10 +36,12 @@ export default class GridCompConnected extends React.Component {
 
     if (grid.activeGridConfig) params.gridId = grid.activeGridConfig.gridId;
 
-    let query = {
+    let query = Object.assign({
       searchTerm: grid.searchTerm,
       sort: grid.sort
-    };
+    }, grid.getConditionQueryObject());
+
+    console.debug('replaceWith %s, %o, %o', routeName, params, query);
 
     this.context.router.replaceWith(routeName, params, query);
   };
@@ -59,6 +61,13 @@ export default class GridCompConnected extends React.Component {
     grid.searchTerm = query.searchTerm;
     grid.activeGridConfig = grid.getActiveGridConfig(this.props.gridId);
     grid.sort = query.sort;
+
+    console.log(grid.activeGridConfig);
+
+    grid.setConditionQueryObject(query);
+
+
+
 
     GridActions.updateGrid(grid);
   }

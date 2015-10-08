@@ -60,13 +60,14 @@ class GridAdminView extends PageAncestor {
 
 
   static getStores(props) {
-    return [GridStore];
+    return [GridStore, MdEntityStore];
   }
 
   // multiple stores @see https://github.com/goatslacker/alt/issues/420
   static getPropsFromStores(props) {
     let grid = GridStore.getGrid(props.params.gridLocation);
-    return {grid};
+    let allOperators = MdEntityStore.getEntity('FILTEROPERATOR').lovItems;
+    return {grid, allOperators};
   }
 
   state = {
@@ -138,46 +139,15 @@ class GridAdminView extends PageAncestor {
       errorMessages.push("Musí být vybrán alespoň 1 sloupec");
     }
 
-    editedGridConfig.conditions.forEach((condition, index) => this.validationCondition(condition, errorMessages, index));
-    editedGridConfig.sortColumns.forEach((sortColumn, index) => this.validationSortColumn(editedGridConfig.sortColumns, sortColumn, errorMessages, index));
+    editedGridConfig.conditions.forEach((condition, index) => GridService.validateCondition(condition, errorMessages, index, this.props.allOperators));
+    editedGridConfig.sortColumns.forEach((sortColumn, index) => GridService.validateSortColumn(editedGridConfig.sortColumns, sortColumn, errorMessages, index));
 
     this.setState({editedGridConfig, errorMessages});
 
     return _.isEmpty(errorMessages);
   }
 
-  validationCondition(condition, errorMessages, index) {
-    if (!condition.column || !condition.operator) {
-      errorMessages.push( (index+1) + ". výběrový filtr musí mít vyplněn sloupec a operátor");
-      return;
-    }
-    let allOperators = MdEntityStore.getEntity('FILTEROPERATOR').lovItems;
-    let operator = allOperators.find(li => li.value === condition.operator);
-    let cardinality = operator.params[0];
-    if (cardinality == 1 || cardinality == "N") {
-      if (_.isEmpty(condition.values) || !condition.values[0]) {
-        errorMessages.push( (index+1) + ". výběrový filtr musí mít vyplněnou hodnotu");
-      }
-    }  else if (cardinality == 2) {
-      if (_.isEmpty(condition.values) || condition.values.length < 2 || !condition.values[0] || !condition.values[1]) {
-        errorMessages.push( (index+1) + ". výběrový filtr musí mít vyplněné obě hodnoty");
-      }
-    }
-  }
 
-  validationSortColumn(sortColumns, sortColumn, errorMessages, index) {
-    if (!sortColumn.field || !sortColumn.sortOrder) {
-      errorMessages.push( (index+1) + ". řazení v sestavě musí mít vyplněno sloupec a volbu řazení");
-      return;
-    }
-
-    if (sortColumn.fixed) {
-      if (sortColumns.filter( (v,i) =>  ( !v.fixed && i < index ) ).length > 0) {
-        errorMessages.push("Uzamknutá řazení musí být na začátku seznamu řazení (tj. nemůže být například první řazení odemčené a druhé zamčené.")
-      }
-    }
-
-  }
 
   onClickAdd = (evt) => {
     console.log('onClickAdd');
@@ -356,8 +326,7 @@ class GridAdminView extends PageAncestor {
     condition.operator = newOperator;
 
     if (newOperator) {
-      let allOperators = MdEntityStore.getEntity('FILTEROPERATOR').lovItems;
-      let operatorLov = allOperators.find(v => v.value === newOperator);
+      let operatorLov = this.props.allOperators.find(v => v.value === newOperator);
 
       if (operatorLov.params[0] === 'N') {
         condition.values = [];
@@ -395,8 +364,9 @@ class GridAdminView extends PageAncestor {
     this.setState({editedGridConfig: this.state.editedGridConfig});
   }
 
-  onCheckSortFixed = (evt, checked) => {
+  onCheckSortFixed(sort, evt, checked) {
     console.log('onCheckSortFixed: checked = ' + checked);
+    sort.fixed = checked;
     this.setState({editedGridConfig: this.state.editedGridConfig});
   };
 
@@ -421,6 +391,7 @@ class GridAdminView extends PageAncestor {
   render() {
     let {
       grid,
+      allOperators,
       ...other,
       } = this.props;
 
@@ -440,7 +411,7 @@ class GridAdminView extends PageAncestor {
 
     let sortOrderOptions = [{value: 'ASC', label: 'Vzestupně'}, {value: 'DESC', label: 'Sestupně'}];
 
-    let allOperators = MdEntityStore.getEntity('FILTEROPERATOR').lovItems;
+    let publicGridConfig = new Boolean(editedGridConfig && editedGridConfig.gridUse == 'PUBLIC').toString();
 
     return (
       <main className="main-content container">
@@ -479,7 +450,7 @@ class GridAdminView extends PageAncestor {
                   <LocalizeField/>
                 </div>
                 <div style={{marginLeft: 30, alignSelf: 'flex-end', marginBottom: 5}}>
-                  <Checkbox name="gridUse" defaultChecked={editedGridConfig.gridUse == 'PUBLIC'} value={editedGridConfig.gridUse == 'PUBLIC'} label="Public Grid" onCheck={this.onCheckGridUse}/>
+                  <Checkbox name="gridUse" defaultChecked={editedGridConfig.gridUse == 'PUBLIC'} value={publicGridConfig} label="Public Grid" onCheck={this.onCheckGridUse}/>
                 </div>
               </div>
             </BlockComp>
@@ -575,7 +546,7 @@ class GridAdminView extends PageAncestor {
                           <StyledSelect name="sortOrder" value={sort.sortOrder} options={sortOrderOptions} onChange={this.onChangeSortOrder.bind(this, sort)}  clearable={false}/>
                         </td>
                         <td style={borderStyle}>
-                          <Checkbox name="sortFixed" value={sort.fixed} defaultChecked={sort.fixed} label="Fixní řazení" onCheck={this.onCheckSortFixed}/>
+                          <Checkbox name="sortFixed" value={new Boolean(sort.fixed).toString()} defaultChecked={sort.fixed} label="Fixní řazení" onCheck={this.onCheckSortFixed.bind(this, sort)}/>
                         </td>
                         <td style={borderStyle}>
                           <a className="font-button-link" onClick={this.onDeleteSort.bind(this, index)}><span className="fa fa-trash"/></a>

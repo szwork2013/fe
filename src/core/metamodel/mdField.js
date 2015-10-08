@@ -7,7 +7,7 @@ export default class MdField {
     // fieldName
     this.fieldName;
 
-    // module_entityName_fieldName
+    // entityName_fieldName
     this.fieldKey;
 
     // main label
