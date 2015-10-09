@@ -1,6 +1,7 @@
 import _ from 'lodash';
 
 import GridConfig from 'core/grid/domain/gridConfig';
+import GridConfigCondition from 'core/grid/domain/gridConfigCondition';
 
 export default class Grid {
 
@@ -30,6 +31,10 @@ export default class Grid {
 
     // aktualni [{field: MdField, desc: false/true}, ....]
     this.sortArray = null;
+
+    // aktualni [gridConfigCondition, ....]
+    this.conditionArray = null;
+
 
   }
 
@@ -78,10 +83,16 @@ export default class Grid {
   }
 
 
+  /**
+   * vrati pole stringu [fieldName1_ASC, fieldName2_DESC, ..]
+   */
   get sort() {
     return (this.sortArray) ? this.sortArray.map(o => o.field.fieldName + ((o.desc)? "_DESC" : "_ASC") ) : null;
   }
 
+  /**
+   * setne sortArray - [ {field: field1Ref, desc: true/false}, ... ]  ze stringu (nebo pole stringu) fieldName1_ASC
+   */
   set sort(sortValue) {
     if (sortValue) {
       if (_.isString(sortValue)) {
@@ -93,6 +104,44 @@ export default class Grid {
       });
     } else {
       this.sortArray = [];
+    }
+  }
+
+  /**
+   * vytvori z conditionArray (pole gridConfigCondition) ->  { filter: [fieldName1_EQUAL, fieldName2_IN, ...],  fieldName1: [value11, value12, ...], fieldName2: [value21, value22, ...], .... }
+   */
+  getConditionQueryObject() {
+    if (_.isEmpty(this.conditionArray)) {
+      return {};
+    } else {
+      let queryObject = {filter: []};
+      for(let gcc of this.conditionArray) {
+        queryObject.filter.push(gcc.columnName + "_" + gcc.operator);
+        queryObject[gcc.columnName] = gcc.values;
+      }
+      return queryObject;
+    }
+  }
+
+  /**
+   * setne conditionArray (pole gridConfigCondition) z { filter: [fieldName1_EQUAL, fieldName2_IN, ...],  fieldName1: [value11, value12, ...], fieldName2: [value21, value22, ...], .... }
+   */
+  setConditionQueryObject(query) {
+
+    if (_.isEmpty(query.filter)) {
+      this.conditionArray = null;
+    } else {
+      this.conditionArray = [];
+      for(let oper of query.filter) {
+        let gcc = new GridConfigCondition(this.activeGridConfig);
+        let operFrags = oper.split('_');
+        let fieldName = operFrags[0];
+        gcc.column = this.activeGridConfig.entity + "_" + fieldName;
+        gcc.operator = operFrags[1];
+        gcc.values = query[fieldName];
+
+        this.conditionArray.push(gcc);
+      }
     }
   }
 

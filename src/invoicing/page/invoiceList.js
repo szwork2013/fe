@@ -1,7 +1,9 @@
 import React from 'react';
 import {State} from 'react-router';
 import reactMixin from 'react-mixin';
+import {TextField} from 'material-ui';
 
+import StyledDatePicker from 'core/components/styledDatePicker/styledDatePicker';
 import PageAncestor from 'core/common/page/pageAncestor';
 import GridService from 'core/grid/service/gridService';
 
@@ -27,6 +29,8 @@ export default class InvoiceList extends PageAncestor {
     var name = this.context.router.getCurrentPath();
     var name2 = this.getPath();
 
+    var testValue = 'ahoj';
+
     return (
       <main className="main-content">
         <h1>Invoice list ! <i className="fa fa-fa-file"></i>
@@ -34,6 +38,8 @@ export default class InvoiceList extends PageAncestor {
           <br/>
           {name2}
         </h1>
+        <StyledDatePicker defaultValue={new Date()} culture='en' style={{marginRight: '20px'}} />
+        <TextField defaultValue={testValue} />
         </main>
       );
   }

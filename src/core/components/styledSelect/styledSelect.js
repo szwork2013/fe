@@ -175,7 +175,8 @@ export default class StyledSelect extends React.Component {
             multi={multi}
             delimiter={delimiter}
             placeholder={placeholder}
-
+            disabled={disabled}
+            matchProp="label"
           />
           <hr className="underscore-grey"  />
           <hr className="underscore-blue"  />

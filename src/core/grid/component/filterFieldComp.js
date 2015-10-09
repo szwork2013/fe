@@ -18,7 +18,7 @@ export default class FilterFieldComp extends React.Component {
   static propTypes = {
     name: React.PropTypes.string.isRequired,
     field: React.PropTypes.instanceOf(MdField).isRequired,
-    value: React.PropTypes.any.isRequired,
+    value: React.PropTypes.any,
     label: React.PropTypes.string,
     multi: React.PropTypes.bool,
     onChange: React.PropTypes.func.isRequired,

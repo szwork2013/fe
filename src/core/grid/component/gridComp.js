@@ -113,7 +113,7 @@ export default class GridComp extends React.Component {
     GridActions.fetchData(grid)
       .then(() => {
         console.debug('data received');
-        if (scrollToTop) {
+        if (scrollToTop && this.refs.VirtualList) {
           this.refs.VirtualList.scrollTop();
           this.refs.VirtualList.forceUpdate();
         }
@@ -190,6 +190,7 @@ export default class GridComp extends React.Component {
     grid.activeGridConfig = this.props.grid.getGridConfig(gridId);
     grid.searchTerm = null;
     grid.sortArray = null;
+    grid.conditionArray = null;
 
     if (this.props.onGridChange) {
       this.props.onGridChange(grid);
@@ -234,7 +235,39 @@ export default class GridComp extends React.Component {
 
     this.search(true);
 
-  }
+  };
+
+  onClickColumnCondition = (condition, mdField) => {
+    console.log('onClickColumnCondition %o on %o', condition, mdField);
+
+    let grid = this.props.grid;
+
+    if (!grid.conditionArray) grid.conditionArray = [];
+
+    let oldConditionIndex = _.findIndex(grid.conditionArray, (gcc => gcc.columnName === mdField.fieldName));
+
+    if (condition) {
+      if (oldConditionIndex >= 0) {
+        grid.conditionArray.splice(oldConditionIndex, 1, condition);
+      } else {
+        grid.conditionArray.push(condition);
+      }
+    } else {
+      if (oldConditionIndex >= 0) {
+        grid.conditionArray.splice(oldConditionIndex, 1);
+      }
+    }
+
+
+    if (this.props.onGridChange) {
+      this.props.onGridChange(grid);
+    }
+
+    this.search(true);
+
+  };
+
+
 
 
   onClickCheck = (evt) => {
@@ -343,8 +376,6 @@ export default class GridComp extends React.Component {
     };
     let iconStyle = {fontSize: 15};
 
-
-
     return (
 
 
@@ -387,10 +418,14 @@ export default class GridComp extends React.Component {
               <div className="md-grid-data-row" style={{marginRight: this.state.showSelection?'28px':'0px'}}>
               {
                 grid.activeGridConfig.$columnRefs.map((mdField, columnIndex) => {
+
+                  let sortObject = _.find(grid.sortArray, so => so.field.fieldName === mdField.fieldName);
+                  let conditionObject = _.find(grid.conditionArray, gcc => gcc.$columnRef.fieldName === mdField.fieldName);
+
                   return (
                     <div key={columnIndex} className="md-grid-header-cell"
                          style={{width: this.columnWidths[0][columnIndex]+'%', minWidth: this.columnWidths[1][columnIndex]+'px', maxWidth: this.columnWidths[2][columnIndex]+'px'}}>
-                      <GridHeader field={mdField} sortArray={grid.sortArray} onClickLink={this.onClickColumnSort} />
+                      <GridHeader field={mdField} sortObject={sortObject} conditionObject={conditionObject} gridConfig={grid.activeGridConfig} onClickLink={this.onClickColumnSort} onConditionSet={this.onClickColumnCondition} />
                     </div>
                   );
                 })
@@ -416,12 +451,13 @@ export default class GridComp extends React.Component {
 
 
   renderItem = (item) => {
+    let activeGridConfig = this.props.grid.activeGridConfig;
     let rowClass = "md-grid-row";
 
     let selected = this.state.selectedRows.has(item.rowId);
     if (selected) {rowClass += " md-grid-row-selected";}
 
-    let showRowHover = this.props.grid.activeGridConfig.showRowHower;
+    let showRowHover = activeGridConfig.showRowHower;
     if (showRowHover) {rowClass += " md-grid-row-hover";}
 
     return (
@@ -442,11 +478,23 @@ export default class GridComp extends React.Component {
         {
           item.cells.map( (gridCell, columnIndex) => {
 
+            let field = activeGridConfig.$columnRefs[columnIndex];
+            let detailRoute = field.detailRoute;
+
+            let formattedValue = field.formatValue(gridCell.value);
+
             return (
               <div key={columnIndex} className="md-grid-cell"
-                onClick={this.onClickRow.bind(this, item.rowId)}
                 style={{width: this.columnWidths[0][columnIndex]+'%', minWidth: this.columnWidths[1][columnIndex]+'px', maxWidth: this.columnWidths[2][columnIndex]+'px' }} >
-                {gridCell.value}
+
+                {
+                  (detailRoute) ?
+                    (
+                      <Link to={detailRoute} params={{id: (gridCell.dataId) ? gridCell.dataId : item.rowId}}> {formattedValue} </Link>
+                    )
+                    : formattedValue
+                }
+
               </div>
             );
           })

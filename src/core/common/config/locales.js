@@ -1,5 +1,11 @@
 import Utils from 'core/common/utils/utils';
 import _ from 'lodash';
+import moment from 'moment';
+import cs from 'moment/locale/cs';
+import sk from 'moment/locale/sk';
+import de from 'moment/locale/de';
+import hu from 'moment/locale/hu';
+import pl from 'moment/locale/pl';
 
 class Locales {
 
@@ -11,6 +17,7 @@ class Locales {
   get lang() {
     if (!this._lang) {
       this._lang = this._resolveLang();
+      moment.locale(this._lang);
     }
     return this._lang;
   }
@@ -19,6 +26,7 @@ class Locales {
     if (_.includes(this.available, _l)) {
       this._lang = _l;
       Utils.writeCookie('lang', _l, 365);
+      moment.locale(_l);
     }
   }
 

@@ -6,17 +6,20 @@ import PageAncestor from 'core/common/page/pageAncestor';
 import GridService from 'core/grid/service/gridService';
 import GridCompConnected from 'core/grid/component/gridCompConnected';
 
-var gridLocation = 'partyCustomers';
+var gridLocation = 'vehicleList';
 
 @reactMixin.decorate(State)
-export default class PartyList extends PageAncestor {
+export default class VehicleList extends PageAncestor {
 
-  static title = 'Customers';
-  static icon = 'user';
+  static title = 'Vehicles';
+  static icon = 'truck';
 
+  static contextTypes = {
+    router: React.PropTypes.func.isRequired
+  };
 
   static fetchData(routerParams) {
-    console.log("PartyList#fetchData(%s)", gridLocation);
+    console.log("VehicleList#fetchData(%s)", gridLocation);
     return GridService.fetchGrids(gridLocation);
   }
 
@@ -27,7 +30,3 @@ export default class PartyList extends PageAncestor {
   }
 
 }
-
-//reactMixin(PartyList.prototype, State);
-
-
