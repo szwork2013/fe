@@ -174,7 +174,7 @@ export default class GridHeader extends React.Component {
 
     let filter = (
       <a ref="filterIconRef" onClick={this.onClickFilter} onMouseOver={this.onMouseOver} onMouseOut={this.onMouseOut}>
-        <span className={classNames('fa', 'fa-filter', {'invisible': !this.state.showFilterIcon})}/>
+        <span style={{marginLeft:1}} className={classNames('fa', 'fa-filter', {'invisible': !this.state.showFilterIcon})}/>
       </a>
 
     );
