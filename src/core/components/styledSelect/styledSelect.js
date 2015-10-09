@@ -1,9 +1,23 @@
 import React from 'react';
 import Select from 'react-select';
 
-import styles from 'core/components/styledSelect/styledSelect.less';
+import Styles from 'core/components/styledSelect/styledSelect.less';
+import MaterialStyles from 'material-ui/lib/utils/styles';
+import Transitions from 'material-ui/lib/styles/transitions';
 
-
+/**
+ * Komponenta StyledSelect v designu Material-UI.
+ *
+ * Komponenta pro vyber z nekolika moznosti s vyhledavanim. Podporuje mod "multi", ve kterem lze zvolit vice moznosti
+ * zaroven. V "ne-multi" modu se komponenta v toku dokumentu chova jako komponenta TextField z material UI.
+ *
+ * V modu "multi" je komponenta dostylovana tak aby zapadala do material designu. V takovem pripade ma nastavenou
+ * vysku na automatickou (height: auto) a minimalni vysku na 48px (min-height: 48px). Pro praci s velikosti kopmonenty
+ * je treba prekryt minimalni vysku komponenty (min-height) namisto klasicke vysky (height), jak je tomu u TextField
+ * z material-ui.
+ *
+ * @author mnemec
+ */
 export default class StyledSelect extends React.Component {
 
   static propTypes = {
@@ -22,6 +36,7 @@ export default class StyledSelect extends React.Component {
     disabled: React.PropTypes.bool,            // whether the Select is disabled or not
     filterOption: React.PropTypes.func,        // method to filter a single option  (option, filterString)
     filterOptions: React.PropTypes.func,       // method to filter the options array: function ([options], filterString, [values])
+    floatingLabelText: React.PropTypes.string,
     ignoreCase: React.PropTypes.bool,          // whether to perform case-insensitive filtering
     inputProps: React.PropTypes.object,        // custom attributes for the Input (in the Select-control) e.g: {'data-foo': 'bar'}
     isLoading: React.PropTypes.bool,           // whether the Select is loading externally or not (such as options being loaded)
@@ -51,6 +66,47 @@ export default class StyledSelect extends React.Component {
     valueRenderer: React.PropTypes.func        // valueRenderer: function (option) {}
   };
 
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      focused: false,
+    }
+  }
+
+  getStyles() {
+    const props = this.props;
+
+    let styles = {
+      root: {
+        fontSize: 16,
+        lineHeight: '24px',
+        width: props.fullWidth ? '100%' : 256,
+        height: props.floatingLabelText ? 72 : 48,
+        display: 'inline-block',
+        position: 'relative',
+        fontFamily: 'Roboto, sans-serif',
+        transition: Transitions.easeOut('200ms', 'height'),
+      },
+    }
+
+    return styles;
+  }
+
+  onBlurEvent = (e) => {
+    this.setState({focused: false});
+    if (this.props.onBlur) {
+      this.props.onBlur(e);
+    }
+  };
+
+  onFocusEvent = (e) => {
+    this.setState({focused: true});
+    if (this.props.onFocus) {
+      this.props.onFocus(e);
+    }
+  };
+
   render() {
 
     let {
@@ -69,6 +125,7 @@ export default class StyledSelect extends React.Component {
       disabled,
       filterOption,
       filterOptions,
+      floatingLabelText,
       ignoreCase,
       inputProps,
       isLoading,
@@ -99,64 +156,30 @@ export default class StyledSelect extends React.Component {
       ...other,
       } = this.props;
 
-    let selectValueRenderer = (selectValue) => {
-      return (multi) ?
-      (
-        valueRenderer?valueRenderer(selectValue):selectValue.label
-      ) : (
-      <div style={{width: '100%'}}>
-      <div style={{paddingRight: '52px'}}>{valueRenderer?valueRenderer(selectValue):selectValue.label}</div>
-      <hr className="underscore2" style={{
-        borderStyle: 'none none solid',
-          borderBottomWidth: '2px',
-          position: 'absolute',
-          width: '100%',
-          bottom: '8px',
-          margin: 0,
-          boxSizing: 'content-box',
-          height: '0px',
-          borderColor: 'rgb(63, 81, 181)',
-          transform: 'scaleX(0)',
-          transition: 'all 450ms cubic-bezier(0.23, 1, 0.32, 1) 0ms',
-          zIndex: 2}} />
-      </div>
-      );
-    }
-
+    let styles = this.getStyles();
     let selectClassName = "StyledSelect";
+    if (this.state.focused) {selectClassName += " is-focused";}
     if (errorText) {selectClassName += " is-error";}
+    if (multi) {selectClassName += " is-multi";}
 
     return (
-        <div className={selectClassName} style={{position: 'relative', paddingBottom: '1px'}}>
-          <div style={{position: 'relative', minHeight: '48px'}}>
-          <Select
+        <div className={selectClassName} style={MaterialStyles.mergeAndPrefix(styles.root, this.props.style)}>
+          <input className="rowAligner" type="text" style={{width: '100%', height: '100%', visibility: 'hidden'}} />
+          <Select ref="select" onFocus={this.onFocusEvent} onBlur={this.onBlurEvent}
             name={name}
-            valueRenderer={selectValueRenderer}
+            valueRenderer={valueRenderer}
             value={value}
             options={options}
-            onBlur={onBlur}
             onChange={onChange}
-            onFocus={onFocus}
             clearable={clearable}
             multi={multi}
             delimiter={delimiter}
             placeholder={placeholder}
+
           />
-          <hr className="underscore1" style={{
-            display: 'inline-block',
-            border: 'none',
-            borderBottom: 'solid 1px #e0e0e0',
-            position: 'absolute',
-            width: '100%',
-            bottom: '8px',
-            margin: 0,
-            boxSizing: 'content-box',
-            height: 0,
-            marginRight: '5px'}} />
-          </div>
-          {
-            ( (errorText) ? (<span className="errorText">{errorText}</span>) : '' )
-          }
+          <hr className="underscore-grey"  />
+          <hr className="underscore-blue"  />
+          <div className="errorText">{errorText}</div>
         </div>
     )
   }
