@@ -4,6 +4,7 @@ import reactMixin from 'react-mixin';
 import {TextField} from 'material-ui';
 
 import StyledDatePicker from 'core/components/styledDatePicker/styledDatePicker';
+import NumberInput from 'core/components/numberInput/numberInput';
 import PageAncestor from 'core/common/page/pageAncestor';
 import GridService from 'core/grid/service/gridService';
 
@@ -29,7 +30,7 @@ export default class InvoiceList extends PageAncestor {
     var name = this.context.router.getCurrentPath();
     var name2 = this.getPath();
 
-    var testValue = 'ahoj';
+    var testValue = '1000';
 
     return (
       <main className="main-content">
@@ -40,6 +41,7 @@ export default class InvoiceList extends PageAncestor {
         </h1>
         <StyledDatePicker defaultValue={new Date()} culture='en' style={{marginRight: '20px'}} />
         <TextField defaultValue={testValue} />
+        <NumberInput />
         </main>
       );
   }
