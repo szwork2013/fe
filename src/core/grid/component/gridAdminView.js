@@ -127,13 +127,20 @@ class GridAdminView extends PageAncestor {
 
   };
 
+  pushIfTrue(array, value) {
+    if (value) array.push(value);
+  }
+
   validate() {
     let errorMessages = this.state.errorMessages;
     let editedGridConfig = this.state.editedGridConfig;
 
     errorMessages = [];
-    let e1 = this.validateGridConfigName();
-    if (e1) errorMessages.push(e1);
+    this.pushIfTrue(errorMessages, this.validateGridConfigName());
+    this.pushIfTrue(errorMessages, this.validateGridScrollSize());
+    this.pushIfTrue(errorMessages, this.validateGridScrollIncrement());
+    this.pushIfTrue(errorMessages, this.validateMaxColumnWidth());
+
 
     if (_.isEmpty(editedGridConfig.columns)) {
       errorMessages.push("Musí být vybrán alespoň 1 sloupec");
@@ -161,6 +168,9 @@ class GridAdminView extends PageAncestor {
     gridConfig.conditions = (grid.implicitConditions) ? grid.implicitConditions.map(gcc => Object.assign(new GridConfigCondition(gridConfig), gcc)) : [];
     gridConfig.sortColumns = [];
     gridConfig.entity = grid.$entityRef.id;
+    gridConfig.gridScrollSize = 100000;
+    gridConfig.gridScrollIncrement = 1000;
+    gridConfig.maxColumnWidth = 350;
 
     this.fetchLovItems(gridConfig.conditions);
 
@@ -193,24 +203,55 @@ class GridAdminView extends PageAncestor {
     }
   };
 
-
-  onChangeGridConfigName = (evt) => {
-    let gridName = evt.target.value;
+//  text fields change handlers
+  onChangeTextField(fieldName, isNumber, evt) {
+    console.debug('onChangeTextField %s, value = %s', fieldName, evt.target.value);
     let editedGridConfig = this.state.editedGridConfig;
-    editedGridConfig.gridName = gridName;
+    editedGridConfig[fieldName] = evt.target.value;
     this.setState({editedGridConfig});
   };
 
-  onBlurGridConfigName = (evt) => {
+  validateTextField(fieldName, message, isPositiveNumber) {
+    let editedGridConfig = this.state.editedGridConfig;
+    let value = editedGridConfig[fieldName];
+
+    console.debug('validateTextField %s, value = %s', fieldName, value);
+
+    let error;
+    if(isPositiveNumber) {
+      value = parseInt(value);
+      if (!Number.isInteger(value)) {
+        error = message;
+      }
+    } else if (!value) {
+      error = message;
+    }
+    editedGridConfig['$error_' + fieldName] = error;
+    return error;
+  }
+
+
+  validateGridConfigName = () => this.validateTextField('gridName', "Název sestavy je povinný");
+  onBlurGridConfigName = () => {
     this.validateGridConfigName();
     this.setState({editedGridConfig: this.state.editedGridConfig});
   };
+  validateGridScrollSize = () => this.validateTextField('gridScrollSize', "Grid scroll size je povinné kladné číslo", true);
+  onBlurGridScrollSize = () => {
+    this.validateGridScrollSize();
+    this.setState({editedGridConfig: this.state.editedGridConfig});
+  };
+  validateGridScrollIncrement = () => this.validateTextField('gridScrollIncrement', "Grid scroll increment je povinné kladné číslo", true);
+  onBlurGridScrollIncrement = () => {
+    this.validateGridScrollIncrement();
+    this.setState({editedGridConfig: this.state.editedGridConfig});
+  };
+  validateMaxColumnWidth = () => this.validateTextField('maxColumnWidth', "Max column widh je povinné celé číslo", true);
+  onBlurMaxColumnWidth = () => {
+    this.validateMaxColumnWidth();
+    this.setState({editedGridConfig: this.state.editedGridConfig});
+  };
 
-  validateGridConfigName() {
-    let editedGridConfig = this.state.editedGridConfig;
-    editedGridConfig.$error_gridName = (editedGridConfig.gridName) ? undefined : "Název sestavy je povinný";
-    return editedGridConfig.$error_gridName;
-  }
 
 
 
@@ -445,8 +486,11 @@ class GridAdminView extends PageAncestor {
                 <div style={{display: 'flex', alignItems: 'baseline'}}>
                   <TextField name="gridName"
                              floatingLabelText="Název sestavy"
-                             style={inputStyle} required errorText={editedGridConfig.$error_gridName}
-                             value={editedGridConfig.gridName} onChange={this.onChangeGridConfigName} onBlur={this.onBlurGridConfigName}  />
+                             style={inputStyle} required
+                             errorText={editedGridConfig.$error_gridName}
+                             value={editedGridConfig.gridName}
+                             onChange={this.onChangeTextField.bind(this, 'gridName', false)}
+                             onBlur={this.onBlurGridConfigName} />
                   <LocalizeField/>
                 </div>
                 <div style={{marginLeft: 30, alignSelf: 'flex-end', marginBottom: 5}}>
@@ -562,6 +606,30 @@ class GridAdminView extends PageAncestor {
                 <span className="fa fa-plus"/> <span style={{lineHeight: '40px'}}> Přidat řazení </span>
               </RaisedButton>
             </BlockComp>
+
+            <BlockComp header="5. Pokročilé nastavení">
+              <div style={{display: 'flex'}}>
+                <TextField name="gridScrollSize"
+                           floatingLabelText="Max scroll Size"
+                           style={inputStyle} required errorText={editedGridConfig.$error_gridScrollSize}
+                           value={editedGridConfig.gridScrollSize}
+                           onChange={this.onChangeTextField.bind(this, 'gridScrollSize', true)}
+                           onBlur={this.onBlurGridScrollSize}  />
+                <TextField name="gridScrollIncrement"
+                           floatingLabelText="Scroll increment"
+                           style={inputStyle} required errorText={editedGridConfig.$error_gridScrollIncrement}
+                           value={editedGridConfig.gridScrollIncrement}
+                           onChange={this.onChangeTextField.bind(this, 'gridScrollIncrement', true)}
+                           onBlur={this.onBlurGridScrollIncrement}  />
+                <TextField name="maxColumnWidth"
+                           floatingLabelText="Max column width"
+                           style={inputStyle} required errorText={editedGridConfig.$error_maxColumnWidth}
+                           value={editedGridConfig.maxColumnWidth}
+                           onChange={this.onChangeTextField.bind(this, 'maxColumnWidth', true)}
+                           onBlur={this.onBlurMaxColumnWidth}  />
+              </div>
+            </BlockComp>
+
 
           </form>
         ) : ''}

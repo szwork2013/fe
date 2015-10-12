@@ -85,7 +85,7 @@ class GridService {
   computeGridWidths(gridData, gridConfig) {
     console.time("computeGridWidths");
     // maximalni hodnota, kterou muze nabyvat min-width
-    var MAXIMAL_COLUMN_MIN_WIDTH_PX = 350;
+    var MAXIMAL_COLUMN_MIN_WIDTH_PX = gridConfig.maxColumnWidth;
     // hodnata pro max-width sloupcu
     var MAXIMAL_COLUMN_WIDTH_PX = 7000;
     // retezec, ktery se doplni z text headeru pro vypocet sirky (zastupuje symobl razeni a filtru)
