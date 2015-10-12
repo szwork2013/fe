@@ -93,9 +93,15 @@ function isValid(value) {
 }
 
 //////////////////////////////////////////////////////////////////
-// React-number modified class
+// React-textFiled modified class
 //////////////////////////////////////////////////////////////////
 
+
+/**
+ * Komponenta textfield rozsirena o formatovani cisla podle property "format".
+ * - pri ztrate focusu (blur) se vyrenderuje hodnota zformatovana dle zadaneho "format"
+ * - pri ziskani focusu se vstupni pole vrati do stavu, v jakem ho vyplnil uzivatel
+ */
 let NumberInput = React.createClass({
 
   mixins: [StylePropable],
@@ -106,12 +112,14 @@ let NumberInput = React.createClass({
 
   propTypes: {
 
+    // numberInput props
     value: PropTypes.number.isRequired,
 //    type: PropTypes.string,
     format: PropTypes.string,
     min: PropTypes.number,
     max: PropTypes.number,
 
+    // textfield props
     errorStyle: React.PropTypes.object,
     errorText: React.PropTypes.string,
     floatingLabelStyle: React.PropTypes.object,
@@ -137,6 +145,7 @@ let NumberInput = React.createClass({
 
   getDefaultProps() {
     return {
+      // numberInput default props
       value: null,
       type: 'tel',
       format: DEFAULT_NUMBER_FORMAT,
@@ -144,6 +153,7 @@ let NumberInput = React.createClass({
       onBlur: function() {},
       onChange: function() {},
 
+      // textfield default props
       fullWidth: false,
       type: 'text',
       rows: 1,
@@ -214,6 +224,7 @@ let NumberInput = React.createClass({
     if (newState) this.setState(newState);
   },
 
+  // onChange nastavuje state.value na aktualni hodnotu
   onChange(event) {
     event.persist();
     this.setState(
@@ -221,10 +232,14 @@ let NumberInput = React.createClass({
     );
   },
 
+  /**
+   * vrati zformatovanou hodnotu dle zadaneho "format"
+   *
+   * @returns {string}
+     */
   valueAsFormatted() {
     const value = this.state.value
-    const n = toNumeral(value)
-
+    const n = toNumeral(value);
     return n ? n.format(this.props.format) : ''
   },
 
@@ -400,8 +415,10 @@ let NumberInput = React.createClass({
     let inputProps;
     let inputElement;
 
+    // hodnota, ktera se vypise je:
+    //    a) pri focusu jednoduse vypsana (tak jak ji uzivatel vlozil),
+    //    b) pri "nefocusu" vypsana zformatovana dle zadaneho "format"
     const displayValue = this.state.isFocused ? this.state.value : this.valueAsFormatted();
-    console.log("focused: "+this.state.isFocused);
 
     inputProps = {
       id: inputId,
@@ -411,7 +428,7 @@ let NumberInput = React.createClass({
       onFocus: this._handleInputFocus,
       disabled: this.props.disabled,
       onKeyDown: this._handleInputKeyDown,
-      value: displayValue
+      value: displayValue,
     };
 
     if (!this.props.hasOwnProperty('valueLink')) {
@@ -511,8 +528,9 @@ let NumberInput = React.createClass({
   },
 
   _handleInputChange(e) {
-    this.setState({hasValue: isValid(e.target.value)});
+    // volani metody onChange z NumberField (nastavi aktualni hodnotu inputu do state)
     this.onChange(e);
+    this.setState({hasValue: isValid(e.target.value)});
     if (this.props.onChange) this.props.onChange(e);
   },
 
