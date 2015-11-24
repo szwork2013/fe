@@ -69,7 +69,11 @@ module.exports = {
 
     module: {
         loaders: [
-            {test: /\.js?$/, include: srcPath, loaders: ['react-hot', 'babel?cacheDirectory']},
+            {
+                test: /\.js?$/,
+                include: srcPath,
+                loaders: (process.env.NODE_ENV === 'development') ? ['react-hot', 'babel?cacheDirectory=true'] : ['babel?cacheDirectory=true']
+            },
 
             {test: /\.less$/, loader: ExtractTextPlugin.extract('css?sourceMap!less?sourceMap')},
 
