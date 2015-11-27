@@ -1,4 +1,6 @@
 import React from 'react';
+import ReactDOM from 'react-dom';
+import LinkedStateMixin from 'react-addons-linked-state-mixin';
 import reactMixin from 'react-mixin';
 import Router from 'react-router';
 import {TextField, RaisedButton, SelectField} from 'material-ui';
@@ -89,7 +91,7 @@ export default class LoginPage extends React.Component {
           passwordError: null,
           tenantError: null
         }, () => {
-          React.findDOMNode(this.refs.userField).getElementsByTagName("input")[0].focus();
+          ReactDOM.findDOMNode(this.refs.userField).getElementsByTagName("input")[0].focus();
         });
 
       });
@@ -145,7 +147,7 @@ export default class LoginPage extends React.Component {
                 style={{marginLeft:15, maxWidth:200}}
                 value={this.state.tenantId} onChange={this.onChangeTenantId} disabled={tenantIdDisabled}
                 hintText="Client" fullWidth errorText={this.state.tenantError}
-                menuItems={this.state.tenants} displayMember="label" valueMember="id" autocomplete="off"/>
+                menuItems={this.state.tenants} displayMember="label" valueMember="id" autoComplete="off"/>
             </div>
           </div>
           <div className="row">
@@ -171,7 +173,7 @@ export default class LoginPage extends React.Component {
 
 }
 
-reactMixin.onClass(LoginPage, React.addons.LinkedStateMixin);
+reactMixin.onClass(LoginPage, LinkedStateMixin);
 reactMixin.onClass(LoginPage, Router.Navigation);
 
 

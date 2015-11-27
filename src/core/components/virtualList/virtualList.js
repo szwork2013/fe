@@ -1,4 +1,5 @@
 import  React from 'react';
+import ReactDOM from 'react-dom';
 import * as utils from 'core/components/virtualList/utils';
 
 var VirtualList = React.createClass({
@@ -45,7 +46,7 @@ var VirtualList = React.createClass({
     // no space to render
     if (viewHeight <= 0) return state;
 
-    var list = this.getDOMNode();
+    var list = ReactDOM.findDOMNode(this);
 
     var offsetTop = utils.topDifference(list, container);
 
@@ -60,9 +61,6 @@ var VirtualList = React.createClass({
     state.bufferStart = renderStats.firstItemIndex * props.itemHeight;
 
     return state;
-  },
-  getInitialState: function() {
-    return this.getVirtualState(this.props);
   },
   shouldComponentUpdate: function(nextProps, nextState) {
     if (this.state.bufferStart !== nextState.bufferStart) return true;
@@ -92,6 +90,9 @@ var VirtualList = React.createClass({
     this.setState(state);
   },
   componentWillMount: function() {
+    var state = this.getVirtualState(this.props);
+    this.setState(state);
+
     this.onScrollDebounced = utils.debounce(this.onScroll, this.props.scrollDelay, false);
     this.onResizeDebounced = utils.debounce(this.onResize, this.props.resizeDelay, false);
   },
@@ -143,6 +144,7 @@ var VirtualList = React.createClass({
   scrollTop: function() {
     this.props.container.scrollTop = 0;
   },
+
   render: function() {
     try {
       return (

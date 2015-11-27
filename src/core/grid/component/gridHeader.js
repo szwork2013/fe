@@ -1,4 +1,5 @@
 import React from 'react';
+import ReactDOM from 'react-dom';
 import _ from 'lodash';
 import classNames from 'classnames';
 
@@ -146,7 +147,7 @@ export default class GridHeader extends React.Component {
         show={this.state.showFilterPopover}
         onHide={() => this.setState({ showFilterPopover: false })}
         rootClose={true}
-        target={()=> React.findDOMNode(this.refs.filterIconRef)}
+        target={()=> ReactDOM.findDOMNode(this.refs.filterIconRef)}
         placement="bottom">
         <Popover style={{minWidth: 300}}
           title={<span><span>Column Filter</span> <span className="fa fa-close" style={{float: 'right', cursor: 'pointer'}} onClick={this.cancelPopover} ></span></span>}

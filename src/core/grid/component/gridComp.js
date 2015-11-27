@@ -1,4 +1,5 @@
 import React from 'react';
+import ReactDOM from 'react-dom';
 import reactMixin from 'react-mixin';
 import {Router, Link} from 'react-router';
 import connectToStores from 'alt/utils/connectToStores';
@@ -85,8 +86,8 @@ export default class GridComp extends React.Component {
 
   componentDidMount() {
     console.debug('componentDidMount');
-    this.container = React.findDOMNode(this.refs.rowContainer);
-    this.gridHeader = React.findDOMNode(this.refs.gridHeader);
+    this.container = ReactDOM.findDOMNode(this.refs.rowContainer);
+    this.gridHeader = ReactDOM.findDOMNode(this.refs.gridHeader);
     window.addEventListener('resize', this.onResizeDebounced);
   }
 

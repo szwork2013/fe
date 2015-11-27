@@ -1,4 +1,5 @@
 import React from 'react';
+import ReactDOM from 'react-dom';
 import {Input} from 'react-bootstrap';
 import { RaisedButton, Styles} from 'material-ui';
 
@@ -138,7 +139,7 @@ export default class DualSelector extends React.Component {
 
 
   _selectOptions(inputRef, action) {
-    let inputElement = React.findDOMNode(inputRef);
+    let inputElement = ReactDOM.findDOMNode(inputRef);
     let selectElement = inputElement.getElementsByTagName('select')[0];
 
     for (let i=0, iLen=selectElement.options.length; i<iLen; i++) {

@@ -1,7 +1,6 @@
 import React from 'react';
 import {Alert} from 'react-bootstrap';
 import { FlatButton, SelectField, TextField, RaisedButton, Checkbox } from 'material-ui';
-import Select  from 'react-select';
 import connectToStores from 'alt/utils/connectToStores';
 import reactMixin from 'react-mixin';
 import Router from 'react-router';
@@ -467,7 +466,7 @@ class GridAdminView extends PageAncestor {
             menuItemStyle={inputStyle}
             onChange={this.onChangeGridConfig}
             hintText="Vyber Sestavu"
-            menuItems={grid.gridConfigs} displayMember="label" valueMember="gridId" autocomplete="off"/>
+            menuItems={grid.gridConfigs} displayMember="label" valueMember="gridId" autoComplete="off"/>
 
         ) : ''}
 

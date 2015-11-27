@@ -1,7 +1,6 @@
 import React from 'react';
 import reactMixin from 'react-mixin';
 import {Navbar, Nav, NavItem, NavDropdown, MenuItem, CollapsibleNav } from 'react-bootstrap';
-import {NavItemLink, MenuItemLink} from 'react-router-bootstrap';
 import Router from 'react-router';
 import connectToStores from 'alt/utils/connectToStores';
 import alt from 'core/common/config/alt-config';
@@ -48,13 +47,13 @@ export default class MainMenu extends React.Component {
 
 
   onSelectWithTransition = (event, eventKey) => {
-    console.log('onSelect2: event = %o, eventKey = %o, target = %o', event, eventKey);
+    console.log('onSelect2: event = %o, eventKey = %o', event, eventKey);
     event.preventDefault();
     this.transitionTo(eventKey);
   };
 
   onSelectLanguage = (event, eventKey) => {
-    console.log('onSelect2: event = %o, eventKey = %o, target = %o', event, eventKey);
+    console.log('onSelect2: event = %o, eventKey = %o', event, eventKey);
     event.preventDefault();
     Locales.lang = eventKey;
     window.location.reload();
@@ -63,6 +62,12 @@ export default class MainMenu extends React.Component {
   printAppState = (e) => {
     console.debug(alt.takeSnapshot());
   }
+
+  onHome = (event) => {
+    event.preventDefault();
+    this.transitionTo("home");
+  };
+
 
 
   /* *******   REACT METHODS ************ */
@@ -93,19 +98,15 @@ export default class MainMenu extends React.Component {
     );
 
 
-
     var mainMenuFrag = (
       <Nav navbar eventKey={11}>
-        <NavItemLink to="home">Home</NavItemLink>
+        <NavItem href={this.makeHref('home')} eventKey={'home'} onClick={this.onHome}>Home</NavItem>
         <NavDropdown id="party_menu_dropdown" title='Party' onSelect={this.onSelectWithTransition}>
 
           { this._menuItem("partyList") }
           { this._menuItem("contactPersonList") }
           { this._menuItem("salesRepList") }
 
-          { /*  dokud bude rozbity react-router-bootstrap po update react-bootstrap na 0.25
-           <MenuItemLink to="partyList" eventKey='1'>Customers</MenuItemLink>
-          */}
 
           <MenuItem divider/>
           <MenuItem eventKey='3'>Administration</MenuItem>
@@ -134,16 +135,24 @@ export default class MainMenu extends React.Component {
     );
 
     return (
-      <Navbar inverse fixedTop fluid brand={<a href="#">Zauzoo</a>} toggleNavKey={1}>
-        <CollapsibleNav eventKey={1}>
+      <Navbar inverse fixedTop fluid>
+
+        <Navbar.Header>
+          <Navbar.Brand>
+            <a href="#">Zauzoo</a>
+          </Navbar.Brand>
+          <Navbar.Toggle />
+        </Navbar.Header>
+
+        <Navbar.Collapse>
 
           { CurrentUserStore.isLoggedIn() ? mainMenuFrag : '' }
 
-          <Nav navbar right eventKey={12}>
+          <Nav navbar pullRight eventKey={12}>
             { CurrentUserStore.isLoggedIn() ? userMenuFrag : '' }
             {languagesFrag}
           </Nav>
-        </CollapsibleNav>
+        </Navbar.Collapse>
       </Navbar>
     );
   }

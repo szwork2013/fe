@@ -1,6 +1,6 @@
 import React from 'react';
 import {Styles, Paper} from 'material-ui';
-
+import {customizeTheme}  from 'core/common/config/mui-theme';
 import styles from 'core/components/blockComp/blockComp.less';
 
 
@@ -24,7 +24,7 @@ export default class BlockComp extends React.Component {
   };
 
   componentWillMount() {
-    this.context.muiTheme.setComponentThemes({
+    customizeTheme(this.context.muiTheme, {
       paper: {
         backgroundColor: Colors.grey50
       }

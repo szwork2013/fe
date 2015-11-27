@@ -4,7 +4,6 @@ import classNames from 'classnames';
 import connectToStores from 'alt/utils/connectToStores';
 
 import {TextField, Checkbox} from 'material-ui';
-import Select  from 'react-select';
 
 import MdField from 'core/metamodel/mdField';
 import MdEntityService from 'core/metamodel/mdEntityService';

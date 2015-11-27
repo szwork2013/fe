@@ -3,6 +3,7 @@ import numeral from 'numeral';
 import {Component, PropTypes, createElement} from 'react';
 
 import React from 'react';
+import ReactDOM from 'react-dom';
 import ColorManipulator from 'material-ui/lib/utils/color-manipulator';
 import StylePropable from 'material-ui/lib/mixins/style-propable';
 import Transitions from 'material-ui/lib/styles/transitions';
@@ -519,7 +520,7 @@ let NumberInput = React.createClass({
 
   _getInputNode() {
     return (this.props.children || this.props.multiLine) ?
-      this.refs[this._getRef()].getInputNode() : React.findDOMNode(this.refs[this._getRef()]);
+      this.refs[this._getRef()].getInputNode() : ReactDOM.findDOMNode(this.refs[this._getRef()]);
   },
 
   _handleInputBlur(e) {

@@ -3,7 +3,9 @@ import { RouteHandler } from 'react-router';
 
 import { ToastContainer, ToastMessage } from 'react-toastr';
 
-import {Styles} from 'material-ui';
+import ThemeManager from 'material-ui/lib/styles/theme-manager';
+import {muiRawTheme, muiThemeCustomization, customizeTheme}  from 'core/common/config/mui-theme';
+
 import injectTapEventPlugin from 'react-tap-event-plugin';
 
 import commonService from 'core/common/service/commonService';
@@ -11,39 +13,9 @@ import MainMenu from 'core/mainmenu/mainMenu';
 
 import styles from 'core/application/application.less';
 
-const ThemeManager = new Styles.ThemeManager();
-const Colors = Styles.Colors;
 
 const ToastMessageFactory = React.createFactory(ToastMessage.animation);
 
-ThemeManager.setPalette({
-  primary1Color: Colors.indigo500,
-  primary2Color: Colors.indigo700,
-  primary3Color: Colors.indigo100,
-  accent1Color: Colors.pinkA200,
-  accent2Color: Colors.pinkA400,
-  accent3Color: Colors.pinkA100
-});
-
-ThemeManager.setComponentThemes({
-  toolbar: {
-    backgroundColor: Colors.blueGrey50,
-    height: 40,
-    titleFontSize: 20
-  },
-  tableRowColumn: {
-    height: 28,
-    spacing: 16
-  },
-  tableHeaderColumn: {
-    height: 28,
-    spacing: 16
-  },
-  button: {
-    iconButtonSize: 40,
-  },
-
-});
 
 
 injectTapEventPlugin();
@@ -73,13 +45,18 @@ export default class Application extends React.Component {
 
   getChildContext() {
     return {
-      muiTheme: ThemeManager.getCurrentTheme()
+      muiTheme: this.muiTheme
     };
   }
 
   state = {
     loading: false
   };
+
+  componentWillMount() {
+    this.muiTheme = ThemeManager.getMuiTheme(muiRawTheme);
+    customizeTheme(this.muiTheme, muiThemeCustomization);
+  }
 
 
   componentDidMount() {

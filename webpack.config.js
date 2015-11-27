@@ -1,4 +1,3 @@
-'use strict';
 
 var webpack = require('webpack'),
     HtmlWebpackPlugin = require('html-webpack-plugin'),
@@ -52,7 +51,8 @@ module.exports = {
     cache: true,
     entry: {
         module: ["assets/less/main.less", "font-awesome/less/font-awesome.less", path.join(srcPath, 'module.js')],
-        common: ['react', 'react-router', 'alt', 'axios', 'events', 'material-ui', 'react-bootstrap', 'react-mixin', 'react-router-bootstrap', 'react-tap-event-plugin', 'when']
+        common: ["alt", "axios", "classnames", "events", "material-ui", "moment", "numeral", "react",
+          "react-addons-linked-state-mixin", "react-bootstrap", "react-dom", "react-mixin", "react-router", "react-select", "react-tap-event-plugin", "react-toastr", "react-widgets", "when"]
     },
     resolve: {
         root: srcPath,
@@ -72,7 +72,7 @@ module.exports = {
             {
                 test: /\.js?$/,
                 include: srcPath,
-                loaders: (process.env.NODE_ENV === 'development') ? ['react-hot', 'babel?cacheDirectory=true'] : ['babel?cacheDirectory=true']
+                loaders: (process.env.NODE_ENV === 'development') ? ['react-hot', 'babel?cacheDirectory'] : ['babel?cacheDirectory']
             },
 
             {test: /\.less$/, loader: ExtractTextPlugin.extract('css?sourceMap!less?sourceMap')},
@@ -88,7 +88,9 @@ module.exports = {
 
     plugins: _plugins,
 
-
+    node: {
+      fs: "empty"
+    },
 
     debug: true,
     devtool: 'eval-source-map',

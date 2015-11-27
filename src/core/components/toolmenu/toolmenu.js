@@ -1,6 +1,6 @@
 import React from 'react';
 import {Styles} from 'material-ui';
-
+import {customizeTheme}  from 'core/common/config/mui-theme';
 import styles from 'core/components/toolmenu/toolmenu.less';
 
 
@@ -15,7 +15,7 @@ export default class Toolmenu extends React.Component {
 
 
   componentWillMount() {
-    this.context.muiTheme.setComponentThemes({
+    customizeTheme(this.context.muiTheme, {
       button: {
         height: 40
       },
