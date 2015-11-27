@@ -1,4 +1,3 @@
-import Utils from 'core/common/utils/utils';
 import _ from 'lodash';
 import moment from 'moment';
 import cs from 'moment/locale/cs';
@@ -6,6 +5,15 @@ import sk from 'moment/locale/sk';
 import de from 'moment/locale/de';
 import hu from 'moment/locale/hu';
 import pl from 'moment/locale/pl';
+
+import momentLocalizer from 'react-widgets/lib/localizers/moment';
+
+
+import Utils from 'core/common/utils/utils';
+
+
+momentLocalizer(moment);
+
 
 class Locales {
 
@@ -37,6 +45,8 @@ class Locales {
      */
   _resolveLang() {
     console.debug('resolving lang ');
+
+
     let _l = Utils.getCookie('lang');
     if (_l) {
       if (_.includes(this.available, _l)) {

@@ -2,9 +2,10 @@ import React from 'react';
 import DateTimePicker from 'react-widgets/lib/DateTimePicker';
 import Popup from 'react-widgets/lib/Popup';
 
+import 'react-widgets/lib/less/react-widgets.less';
+
 import styles from 'core/components/styledDatePicker/styledDatePicker.less';
 
-require('react-widgets/lib/less/react-widgets.less');
 
 export default class StyledDatePicker extends React.Component {
 

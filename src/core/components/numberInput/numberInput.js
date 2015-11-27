@@ -184,7 +184,7 @@ let NumberInput = React.createClass({
   },
 
   getTheme() {
-    return this.context.muiTheme.component.textField;
+    return this.context.muiTheme.textField;
   },
 
   componentDidMount() {

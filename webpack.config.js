@@ -21,7 +21,7 @@ var _plugins = [
   }),
   new webpack.NoErrorsPlugin(),
   new ExtractTextPlugin('styles-[hash:8].css'),  // // extract inline css into separate 'styles.css'
-  //new webpack.ContextReplacementPlugin(/moment[\/\\]locale$/, /de|en|hu|cs|sk|pl/)
+  new webpack.IgnorePlugin(/^\.\/locale$/, [/moment$/])
 ];
 
 
@@ -81,8 +81,8 @@ module.exports = {
 
             { test: /\.woff(2)?(\?v=[0-9]\.[0-9]\.[0-9])?$/, loader: "url-loader?limit=10000&minetype=application/font-woff" },
             { test: /\.(ttf|eot|svg|gif)(\?v=[0-9]\.[0-9]\.[0-9])?$/, loader: "file-loader" }
-        ],
-      noParse: [/moment.js/]
+        ]
+   //   noParse: [/moment.js/]  - zmensi build, protoze bez toho se bundluji vsechny locales, ale s tim zase nefunguje react-widgets/lib/localizers/moment
     },
 
 
