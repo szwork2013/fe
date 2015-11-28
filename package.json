@@ -9,7 +9,7 @@
     "build": "set NODE_ENV=production&& rm -Rf build/* && webpack -p --progress --profile --colors --devtool source-map --optimize-dedupe",
     "build-linux": "export NODE_ENV=production&& rm -Rf build/* && webpack -p --progress --profile --colors --devtool source-map --optimize-dedupe",
     "lint": "eslint src",
-    "test": "mocha --compilers js:babel-core/register --require ./test/test_helper.js --recursive",
+    "test": "mocha --compilers js:babel-core/register,less:./test/less-null-compiler.js  --require ./test/test_helper.js --recursive",
     "test:watch": "npm run test -- --watch",
     "watch": "set NODE_ENV=development&& rm -Rf build/* && webpack-dev-server --hot --inline --progress --colors"
   },
