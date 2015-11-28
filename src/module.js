@@ -27,7 +27,7 @@ Router.run(routes, Router.HistoryLocation, (Root, state) => {
 
   When.all(promises)
     .then((data) => {
-        ReactDOM.render(<Root {...state} data={data}/>, document.getElementById('app'));
+        ReactDOM.render(<Root {...state} data={data}/>, document.body);
     })
 
 });

@@ -11,7 +11,7 @@ import injectTapEventPlugin from 'react-tap-event-plugin';
 import commonService from 'core/common/service/commonService';
 import MainMenu from 'core/mainmenu/mainMenu';
 
-import styles from 'core/application/application.less';
+import 'core/application/application.less';
 
 
 const ToastMessageFactory = React.createFactory(ToastMessage.animation);
