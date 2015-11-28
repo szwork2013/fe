@@ -9,7 +9,8 @@
     "build": "set NODE_ENV=production&& rm -Rf build/* && webpack -p --progress --profile --colors --devtool source-map --optimize-dedupe",
     "build-linux": "export NODE_ENV=production&& rm -Rf build/* && webpack -p --progress --profile --colors --devtool source-map --optimize-dedupe",
     "lint": "eslint src",
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "mocha --compilers js:babel-core/register --require ./test/test_helper.js --recursive",
+    "test:watch": "npm run test -- --watch",
     "watch": "set NODE_ENV=development&& rm -Rf build/* && webpack-dev-server --hot --inline --progress --colors"
   },
   "devDependencies": {
@@ -17,6 +18,8 @@
     "babel-eslint": "^4.1.6",
     "babel-loader": "^5.4.0",
     "bootstrap": "^3.3.5",
+    "chai": "^3.4.1",
+    "chai-immutable": "^1.5.3",
     "css-loader": "^0.17.0",
     "eslint": "^1.10.1",
     "eslint-plugin-react": "^3.10.0",
@@ -24,8 +27,10 @@
     "file-loader": "^0.8.5",
     "font-awesome": "^4.4.0",
     "html-webpack-plugin": "^1.7.0",
+    "jsdom": "^7.1.0",
     "less": "^2.5.1",
     "less-loader": "^2.2.0",
+    "mocha": "^2.3.4",
     "node-libs-browser": "^0.5.2",
     "react-hot-loader": "^1.3.0",
     "style-loader": "^0.12.3",
@@ -40,6 +45,7 @@
     "classnames": "^2.1.3",
     "events": "^1.1.0",
     "flexboxgrid": "^6.3.0",
+    "immutable": "^3.7.5",
     "material-ui": "^0.13.4",
     "moment": "^2.10.6",
     "numeral": "^1.5.3",
@@ -48,11 +54,13 @@
     "react-bootstrap": "0.28.1",
     "react-dom": "^0.14.3",
     "react-mixin": "^3.0.3",
+    "react-redux": "^4.0.0",
     "react-router": "^0.13.5",
     "react-select": "^0.9.1",
     "react-tap-event-plugin": "0.2.1",
     "react-toastr": "^2.2.2",
     "react-widgets": "^3.1.0",
+    "redux": "^3.0.4",
     "when": "^3.7.5"
   }
 }
