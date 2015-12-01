@@ -16,7 +16,7 @@ describe('Application', () => {
     );
 
     const divs = scryRenderedDOMComponentsWithTag(component, 'div');
-    
+
     expect(divs.length).to.be.above(0);
 
   });

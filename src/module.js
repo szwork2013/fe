@@ -2,11 +2,22 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import Router from 'react-router';
-import routes from 'routes';
 import When from 'when/keys';
+import {Provider} from 'react-redux';
 
+import immutableConfig from 'core/common/config/immutable-config';
+import routes from 'routes';
+import createStore from 'core/common/redux/store';
 import CommonService from 'core/common/service/commonService';
 
+
+
+
+// redux
+const store = createStore();
+
+
+// router
 
 Router.run(routes, Router.HistoryLocation, (Root, state) => {
 
@@ -27,7 +38,10 @@ Router.run(routes, Router.HistoryLocation, (Root, state) => {
 
   When.all(promises)
     .then((data) => {
-        ReactDOM.render(<Root {...state} data={data}/>, document.body);
-    })
+        ReactDOM.render(
+            <Provider store={store} key="provider">
+              <Root {...state} data={data}/>
+            </Provider>, document.body);
+    });
 
 });

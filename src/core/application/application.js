@@ -76,6 +76,14 @@ export default class Application extends React.Component {
 
 
   render() {
+
+
+    var devtools = '';
+    if (__DEV__) {
+      const DevTools = require('core/common/redux/devtools');
+      devtools = <DevTools />;
+    }
+
     return (
       <div id="content">
 
@@ -96,6 +104,7 @@ export default class Application extends React.Component {
         <ToastContainer ref="toastrRef"
                         toastMessageFactory={ToastMessageFactory}
                         className="toast-top-right" />
+        {devtools}
       </div>
     )
   }

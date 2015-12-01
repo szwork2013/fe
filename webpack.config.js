@@ -1,3 +1,4 @@
+'use strict';
 
 var webpack = require('webpack'),
     HtmlWebpackPlugin = require('html-webpack-plugin'),
@@ -5,14 +6,16 @@ var webpack = require('webpack'),
     path = require('path'),
     srcPath = path.join(__dirname, 'src');
 
-console.log('process.env.NODE_ENV = _' + process.env.NODE_ENV + '_');
+
+console.log('process.env.NODE_ENV : _' + process.env.NODE_ENV + '_');
 
 
 var _plugins = [
   new webpack.DefinePlugin({
     'process.env': {
       NODE_ENV: JSON.stringify(process.env.NODE_ENV)
-    }
+    },
+    __DEV__: (process.env.NODE_ENV === 'development')
   }),
   new webpack.optimize.CommonsChunkPlugin('common', 'common-[hash:8].js'),
   new HtmlWebpackPlugin({
@@ -88,9 +91,9 @@ module.exports = {
 
     plugins: _plugins,
 
-    node: {
-      fs: "empty"
-    },
+    //node: {
+    //  fs: "empty"
+    //},
 
     debug: true,
     devtool: 'eval-source-map',
