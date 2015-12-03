@@ -1,6 +1,8 @@
 import React from 'react';
-import CurrentUserStore from 'core/security/currentUserStore';
-import CurrentUserActions from 'core/security/currentUserActions';
+
+import {setCurrentUserAction, redirectAfterLoginAction} from 'core/security/securityActions';
+import {store} from 'core/common/redux/store';
+
 import SecurityService from 'core/security/securityService';
 import CommonService from 'core/common/service/commonService';
 import * as favicon from 'core/common/utils/favicon';
@@ -13,17 +15,19 @@ export default class PageAncestor extends React.Component {
     console.log('willTransitionTo: transition = %o, params = %o, query = %o', transition.path + ' ' + transition.abortReason, params, query);
 
     // check if autenticated
-    if (!CurrentUserStore.isLoggedIn()) {
+    let currentUser = store.getState().getIn(['core', 'security', 'currentUser']);
+
+    if (!currentUser) {
 
       SecurityService.getCurrentUser()
         .then((currentUser) => {
 
           if (currentUser) {
-            CurrentUserActions.updateCurrentUser(currentUser);
+            store.dispatch(setCurrentUserAction(currentUser));
             CommonService.emitter.emit('loadEnd');
             favicon.handleFavicon(this.handler);
           } else {
-            CurrentUserActions.updateRedirectAfterLogin(transition.path);
+            store.dispatch(redirectAfterLoginAction(transition.path));
             transition.redirect('loginPage');
           }
 

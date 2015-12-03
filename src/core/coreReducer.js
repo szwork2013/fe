@@ -1,6 +1,6 @@
 import { combineReducers } from 'redux-immutablejs';
 
-import {security} from 'core/security/securityReducer'
+import {security} from 'core/security/securityStore'
 
 
 

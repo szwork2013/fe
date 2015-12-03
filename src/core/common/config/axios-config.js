@@ -3,8 +3,9 @@ import Axios from 'axios';
 
 import Locales from 'core/common/config/locales';
 import commonService from 'core/common/service/commonService';
-import CurrentUserActions from 'core/security/currentUserActions';
+import {redirectAfterLoginAction} from 'core/security/securityActions';
 import {stringify} from 'core/common/utils/jsonUtils';
+import {store} from 'core/common/redux/store';
 
 console.debug('axios init');
 
@@ -47,7 +48,7 @@ Axios.interceptors.response.use(function (response) {
   if (error.status == 401) {
     let _r = commonService.router;
     if (_r) {
-      CurrentUserActions.updateRedirectAfterLogin(_r.getCurrentPath());
+      store.dispatch(redirectAfterLoginAction(_r.getCurrentPath()));
       _r.transitionTo('loginPage');
     }
   } else {

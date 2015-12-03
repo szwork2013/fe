@@ -6,15 +6,13 @@ import When from 'when/keys';
 import {Provider} from 'react-redux';
 
 import immutableConfig from 'core/common/config/immutable-config';
+import {store} from 'core/common/redux/store';
 import routes from 'routes';
-import createStore from 'core/common/redux/store';
+
 import CommonService from 'core/common/service/commonService';
 
 
 
-
-// redux
-const store = createStore();
 
 
 // router

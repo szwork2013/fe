@@ -4,8 +4,11 @@ import thunkMiddleware from 'redux-thunk';
 import reducer from 'core/common/redux/reducer';
 
 
-export default function finalCreateStore() {
+export const store = finalCreateStore();
 
+function finalCreateStore() {
+
+  console.debug('Creating redux store');
 
   let _finalCreateStore;
 

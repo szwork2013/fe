@@ -1,32 +1,30 @@
 import React from 'react';
 import reactMixin from 'react-mixin';
+import { connect } from 'react-redux'
 import {Navbar, Nav, NavItem, NavDropdown, MenuItem, CollapsibleNav } from 'react-bootstrap';
 import Router from 'react-router';
-import connectToStores from 'alt/utils/connectToStores';
-import alt from 'core/common/config/alt-config';
 
-import routes from 'routes';
 import SecurityService from 'core/security/securityService';
-import CurrentUserActions from 'core/security/currentUserActions';
-import CurrentUserStore from 'core/security/currentUserStore';
+import * as securityActions from 'core/security/securityActions';
+import { LoginFormRecord } from 'core/security/loginForm';
 
 import Locales from 'core/common/config/locales';
 
-@connectToStores
-@reactMixin.decorate(Router.Navigation)
+
+
+function mapStateToProps(state) {
+  return {
+    currentUser: state.getIn(['core', 'security', 'currentUser'])
+  };
+}
+
+
+@connect(mapStateToProps, securityActions)
 export default class MainMenu extends React.Component {
 
   static contextTypes = {
     router: React.PropTypes.func.isRequired
   };
-
-  static getStores(props) {
-    return [CurrentUserStore];
-  }
-
-  static getPropsFromStores(props) {
-    return CurrentUserStore.getState();
-  }
 
 
 
@@ -38,8 +36,9 @@ export default class MainMenu extends React.Component {
 
     SecurityService.logout()
       .then((response) => {
-        CurrentUserActions.updateCurrentUser(null);
-        this.transitionTo('loginPage');
+        this.props.setCurrentUserAction(null);
+        this.props.setLoginFormDataAction(new LoginFormRecord());
+        this.context.router.transitionTo('loginPage');
       }, (err) => {
         console.log('logout error');
       });
@@ -49,7 +48,7 @@ export default class MainMenu extends React.Component {
   onSelectWithTransition = (event, eventKey) => {
     console.log('onSelect2: event = %o, eventKey = %o', event, eventKey);
     event.preventDefault();
-    this.transitionTo(eventKey);
+    this.context.router.transitionTo(eventKey);
   };
 
   onSelectLanguage = (event, eventKey) => {
@@ -65,7 +64,7 @@ export default class MainMenu extends React.Component {
 
   onHome = (event) => {
     event.preventDefault();
-    this.transitionTo("home");
+    this.context.router.transitionTo("home");
   };
 
 
@@ -75,10 +74,16 @@ export default class MainMenu extends React.Component {
   render() {
 
 
-    let currentUser = this.props.currentUser;
+    const {
+      currentUser
+      } = this.props;
+
+    console.debug(this.props);
+    console.debug(currentUser);
+
 
     var userMenuFrag = (
-      <NavDropdown eventKey={3} id="user_menu_dropdown" title={currentUser ? (currentUser.displayName + ' (' + currentUser.tenantName + ')' ) : ''}>
+      <NavDropdown eventKey={3} id="user_menu_dropdown" title={currentUser ? (currentUser.get('displayName') + ' (' + currentUser.get('tenantName') + ')' ) : ''}>
         <MenuItem eventKey='1' onSelect={this.logout}>Logout</MenuItem>
       </NavDropdown>
     );
@@ -100,7 +105,7 @@ export default class MainMenu extends React.Component {
 
     var mainMenuFrag = (
       <Nav navbar eventKey={11}>
-        <NavItem href={this.makeHref('home')} eventKey={'home'} onClick={this.onHome}>Home</NavItem>
+        <NavItem href={this.context.router.makeHref('home')} eventKey={'home'} onClick={this.onHome}>Home</NavItem>
         <NavDropdown id="party_menu_dropdown" title='Party' onSelect={this.onSelectWithTransition}>
 
           { this._menuItem("partyList") }
@@ -146,10 +151,10 @@ export default class MainMenu extends React.Component {
 
         <Navbar.Collapse>
 
-          { CurrentUserStore.isLoggedIn() ? mainMenuFrag : '' }
+          { currentUser ? mainMenuFrag : '' }
 
           <Nav navbar pullRight eventKey={12}>
-            { CurrentUserStore.isLoggedIn() ? userMenuFrag : '' }
+            { currentUser ? userMenuFrag : '' }
             {languagesFrag}
           </Nav>
         </Navbar.Collapse>
@@ -158,18 +163,14 @@ export default class MainMenu extends React.Component {
   }
 
 
-
   _menuItem(route, title, icon) {
-    //console.log('_menuItem: ', routes);
-    //console.log('this.context.router', this.context.router);
-
     let routeObj = this.context.router.namedRoutes[route];
     let routeHandler = (routeObj) ? routeObj.handler : null;
     let resolvedIcon = (icon) ? icon : ((routeHandler) ? routeHandler.icon : null);
     let resolvedIconClassname = (resolvedIcon) ? ('fa fa-' + resolvedIcon.replace(/^fa-/, '')) : null;
     let resolvedTitle = (title) ? title : ((routeHandler) ? routeHandler.title : null);
 
-    var href = this.makeHref(route);
+    var href = this.context.router.makeHref(route);
     //var isActive = this.isActive('destination', {some: 'params'}, {some: 'query param'});
     var iconElement = (resolvedIconClassname) ? <span className={resolvedIconClassname}/> :  '';
 

@@ -1,13 +1,10 @@
 import React from 'react';
 import { RouteHandler } from 'react-router';
-
 import { ToastContainer, ToastMessage } from 'react-toastr';
+import injectTapEventPlugin from 'react-tap-event-plugin';
 
 import ThemeManager from 'material-ui/lib/styles/theme-manager';
 import {muiRawTheme, muiThemeCustomization, customizeTheme}  from 'core/common/config/mui-theme';
-
-import injectTapEventPlugin from 'react-tap-event-plugin';
-
 import commonService from 'core/common/service/commonService';
 import MainMenu from 'core/mainmenu/mainMenu';
 
@@ -28,7 +25,6 @@ injectTapEventPlugin();
   } catch(e) {
     console.log('REACT IS RUNNING IN ' + ((e.message.indexOf('render') >= 0)?'DEV':'PROD') + ' MODE');
   }
-
 
 
 

@@ -5,9 +5,7 @@ import Router from 'react-router';
 import { connect } from 'react-redux'
 import pureRender from 'pure-render-decorator';
 import SecurityService from 'core/security/securityService';
-import CurrentUserActions from 'core/security/currentUserActions';
-import CurrentUserStore from 'core/security/currentUserStore';
-import { setLoginFormDataAction, setLoginFormUsernameAction, setCurrentUserAction } from 'core/security/securityReducer';
+import * as securityActions from 'core/security/securityActions';
 import { LoginForm, LoginFormRecord } from 'core/security/loginForm';
 import * as favicon from 'core/common/utils/favicon';
 
@@ -19,10 +17,8 @@ function mapStateToProps(state) {
   };
 }
 
-const mapDispatchToProps = {setLoginFormDataAction, setLoginFormUsernameAction, setCurrentUserAction};
 
-
-@connect(mapStateToProps, mapDispatchToProps)
+@connect(mapStateToProps, securityActions)
 @pureRender
 export default class LoginPage extends React.Component {
 

@@ -1,22 +1,9 @@
 import {Map, Record} from 'immutable';
 import { combineReducers } from 'redux-immutablejs';
-import { createAction, createPromiseAction } from 'core/common/redux/actions';
 
 import { LoginFormRecord } from 'core/security/loginForm';
 
-import SecurityService from 'core/security/securityService';
-
-export const setCurrentUserAction = createAction('CORE_SECURITY_SET_CURRENT_USER');
-export const redirectAfterLoginAction = createAction('CORE_SECURITY_REDIRECT_AFTER_LOGIN');
-export const setLoginFormDataAction = createAction('CORE_SECURITY_SET_LOGIN_FORM_DATA');
-
-export const setLoginFormUsernameAction = createPromiseAction('CORE_SECURITY_SET_LOGIN_FORM_USERNAME', function(dispatch, getState, types, username) {
-  dispatch(createAction(types.loading)(username));
-
-  return SecurityService.getTenants(username)
-    .then(tenants => dispatch(createAction(types.success)(tenants)));
-});
-
+import {setCurrentUserAction, redirectAfterLoginAction, setLoginFormDataAction, setLoginFormUsernameAction} from 'core/security/securityActions';
 
 
 function currentUser(state = null, action) {
