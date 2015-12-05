@@ -3,7 +3,8 @@ import ReactDOM from 'react-dom';
 import reactMixin from 'react-mixin';
 import Router from 'react-router';
 import { connect } from 'react-redux'
-import pureRender from 'pure-render-decorator';
+import shouldPureComponentUpdate from 'react-pure-render/function';
+
 import SecurityService from 'core/security/securityService';
 import * as securityActions from 'core/security/securityActions';
 import { LoginForm, LoginFormRecord } from 'core/security/loginForm';
@@ -19,8 +20,8 @@ function mapStateToProps(state) {
 
 
 @connect(mapStateToProps, securityActions)
-@pureRender
 export default class LoginPage extends React.Component {
+  shouldComponentUpdate = shouldPureComponentUpdate;
 
   static title = 'Zauzoo Login';
   static icon = 'lock';

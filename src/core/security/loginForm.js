@@ -1,6 +1,6 @@
 import React, { PropTypes } from 'react';
 import {Record, List} from 'immutable';
-import pureRender from 'pure-render-decorator';
+import shouldPureComponentUpdate from 'react-pure-render/function';
 import {TextField, RaisedButton, SelectField} from 'material-ui';
 import {FieldRecord, enhanceFormRecord} from 'core/form/fieldRecord';
 import { Alert } from 'react-bootstrap';
@@ -42,9 +42,9 @@ export class LoginFormRecord extends Record({
 enhanceFormRecord(LoginFormRecord);
 
 
-@pureRender
-export class LoginForm extends React.Component {
 
+export class LoginForm extends React.Component {
+  shouldComponentUpdate = shouldPureComponentUpdate;
 
   render() {
 

@@ -9,7 +9,7 @@ import {setCurrentUserAction, redirectAfterLoginAction, setLoginFormDataAction, 
 function currentUser(state = null, action) {
   switch (action.type) {
     case setCurrentUserAction.type:
-      return Map(action.payload);
+      return (action.payload) ? Map(action.payload) : null;
     default:
       return state
   }
