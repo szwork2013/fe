@@ -5,16 +5,16 @@ import {Router, Link} from 'react-router';
 import connectToStores from 'alt/utils/connectToStores';
 import _ from 'lodash';
 import classNames from 'classnames';
+import {Navbar, Nav, NavItem, NavDropdown, MenuItem, CollapsibleNav, Input} from 'react-bootstrap';
+import {Checkbox, IconButton, FontIcon, Styles} from 'material-ui';
 
 import VirtualList from 'core/components/virtualList/virtualList';
-
-import {Navbar, Nav, NavItem, NavDropdown, MenuItem, CollapsibleNav, Input} from 'react-bootstrap';
-import {Checkbox, IconButton, FontIcon} from 'material-ui';
-
+import {customizeTheme}  from 'core/common/config/mui-theme';
 import GridStore from 'core/grid/store/gridStore';
 import GridActions from 'core/grid/action/gridActions';
 import Grid from 'core/grid/domain/grid';
 import GridHeader from 'core/grid/component/gridHeader';
+import {ZzIconButton} from 'core/components/toolmenu/toolmenu';
 
 
 import styles from 'core/grid/component/gridComp.less';
@@ -24,7 +24,8 @@ import styles from 'core/grid/component/gridComp.less';
 export default class GridComp extends React.Component {
 
   static contextTypes = {
-    router: React.PropTypes.func.isRequired
+    router: React.PropTypes.func.isRequired,
+    muiTheme: React.PropTypes.object
   };
 
   static defaultProps = {
@@ -78,6 +79,13 @@ export default class GridComp extends React.Component {
 
   componentWillMount() {
     console.debug('componentWillMount');
+
+    customizeTheme(this.context.muiTheme, {
+      flatButton: {
+        color: Styles.Colors.blueGrey50
+      }
+    });
+
     this.onResizeDebounced = _.debounce(this.onResize, 100);
     if (this.props.grid.activeGridConfig) {
       this.search();
@@ -324,7 +332,10 @@ export default class GridComp extends React.Component {
   render() {
     console.debug("gridComp rendering: " + Date.now());
 
-    let grid = this.props.grid;
+    let {
+      grid,
+      children
+      } = this.props;
 
     var classes = classNames({
       'grid-comp--loading': this.state.loading
@@ -336,7 +347,7 @@ export default class GridComp extends React.Component {
     if (!grid.activeGridConfig) {
       return (
         <div className="md-grid">
-          <Navbar fluid style={{marginBottom: 10, minHeight: 'initial'}}>
+          <Navbar fluid style={{marginBottom: 10, minHeight: 'initial', fontSize: 14}}>
             <Nav>
               <NavItem eventKey={3} href={this.context.router.makeHref('gridAdmin', {gridLocation: this.props.gridLocation})} onClick={this.onSelectGridManage}>Create Grid</NavItem>
             </Nav>
@@ -371,29 +382,23 @@ export default class GridComp extends React.Component {
 
     let _gridData = grid.data;
 
-    let iconbuttonStyle = {
-      height: 40,
-      width: 40
-    };
-    let iconStyle = {fontSize: 15};
 
     return (
 
 
       <div className="md-grid">
 
-        <Navbar fluid style={{marginBottom: 10, minHeight: 'initial'}}>
+        <Navbar fluid  style={{marginBottom: 10, minHeight: 'initial', fontSize: 14}}>
           <Nav navbar>
             {gridConfigMenu}
           </Nav>
-          <IconButton onClick={this.onClickCheck} tooltip="Show selection" style={iconbuttonStyle} iconStyle={iconStyle}>
-            <FontIcon className={classNames('fa', {'fa-check-square': this.state.showSelection, 'fa-check-square-o': !this.state.showSelection})} />
-          </IconButton>
-          <IconButton onClick={this.onClickRefresh} tooltip="Refresh" style={iconbuttonStyle} iconStyle={iconStyle}>
-            <FontIcon className="fa fa-refresh" />
-          </IconButton>
+          <ZzIconButton tooltip="Show selection" fontIcon={classNames('fa', {'fa-check-square': this.state.showSelection, 'fa-check-square-o': !this.state.showSelection})}
+                        onClick={this.onClickCheck} />
+          <ZzIconButton tooltip="Refresh" fontIcon="fa fa-refresh" onClick={this.onClickRefresh} />
 
           { (_gridData && _gridData.totalCount) ? (_gridData.totalCount + ' rows') : '' }
+
+          {children}
 
           <form className="navbar-form navbar-right" role="search" onSubmit={this.onSearchTermSubmit}>
             <Input type="text"  placeholder='Search' onChange={this.onSearchTermChange} value={this.state.searchTerm}

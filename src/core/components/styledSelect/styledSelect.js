@@ -85,7 +85,7 @@ export default class StyledSelect extends React.Component {
         height: props.floatingLabelText ? 72 : 48,
         display: 'inline-block',
         position: 'relative',
-        fontFamily: 'Roboto, sans-serif',
+        fontFamily: 'Roboto+Condensed, sans-serif',
         transition: Transitions.easeOut('200ms', 'height'),
       },
     }

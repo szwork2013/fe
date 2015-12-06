@@ -1,5 +1,5 @@
 import React from 'react';
-import {Styles} from 'material-ui';
+import {Styles, IconButton, FontIcon} from 'material-ui';
 import {customizeTheme}  from 'core/common/config/mui-theme';
 import styles from 'core/components/toolmenu/toolmenu.less';
 
@@ -16,9 +16,6 @@ export default class Toolmenu extends React.Component {
 
   componentWillMount() {
     customizeTheme(this.context.muiTheme, {
-      button: {
-        height: 40
-      },
       flatButton: {
         color: Colors.blueGrey50
       }
@@ -45,7 +42,6 @@ export default class Toolmenu extends React.Component {
                 key: index,
                 style: Object.assign({},child.props.style, {
                   fontWeight: Typography.fontWeightNormal,
-                  textTransform: 'none',
                   paddingLeft: 8,
                   paddingRight: 8
                 }),
@@ -61,5 +57,40 @@ export default class Toolmenu extends React.Component {
     )
   }
 
+}
+
+export const ZzIconButton = ({tooltip, fontIcon, onClick}) => (
+  <IconButton onClick={onClick} tooltip={tooltip} style={{
+      height: 40,
+      width: 40
+    }} iconStyle={{fontSize: 15}}>
+    <FontIcon className={fontIcon} />
+  </IconButton>
+);
+
+
+export class ZzIconButtonRoute extends React.Component {
+  static contextTypes = {
+    router: React.PropTypes.func.isRequired
+  };
+
+  onClick = (event) => {
+    event.preventDefault();
+    const {routeName, params, query} = this.props;
+    this.context.router.transitionTo(routeName, params, query);
+  };
+
+  render() {
+    const {tooltip, fontIcon, routeName, params, query} = this.props;
+
+    return (
+      <a href={this.context.router.makeHref(routeName, params, query)} onClick={this.onClick}>
+        <IconButton tooltip={tooltip} style={{height: 40,width: 40}} iconStyle={{fontSize: 15}}>
+          <FontIcon className={fontIcon}/>
+        </IconButton>
+      </a>
+    );
+
+  }
 
 }

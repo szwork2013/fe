@@ -4,7 +4,7 @@ let Spacing = require('material-ui/lib/styles/spacing');
 
 export const muiRawTheme = {
   spacing: Spacing,
-  fontFamily: 'Roboto, sans-serif',
+  fontFamily: 'Roboto+Condensed, sans-serif',
   palette: {
 
     primary1Color: Colors.indigo500,
@@ -15,7 +15,7 @@ export const muiRawTheme = {
     accent3Color: Colors.pinkA100,
 
     //// MUI doc
-    textColor: Colors.darkBlack,
+    textColor: '#666',
     alternateTextColor: Colors.white,
     canvasColor: Colors.white,
     borderColor: Colors.grey300,
@@ -44,7 +44,9 @@ export const muiThemeCustomization = {
     spacing: 16
   },
   button: {
-    iconButtonSize: 40
+    height: 40,
+    iconButtonSize: 40,
+    textTransform: 'none'
   }
 
 };

@@ -78,9 +78,6 @@ export default class MainMenu extends React.Component {
       currentUser
       } = this.props;
 
-    console.debug(this.props);
-    console.debug(currentUser);
-
 
     var userMenuFrag = (
       <NavDropdown eventKey={3} id="user_menu_dropdown" title={currentUser ? (currentUser.get('displayName') + ' (' + currentUser.get('tenantName') + ')' ) : ''}>
