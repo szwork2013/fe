@@ -10,6 +10,7 @@ import When from 'when';
 import hoistNonReactStatics from 'core/common/utils/hoistNonReactStatics';
 import PageAncestor from 'core/common/page/pageAncestor';
 import Axios from 'core/common/config/axios-config';
+import { connect } from 'react-redux';
 
 import GridStore from 'core/grid/store/gridStore';
 import GridActions from 'core/grid/action/gridActions';
@@ -21,7 +22,6 @@ import GridService from 'core/grid/service/gridService';
 import Utils from 'core/common/utils/utils';
 import ArrayUtils from 'core/common/utils/arrayUtils';
 import MdEntityService from 'core/metamodel/mdEntityService';
-import MdEntityStore from 'core/metamodel/mdEntityStore';
 import ConditionValue from 'core/grid/component/conditionValue';
 import CommonService from 'core/common/service/commonService';
 
@@ -59,14 +59,13 @@ class GridAdminView extends PageAncestor {
 
 
   static getStores(props) {
-    return [GridStore, MdEntityStore];
+    return [GridStore];
   }
 
   // multiple stores @see https://github.com/goatslacker/alt/issues/420
   static getPropsFromStores(props) {
     let grid = GridStore.getGrid(props.params.gridLocation);
-    let allOperators = MdEntityStore.getEntity('FILTEROPERATOR').lovItems;
-    return {grid, allOperators};
+    return {grid};
   }
 
   state = {
@@ -688,5 +687,12 @@ class GridAdminView extends PageAncestor {
 
 }
 
+function mapStateToProps(state) {
+  return {
+    allOperators: state.getIn(['core', 'metamodel', 'entities', 'FILTEROPERATOR']).lovItems
+  }
+}
+
 // pokud ma "connectToStores" componenta fetchData nebo jinou statickou metodu musi se patchnout pomoci hoistNonReactStatics, protoze connectToStores by ji vyrusila...
-export default hoistNonReactStatics(connectToStores(GridAdminView), GridAdminView);
+export default hoistNonReactStatics(connectToStores( connect(mapStateToProps)(GridAdminView) ), GridAdminView);
+

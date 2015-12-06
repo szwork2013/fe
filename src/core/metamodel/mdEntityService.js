@@ -2,10 +2,11 @@ import Axios from 'core/common/config/axios-config';
 
 import When from 'when';
 
-import MdEntityActions from 'core/metamodel/mdEntityActions';
+import {updateEntitiesAction} from 'core/metamodel/metamodelActions';
+import {store} from 'core/common/redux/store';
+
 import MdEntity from 'core/metamodel/mdEntity';
 import MdField from 'core/metamodel/mdField';
-import MdEntityStore from 'core/metamodel/mdEntityStore';
 
 import Utils from 'core/common/utils/utils';
 
@@ -28,7 +29,7 @@ class MdEntityService {
     let unresolvedEntityNames = [];
 
     for(let entityName of entityNames) {
-      let mdEntity = MdEntityStore.getEntity(entityName);
+      let mdEntity =  store.getState().getIn(['core', 'metamodel', 'entities', entityName]);
       if (mdEntity) {
         entityObject[entityName] = mdEntity;
       } else {
@@ -69,7 +70,7 @@ class MdEntityService {
 
     return finalPromise.then((entityObject) => {
       if (asyncFetch) {
-        MdEntityActions.updateEntities(entityObject);
+        store.dispatch(updateEntitiesAction(entityObject));
       }
       return entityObject;
     });

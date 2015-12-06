@@ -2,7 +2,7 @@ import React, {PropTypes} from 'react';
 import ReactDOM from 'react-dom';
 import reactMixin from 'react-mixin';
 import Router from 'react-router';
-import { connect } from 'react-redux'
+import { connect } from 'react-redux';
 import shouldPureComponentUpdate from 'react-pure-render/function';
 
 import SecurityService from 'core/security/securityService';

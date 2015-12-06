@@ -1,17 +1,29 @@
 import React from 'react';
 import _ from 'lodash';
 import classNames from 'classnames';
-import connectToStores from 'alt/utils/connectToStores';
 
 import {TextField, Checkbox} from 'material-ui';
+import { connect } from 'react-redux'
 
 import MdField from 'core/metamodel/mdField';
-import MdEntityService from 'core/metamodel/mdEntityService';
-import MdEntityStore from 'core/metamodel/mdEntityStore';
 import StyledSelect from 'core/components/styledSelect/styledSelect';
 
 
-@connectToStores
+function mapStateToProps(state, ownProps ) {
+  let valueSource = ownProps.field.valueSource;
+  let fieldOptions;
+
+  if (valueSource) {
+    let entity =  state.getIn(['core', 'metamodel', 'entities', valueSource]);
+    if (entity) {
+      fieldOptions = entity.lovItems;
+    }
+  }
+  return {fieldOptions};
+}
+
+
+@connect(mapStateToProps)
 export default class FilterFieldComp extends React.Component {
 
   static propTypes = {
@@ -24,23 +36,6 @@ export default class FilterFieldComp extends React.Component {
     disabled: React.PropTypes.bool
   };
 
-  static getStores(props) {
-    return [MdEntityStore];
-  }
-
-  // multiple stores @see https://github.com/goatslacker/alt/issues/420
-  static getPropsFromStores(props) {
-    let valueSource = props.field.valueSource;
-    let fieldOptions;
-
-    if (valueSource) {
-      let entity = MdEntityStore.getEntity(valueSource);
-      if (entity) {
-        fieldOptions = entity.lovItems;
-      }
-    }
-    return {fieldOptions};
-  }
 
 
   onChangeText = (e) => {

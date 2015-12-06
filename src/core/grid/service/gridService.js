@@ -9,8 +9,6 @@ import GridConfig from 'core/grid/domain/gridConfig';
 import GridConfigCondition from 'core/grid/domain/gridConfigCondition';
 import GridConfigSort from 'core/grid/domain/gridConfigSort';
 
-import MdEntityStore from 'core/metamodel/mdEntityStore';
-import MdEntityActions from 'core/metamodel/mdEntityActions';
 import MdEntity from 'core/metamodel/mdEntity';
 import MdEntityService from 'core/metamodel/mdEntityService';
 

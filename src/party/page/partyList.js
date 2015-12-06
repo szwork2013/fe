@@ -1,5 +1,4 @@
 import React from 'react';
-import {State} from 'react-router';
 import reactMixin from 'react-mixin';
 
 
@@ -10,7 +9,6 @@ import {ZzIconButtonRoute} from 'core/components/toolmenu/toolmenu';
 
 var gridLocation = 'partyCustomers';
 
-@reactMixin.decorate(State)
 export default class PartyList extends PageAncestor {
 
   static title = 'Customers';
@@ -20,7 +18,6 @@ export default class PartyList extends PageAncestor {
     console.log("PartyList#fetchData(%s)", gridLocation);
     return GridService.fetchGrids(gridLocation);
   }
-
 
 
   render() {
