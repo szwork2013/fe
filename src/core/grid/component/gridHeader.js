@@ -69,11 +69,11 @@ export default class GridHeader extends React.Component {
     }
 
     let entitiesToFetch = ['FILTEROPERATOR'];
-    if (field.valueSource) entitiesToFetch.push(field.valueSource);
+    if (field.hasLocalValueSource()) entitiesToFetch.push(field.valueSource);
 
-    MdEntityService.fetchEntities(entitiesToFetch, {}, _.fill(Array(entitiesToFetch.length), true))
-    .then(entityHash => {
-      let allOperators = entityHash.FILTEROPERATOR.lovItems;
+    MdEntityService.fetchEntities(entitiesToFetch, _.fill(Array(entitiesToFetch.length), true))
+    .then(entityMap => {
+      let allOperators = entityMap.get('FILTEROPERATOR').lovItems;
       let operatorOptions = allOperators.filter(li => _.includes(conditionObject.$columnRef.availableOperators, li.value));
 
       conditionSubmitEnabled = GridService.validateCondition(conditionObject, [], 0, allOperators);

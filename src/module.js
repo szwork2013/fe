@@ -30,7 +30,7 @@ Router.run(routes, Router.HistoryLocation, (Root, state) => {
 
   var promises = state.routes.filter((route) => route.handler.fetchData)
     .reduce((promises, route) => {
-      promises[route.name] = route.handler.fetchData(state.params);
+      promises[route.name] = route.handler.fetchData(state.params, state.query);
       return promises;
     }, {});
 

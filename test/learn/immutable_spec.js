@@ -1,5 +1,5 @@
 import {expect} from 'chai';
-import {List, Map} from 'immutable';
+import {List, Map, fromJS} from 'immutable';
 
 describe('immutability', () => {
 
@@ -58,6 +58,34 @@ describe('immutability', () => {
             '28 Days Later'
         )
       }));
+    });
+
+  });
+
+  describe('MergeDeep Map with object', () => {
+
+    it('is immutable', () => {
+
+
+      let entityMap = Map();
+      entityMap = entityMap.set('Party', {id: 'PartyId'});
+      entityMap = entityMap.set('Address', {id: 'AddressId'});
+
+      for (let item of entityMap.entries()) {
+        console.log(item); // 1, 2, 3
+      }
+
+      let Party = entityMap.get('Party');
+      Party.lovItems = ['bla'];
+      entityMap = entityMap.set('Party', Party);
+
+      entityMap = entityMap.merge({Feature: {id: 'FeatureId'}});
+
+      for (let item of entityMap.entries()) {
+        console.log(item); // 1, 2, 3
+      }
+
+
     });
 
   });

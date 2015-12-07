@@ -15,98 +15,85 @@ class MdEntityService {
 
 
   /**
-   * Dotahne ze serveru entity ze zadanych entityNames, ktere neexistuji v MdEntityStore
+   * Dotahne ze serveru entity ze zadanych entityNames, ktere neexistuji v metamodel/entities
    * Pokud je zadane pole withLovs, tak k nim jeste dotahne lovItems, pokud nejsou jeste dotazene (lovitems === undefined)
-   * Pokud se neco dotahovalo aktualizuje MdEntityStore
+   * Pokud se neco dotahovalo aktualizuje metamodel/entities
    *  Vrati promise resolvovany do (doplneneho) entityObject
    * @param entityNames - pole [Party, ...]
-   * @param entityObject - objekt {entityName: MdEntity, ...}
    * @param withLovs - pole [true, false..] o stejne delce jako entityNames, kde pokud je true tak se dotahnou i lov do mdEntity.lovItems
    * @returns Promise<entityObject>
      */
-  fetchEntities(entityNames, entityObject, withLovs) {
+  fetchEntities(entityNames, withLovs) {
 
-    let unresolvedEntityNames = [];
+    const entityMap = store.getState().getIn(['metamodel', 'entities']);
 
-    for(let entityName of entityNames) {
-      let mdEntity =  store.getState().getIn(['core', 'metamodel', 'entities', entityName]);
-      if (mdEntity) {
-        entityObject[entityName] = mdEntity;
-      } else {
-        unresolvedEntityNames.push(entityName);
-      }
-    }
+    let unresolvedEntityNames = entityNames.filter(v => !entityMap.has(v));
+
     var promise;
     var asyncFetch = false;
     if (unresolvedEntityNames.length > 0) {
       asyncFetch = true;
-      promise = this.fetchMissingEntities(unresolvedEntityNames, entityObject);
+      promise = this.fetchMissingEntities(unresolvedEntityNames, entityMap);
     } else {
-      promise = When(entityObject);
+      promise = When(entityMap);
     }
 
-    var finalPromise = promise.then((entityObject) => {
+    var finalPromise = promise.then((entityMap) => {
       if (withLovs && withLovs.length === entityNames.length) {
         var keyWithLovs = entityNames.filter( (k,i) => withLovs[i]);
-        let unresolvedLovs = [];
-        for(let k of keyWithLovs) {
-          let mdEntity = entityObject[k];
-          if (mdEntity.lovItems === undefined) {
-            unresolvedLovs.push(k);
-          }
-        }
+        let unresolvedLovs = keyWithLovs.filter(k => entityMap.get(k).lovItems === undefined);
+
         var promiseLov;
         if (unresolvedLovs.length > 0) {
           asyncFetch = true;
-          promiseLov = this.fetchMissingEntityLovs(unresolvedLovs, entityObject);
+          promiseLov = this.fetchMissingEntityLovs(unresolvedLovs, entityMap);
         } else {
-          promiseLov = When(entityObject);
+          promiseLov = When(entityMap);
         }
         return promiseLov;
       } else {
-        return entityObject;
+        return entityMap;
       }
     });
 
-    return finalPromise.then((entityObject) => {
+    return finalPromise.then((entityMap) => {
       if (asyncFetch) {
-        store.dispatch(updateEntitiesAction(entityObject));
+        store.dispatch(updateEntitiesAction(entityMap));
       }
-      return entityObject;
+      return entityMap;
     });
 
   }
 
 
-  fetchMissingEntities(entityNames, entityObject) {
+  fetchMissingEntities(entityNames, entityMap) {
     return Axios.get('/core/metamodel/entity', {params: {entityName: entityNames}})
       .then((response) => {
-        if (response.data.length  > 0) {
-          for(let entity of response.data) {
-            Object.setPrototypeOf(entity, MdEntity.prototype);
 
-            for(let fieldName in entity.fields) {
-              let field = entity.fields[fieldName];
-              Object.setPrototypeOf(field, MdField.prototype);
-              field.fieldKey = Utils.formatId(entity.id, fieldName);
-            }
+        for(let entity of response.data) {
+          Object.setPrototypeOf(entity, MdEntity.prototype);
 
-            entityObject[entity.id] = entity;
+          for(let fieldName in entity.fields) {
+            let field = entity.fields[fieldName];
+            Object.setPrototypeOf(field, MdField.prototype);
+            field.fieldKey = Utils.formatId(entity.id, fieldName);
           }
-
+          entityMap = entityMap.set(entity.id, entity);
         }
-        return entityObject;
+        return entityMap;
       });
   }
 
-  fetchMissingEntityLovs(entityNames, entityObject) {
+  fetchMissingEntityLovs(entityNames, entityMap) {
     return Axios.get('/core/metamodel/lovitem', {params: {entityName: entityNames}})
       .then((response) => {
-        var mapa = response.data;
+        var data = response.data;
         for(let ek of entityNames) {
-          entityObject[ek].lovItems = mapa[ek];
+          let entity = entityMap.get(ek);
+          entity.lovItems = data[ek];
+          entityMap = entityMap.set(ek, entity);
         }
-        return entityObject;
+        return entityMap;
       });
   }
 

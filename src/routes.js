@@ -27,17 +27,17 @@ const routes = (
 
     <Route name="loginPage" path="login"  handler={LoginPage}/>
 
-    <Route name="partyList" path="party/customer/list/:gridId?"  handler={PartyList}/>
-    <Route name="contactPersonList" path="party/contact-person/list/:gridId?"  handler={ContactPersonList}/>
-    <Route name="salesRepList" path="party/sales-rep/list/:gridId?"  handler={SalesRepList}/>
+    <Route name="partyList" path="party/grid/customer/:gridId?"  handler={PartyList}/>
+    <Route name="contactPersonList" path="party/grid/contact-person/:gridId?"  handler={ContactPersonList}/>
+    <Route name="salesRepList" path="party/grid/sales-rep/:gridId?"  handler={SalesRepList}/>
 
-    <Route name="partyDetail" path="party/:id"  handler={PartyDetail}/>
+    <Route name="partyDetail" path="party/detail/:id"  handler={PartyDetail}/>
 
 
-    <Route name="invoiceList" path="invoice/list/:gridId?"  handler={InvoiceList}/>
+    <Route name="invoiceList" path="invoice/grid/:gridId?"  handler={InvoiceList}/>
 
-    <Route name="vehicleList" path="vehicle/list/:gridId?"  handler={VehicleList}/>
-    <Route name="vehicleDetail" path="vehicle/:id"  handler={VehicleDetail}/>
+    <Route name="vehicleList" path="vehicle/grid/:gridId?"  handler={VehicleList}/>
+    <Route name="vehicleDetail" path="vehicle/detail/:id"  handler={VehicleDetail}/>
 
     <Route name="gridAdmin" path="core/grid/admin/:gridLocation"  handler={GridAdminView}/>
 

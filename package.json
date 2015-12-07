@@ -52,6 +52,7 @@
     "events": "^1.1.0",
     "flexboxgrid": "^6.3.0",
     "immutable": "^3.7.5",
+    "lodash": "^3.10.1",
     "material-ui": "^0.13.4",
     "moment": "^2.10.6",
     "numeral": "^1.5.3",

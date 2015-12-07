@@ -14,7 +14,7 @@ import Locales from 'core/common/config/locales';
 
 function mapStateToProps(state) {
   return {
-    currentUser: state.getIn(['core', 'security', 'currentUser'])
+    currentUser: state.getIn(['security', 'currentUser'])
   };
 }
 

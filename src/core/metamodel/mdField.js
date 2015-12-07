@@ -49,6 +49,7 @@ export default class MdField {
   }
 
 
+
   get gridHeaderLabelActive() {
     return (this.gridHeaderLabel) ? this.gridHeaderLabel : this.label;
   }
@@ -70,6 +71,10 @@ export default class MdField {
       default:
         return value;
     }
+  }
+
+  hasLocalValueSource() {
+    return (this.valueSource && this.valueSourceType === 'LOCAL');
   }
 
 }

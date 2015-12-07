@@ -1,6 +1,5 @@
 import React, {PropTypes} from 'react';
 import ReactDOM from 'react-dom';
-import reactMixin from 'react-mixin';
 import Router from 'react-router';
 import { connect } from 'react-redux';
 import shouldPureComponentUpdate from 'react-pure-render/function';
@@ -13,8 +12,8 @@ import * as favicon from 'core/common/utils/favicon';
 
 function mapStateToProps(state) {
   return {
-    loginFormData: state.getIn(['core', 'security', 'loginFormData']),
-    redirectAfterLogin: state.getIn(['core', 'security', 'redirectAfterLogin'])
+    loginFormData: state.getIn(['security', 'loginFormData']),
+    redirectAfterLogin: state.getIn(['security', 'redirectAfterLogin'])
   };
 }
 

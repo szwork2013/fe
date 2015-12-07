@@ -54,12 +54,12 @@ class GridService {
           entities.push(grid.entityName);
           gridObject[grid.gridLocation] = grid;
         }
-        return MdEntityService.fetchEntities(_.uniq(entities), {});
+        return MdEntityService.fetchEntities(_.uniq(entities));
       })
-        .then( (entityObject) => {
+        .then( (entityMap) => {
           for(let gridLocation in gridObject) {
             let grid = gridObject[gridLocation];
-            grid.$entityRef = entityObject[grid.entityName];
+            grid.$entityRef = entityMap.get(grid.entityName);
 
             // doplnime gridConfig.$columnRefs: MdField[]
 

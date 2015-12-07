@@ -10,11 +10,12 @@ import StyledSelect from 'core/components/styledSelect/styledSelect';
 
 
 function mapStateToProps(state, ownProps ) {
-  let valueSource = ownProps.field.valueSource;
   let fieldOptions;
 
-  if (valueSource) {
-    let entity =  state.getIn(['core', 'metamodel', 'entities', valueSource]);
+  let {field} = ownProps;
+
+  if (field.hasLocalValueSource()) {
+    let entity =  state.getIn(['metamodel', 'entities', field.valueSource]);
     if (entity) {
       fieldOptions = entity.lovItems;
     }

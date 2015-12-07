@@ -46,7 +46,7 @@ class GridAdminView extends PageAncestor {
     console.log("GridAdminView#fetchData(%o)", routerParams);
     return When.join(
       GridService.fetchGrids(routerParams.gridLocation),
-      MdEntityService.fetchEntities(['FILTEROPERATOR'], {}, [true])
+      MdEntityService.fetchEntities(['FILTEROPERATOR'], [true])
     );
   }
 
@@ -89,10 +89,10 @@ class GridAdminView extends PageAncestor {
 
     // dotahny vsechny existujici seznamy
     let valueSources = _.uniq(clonedGridConfig.conditions
-      .filter(condition => (condition.$columnRef && condition.$columnRef.valueSource) )
+      .filter(condition => (condition.$columnRef && condition.$columnRef.hasLocalValueSource()) )
       .map(condition => (condition.$columnRef.valueSource)));
 
-    MdEntityService.fetchEntities(valueSources, {}, valueSources.map(v => true) )
+    MdEntityService.fetchEntities(valueSources, valueSources.map(v => true) )
     .then(() => {
       this.setState({editedGridConfig: clonedGridConfig});
     });
@@ -352,10 +352,10 @@ class GridAdminView extends PageAncestor {
   fetchLovItems(conditions) {
     if (_.isEmpty(conditions)) return;
 
-    let valueSources = _.uniq(conditions.filter(c => (c.$columnRef && c.$columnRef.valueSource)).map(c => c.$columnRef.valueSource));
+    let valueSources = _.uniq(conditions.filter(c => (c.$columnRef && c.$columnRef.hasLocalValueSource())).map(c => c.$columnRef.valueSource));
 
     if (valueSources.length > 0) {
-      MdEntityService.fetchEntities(valueSources, {}, [true]);
+      MdEntityService.fetchEntities(valueSources, [true]);
     }
   }
 
@@ -689,7 +689,7 @@ class GridAdminView extends PageAncestor {
 
 function mapStateToProps(state) {
   return {
-    allOperators: state.getIn(['core', 'metamodel', 'entities', 'FILTEROPERATOR']).lovItems
+    allOperators: state.getIn(['metamodel', 'entities', 'FILTEROPERATOR']).lovItems
   }
 }
 

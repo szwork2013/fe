@@ -1,10 +1,13 @@
 import { combineReducers } from 'redux-immutablejs';
 
-import {core} from 'core/coreReducer';
-
+import {security} from 'core/security/securityStore';
+import {metamodel} from 'core/metamodel/metamodelStore';
+import {party} from 'party/partyStore';
 
 const zauzooApp = combineReducers({
-  core
+  metamodel,
+  security,
+  party
 });
 
 export default zauzooApp;
