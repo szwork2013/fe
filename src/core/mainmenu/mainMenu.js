@@ -3,6 +3,7 @@ import reactMixin from 'react-mixin';
 import { connect } from 'react-redux'
 import {Navbar, Nav, NavItem, NavDropdown, MenuItem, CollapsibleNav } from 'react-bootstrap';
 import Router from 'react-router';
+import shouldPureComponentUpdate from 'react-pure-render/function';
 
 import SecurityService from 'core/security/securityService';
 import * as securityActions from 'core/security/securityActions';
@@ -21,6 +22,7 @@ function mapStateToProps(state) {
 
 @connect(mapStateToProps, securityActions)
 export default class MainMenu extends React.Component {
+  shouldComponentUpdate = shouldPureComponentUpdate;
 
   static contextTypes = {
     router: React.PropTypes.func.isRequired
@@ -77,6 +79,8 @@ export default class MainMenu extends React.Component {
     const {
       currentUser
       } = this.props;
+
+    //console.log('MAIN MENU CURRENT USER : ' + currentUser);
 
 
     var userMenuFrag = (

@@ -4,24 +4,19 @@ import {uniq,values} from 'lodash';
 import When from 'when';
 import { connect } from 'react-redux';
 
-
+import hoistNonReactStatics from 'core/common/utils/hoistNonReactStatics';
 import PageAncestor from 'core/common/page/pageAncestor';
 import {store} from 'core/common/redux/store';
 import MdEntityService from 'core/metamodel/mdEntityService';
 import PartyService from 'party/partyService';
 import {setPartyAction} from 'party/partyActions';
-import { PartyPoForm } from 'party/component/partyPoForm';
+import PartyFoForm from 'party/component/PartyFoForm';
+import PartyPoForm from 'party/component/PartyPoForm';
 
 
-function mapStateToProps(state) {
-  return {
-    partyObject: state.getIn(['party', 'partyObject'])
-  };
-}
 
 
-@connect(mapStateToProps)
-export default class PartyDetail extends PageAncestor {
+class PartyDetail extends PageAncestor {
   shouldComponentUpdate = shouldPureComponentUpdate;
 
   static title = 'Customers';
@@ -57,7 +52,9 @@ export default class PartyDetail extends PageAncestor {
   render() {
 
     const {
-      partyObject
+      partyObject,
+      partyEntity,
+      setPartyAction
       } = this.props;
 
     return (
@@ -67,7 +64,7 @@ export default class PartyDetail extends PageAncestor {
         <form onSubmit={ e => this.onSubmit(e)} >
           <div className="container-fluid">
             <div className="row">
-              { this.mainForm(partyObject) }
+              { this.mainForm(partyObject, partyEntity, setPartyAction) }
             </div>
           </div>
         </form>
@@ -80,14 +77,25 @@ export default class PartyDetail extends PageAncestor {
     );
   }
 
-  mainForm = (partyObject) => {
+  mainForm = (partyObject, partyEntity, setPartyAction) => {
+    const props = {dataObject: partyObject, entity: partyEntity, setDataAction: setPartyAction};
     switch (partyObject.partyCategory) {
       case 'PO':
-        return <PartyPoForm {...this.props} /> ;
+        return <PartyPoForm {...props} /> ;
+      case 'FO':
+        return <PartyFoForm {...props} /> ;
     }
   }
 
 }
 
+function mapStateToProps(state) {
+  return {
+    partyObject: state.getIn(['party', 'partyObject']),
+    partyEntity: state.getIn(['metamodel', 'entities', 'Party'])
+  };
+}
+
+export default hoistNonReactStatics(connect(mapStateToProps, {setPartyAction})(PartyDetail), PartyDetail);
 
 
