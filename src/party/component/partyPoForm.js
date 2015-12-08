@@ -5,36 +5,83 @@ import {TextField, RaisedButton, SelectField} from 'material-ui';
 import { Alert } from 'react-bootstrap';
 
 import createForm from 'core/form/createForm';
+import {showForTenant} from 'core/form/formUtils';
+import StyledSelect from 'core/components/styledSelect/styledSelect';
 
 class PartyPoForm extends React.Component {
   shouldComponentUpdate = shouldPureComponentUpdate;
 
   render() {
 
-    const {fields: {firstName, lastName}} = this.props;
+    const {fields: {
+      fullName, ico, dic, icoDph, defaultCurrency, defaultLanguage, defaultPaymentCond, legalForm, naceCode, marketingSource, nationality, taxDomicile
+      }
+      } = this.props;
 
+    console.log("PartyPoForm.render() : ", fullName);
 
     return (
 
       <div className="col-xs-10">
 
 
+        {/*  1. row  */}
         <div className="row">
           <div className="col-xs-12">
-            <TextField {...fullName} />
+            <TextField {...fullName} fullWidth />
           </div>
         </div>
+
+        {/*  2. row  */}
         <div className="row">
           <div className="col-xs-4">
-            <TextField {...ico} />
+            <TextField {...ico} fullWidth />
           </div>
           <div className="col-xs-4">
-            <TextField {...ico} />
+            <TextField {...dic} fullWidth />
+          </div>
+          {showForTenant(
+            (<div className="col-xs-4">
+              <TextField {...icoDph} fullWidth />
+            </div>), 2)}
+        </div>
+
+        {/*  3. row  */}
+        <div className="row">
+          <div className="col-xs-4">
+            <StyledSelect {...defaultCurrency}  />
           </div>
           <div className="col-xs-4">
-            <TextField {...ico} />
+            <StyledSelect {...defaultLanguage}  />
+          </div>
+          <div className="col-xs-4">
+            <StyledSelect {...defaultPaymentCond}  />
           </div>
         </div>
+
+        {/*  4. row  */}
+        <div className="row">
+          <div className="col-xs-4">
+            <StyledSelect {...legalForm}  />
+          </div>
+          <div className="col-xs-4">
+            <StyledSelect {...naceCode}  />
+          </div>
+          <div className="col-xs-4">
+            <StyledSelect {...marketingSource}  />
+          </div>
+        </div>
+
+        {/*  5. row  */}
+        <div className="row">
+          <div className="col-xs-4">
+            <StyledSelect {...nationality}  />
+          </div>
+          <div className="col-xs-4">
+            <StyledSelect {...taxDomicile}  />
+          </div>
+        </div>
+
 
       </div>
 
@@ -50,9 +97,25 @@ const definition = {
   }, {
     name: 'ico'
   }, {
-    name: 'ico'
+    name: 'dic'
   }, {
-    name: 'ico'
+    name: 'icoDph'
+  }, {
+    name: 'defaultCurrency'
+  }, {
+    name: 'defaultLanguage'
+  }, {
+    name: 'defaultPaymentCond'
+  }, {
+    name: 'legalForm'
+  }, {
+    name: 'naceCode'
+  }, {
+    name: 'marketingSource'
+  }, {
+    name: 'nationality'
+  }, {
+    name: 'taxDomicile'
   }]
 };
 

@@ -15,11 +15,11 @@ export default class PageAncestor extends React.Component {
     console.log('willTransitionTo: transition = %o, params = %o, query = %o', transition.path + ' ' + transition.abortReason, params, query);
 
     // check if autenticated
-    let currentUser = store.getState().getIn(['security', 'currentUser']);
+    let currentUser = SecurityService.getCurrentUser();
 
     if (!currentUser) {
 
-      SecurityService.getCurrentUser()
+      SecurityService.readCurrentUser()
         .then((currentUser) => {
 
           if (currentUser) {

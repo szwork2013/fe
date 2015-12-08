@@ -10,7 +10,7 @@ import {setPartyAction} from 'party/partyActions';
 function partyObject(state = null, action) {
   switch (action.type) {
     case setPartyAction.type:
-      return action.payload;
+      return Object.assign({},action.payload);
     default:
       return state;
   }

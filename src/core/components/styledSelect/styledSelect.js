@@ -55,7 +55,6 @@ export default class StyledSelect extends React.Component {
     optionComponent: React.PropTypes.func,     // option component to render in dropdown
     optionRenderer: React.PropTypes.func,      // optionRenderer: function (option) {}
     options: React.PropTypes.array,            // array of options
-    placeholder: React.PropTypes.string,       // field placeholder, displayed when there's no value
     searchable: React.PropTypes.bool,          // whether to enable searching feature or not
     searchingText: React.PropTypes.string,     // message to display whilst options are loading via asyncOptions
     searchPromptText: React.PropTypes.string,  // label to prompt for search input
@@ -144,7 +143,6 @@ export default class StyledSelect extends React.Component {
       optionComponent,
       optionRenderer,
       options,
-      placeholder,
       searchable,
       searchingText,
       searchPromptText,
@@ -174,7 +172,7 @@ export default class StyledSelect extends React.Component {
             clearable={clearable}
             multi={multi}
             delimiter={delimiter}
-            placeholder={placeholder}
+            placeholder={floatingLabelText}
             disabled={disabled}
             matchProp="label"
           />

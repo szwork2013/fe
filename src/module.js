@@ -38,7 +38,7 @@ Router.run(routes, Router.HistoryLocation, (Root, state) => {
     .then((data) => {
         ReactDOM.render(
             <Provider store={store} key="provider">
-              <Root {...state} data={data}/>
+              <Root {...state}/>
             </Provider>, document.body);
     });
 

@@ -1,5 +1,5 @@
 import Axios from 'core/common/config/axios-config';
-
+import {store} from 'core/common/redux/store';
 
 class SecurityService  {
 
@@ -17,19 +17,25 @@ class SecurityService  {
     return Axios.post('/core/security/logout');
   }
 
-  getCurrentUser() {
-    console.log('Getting current user');
+  readCurrentUser() {
+    console.log('Reading current user');
     return Axios.get('/core/security/current-user').then((response) => {
       return response.data;
     }, (error) => {
       if (error.status === 401) {
-        console.log('Not authenticated - 401 from getCurrentUser()');
+        console.log('Not authenticated - 401 from readCurrentUser()');
         return null;
       } else {
         throw error;
       }
     })
   }
+
+  getCurrentUser() {
+    return store.getState().getIn(['security', 'currentUser']);
+  }
+
+
 
   getTenants(username) {
     return Axios.get('/public/tenant', {

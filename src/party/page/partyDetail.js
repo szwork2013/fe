@@ -3,6 +3,7 @@ import shouldPureComponentUpdate from 'react-pure-render/function';
 import {uniq,values} from 'lodash';
 import When from 'when';
 import { connect } from 'react-redux';
+import { FlatButton} from 'material-ui';
 
 import hoistNonReactStatics from 'core/common/utils/hoistNonReactStatics';
 import PageAncestor from 'core/common/page/pageAncestor';
@@ -12,7 +13,7 @@ import PartyService from 'party/partyService';
 import {setPartyAction} from 'party/partyActions';
 import PartyFoForm from 'party/component/PartyFoForm';
 import PartyPoForm from 'party/component/PartyPoForm';
-
+import Toolmenu from 'core/components/toolmenu/toolmenu';
 
 
 
@@ -43,8 +44,15 @@ class PartyDetail extends PageAncestor {
       });
   }
 
-  onSubmit = (evt) => {
-    console.log('onSubmit');
+  onSave = (evt) => {
+    console.log('onSave');
+  };
+  onDelete = (evt) => {
+    console.log('onDelete');
+  };
+  onBack = (evt) => {
+    console.log('onBack');
+    this.context.router.goBack();
   };
 
 
@@ -60,11 +68,11 @@ class PartyDetail extends PageAncestor {
     return (
 
       <main className="main-content">
-
-        <form onSubmit={ e => this.onSubmit(e)} >
+        {this._createToolMenu(partyObject)}
+        <form>
           <div className="container-fluid">
             <div className="row">
-              { this.mainForm(partyObject, partyEntity, setPartyAction) }
+              { this._mainForm(partyObject, partyEntity, setPartyAction) }
             </div>
           </div>
         </form>
@@ -77,7 +85,7 @@ class PartyDetail extends PageAncestor {
     );
   }
 
-  mainForm = (partyObject, partyEntity, setPartyAction) => {
+  _mainForm = (partyObject, partyEntity, setPartyAction) => {
     const props = {dataObject: partyObject, entity: partyEntity, setDataAction: setPartyAction};
     switch (partyObject.partyCategory) {
       case 'PO':
@@ -85,7 +93,26 @@ class PartyDetail extends PageAncestor {
       case 'FO':
         return <PartyFoForm {...props} /> ;
     }
+  };
+
+  _createToolMenu(partyObject) {
+    return (
+      <Toolmenu>
+          <FlatButton onClick={this.onSave}>
+            <span className="fa fa-save"/><span> Save customer</span>
+          </FlatButton>
+        { (partyObject.partyId > 0) ? (
+          <FlatButton onClick={this.onDelete}>
+            <span className="fa fa-trash"/><span> Delete Customer</span>
+          </FlatButton>
+        ) : <div/>}
+        <FlatButton onClick={this.onBack}>
+          <span className="fa fa-chevron-left"/><span> Back</span>
+        </FlatButton>
+      </Toolmenu>
+    );
   }
+
 
 }
 
