@@ -11,8 +11,8 @@ import {store} from 'core/common/redux/store';
 import MdEntityService from 'core/metamodel/mdEntityService';
 import PartyService from 'party/partyService';
 import {setPartyAction} from 'party/partyActions';
-import PartyFoForm from 'party/component/PartyFoForm';
-import PartyPoForm from 'party/component/PartyPoForm';
+import PartyFoForm from 'party/component/partyFoForm';
+import PartyPoForm from 'party/component/partyPoForm';
 import Toolmenu from 'core/components/toolmenu/toolmenu';
 
 
