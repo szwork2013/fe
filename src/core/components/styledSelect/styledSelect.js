@@ -74,7 +74,7 @@ export default class StyledSelect extends React.Component {
 
     this.state = {
       focused: false,
-      value: null,
+      value: props.value,
     }
   }
 
