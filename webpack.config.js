@@ -6,7 +6,6 @@ var webpack = require('webpack'),
     path = require('path'),
     srcPath = path.join(__dirname, 'src');
 
-
 console.log('process.env.NODE_ENV : _' + process.env.NODE_ENV + '_');
 
 
@@ -15,7 +14,8 @@ var _plugins = [
     'process.env': {
       NODE_ENV: JSON.stringify(process.env.NODE_ENV)
     },
-    __DEV__: (process.env.NODE_ENV === 'development')
+    __DEV__: (process.env.NODE_ENV === 'development'),
+    __REDUXDEVTOOLS__: (process.env.NODE_ENV === 'development' && (process.argv.indexOf("--devtools") != -1))
   }),
   new webpack.optimize.CommonsChunkPlugin('common', 'common-[hash:8].js'),
   new HtmlWebpackPlugin({

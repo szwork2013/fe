@@ -30,12 +30,10 @@ export default class Toolmenu extends React.Component {
       ...other,
       } = this.props;
 
-
     return (
       <div className="toolmenu" style={style}>
         {
-          children.map((child, index) => {
-
+          React.Children.map(children, (child, index) => {
             return React.cloneElement(
               child,
               {
@@ -44,15 +42,11 @@ export default class Toolmenu extends React.Component {
                   fontWeight: Typography.fontWeightNormal,
                   paddingLeft: 8,
                   paddingRight: 8
-                }),
+                })
               }
             );
-
-            return child;
           })
         }
-
-
       </div>
     )
   }

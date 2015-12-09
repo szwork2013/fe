@@ -17,6 +17,7 @@ import VehicleDetail from 'product/page/vehicleDetail';
 import LoginPage from 'core/security/loginPage';
 
 import GridAdminView from 'core/grid/component/gridAdminView';
+import ResponsiveTest from 'administration/responsiveTest';
 
 
 const routes = (
@@ -40,6 +41,8 @@ const routes = (
     <Route name="vehicleDetail" path="vehicle/detail/:id"  handler={VehicleDetail}/>
 
     <Route name="gridAdmin" path="core/grid/admin/:gridLocation"  handler={GridAdminView}/>
+
+    <Route name="responsiveTest" path="administration/responsive-test"  handler={ResponsiveTest}/>
 
 
   </Route>

@@ -6,4 +6,3 @@ if (__DEV__) {
   var installDevTools = require("immutable-devtools");
   installDevTools(Immutable);
 }
-

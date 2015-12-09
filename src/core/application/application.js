@@ -75,7 +75,7 @@ export default class Application extends React.Component {
 
 
     var devtools = '';
-    if (__DEV__) {
+    if (__REDUXDEVTOOLS__) {
       const DevTools = require('core/common/redux/devtools');
       devtools = <DevTools />;
     }

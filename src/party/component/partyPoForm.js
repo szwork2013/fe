@@ -22,7 +22,7 @@ class PartyPoForm extends React.Component {
 
     return (
 
-      <div className="col-xs-10">
+      <div className="col-xs-6">
 
 
         {/*  1. row  */}

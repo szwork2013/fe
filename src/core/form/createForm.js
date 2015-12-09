@@ -64,9 +64,6 @@ export default function createForm(definition, FormComponent) {
         this.fields[fieldName].value = this.props.dataObject[fieldName];
       }
 
-      console.log("dataObject = ", this.props.dataObject);
-      console.log("fields = ", this.fields);
-
       return <FormComponent fields={this.fields} {...this.props} />;
     }
   };

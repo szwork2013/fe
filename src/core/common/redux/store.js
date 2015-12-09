@@ -8,11 +8,11 @@ export const store = finalCreateStore();
 
 function finalCreateStore() {
 
-  console.debug('Creating redux store');
+  console.debug('Creating redux store __REDUXDEVTOOLS__ = ' + __REDUXDEVTOOLS__);
 
   let _finalCreateStore;
 
-  if (__DEV__) {
+  if (__REDUXDEVTOOLS__) {
     const { persistState } = require('redux-devtools');
     const DevTools = require('core/common/redux/devtools');
 
