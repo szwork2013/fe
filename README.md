@@ -3,16 +3,28 @@
 
 ### Develoment 
 *Dependencies*
- - tested on node 0.12.7 (did not tried on node 4 yet)
- - recommended npm 3 : `npm install -g npm@v3.x-next` and then see https://github.com/felixrieseberg/npm-windows-upgrade
+ - tested on node 5 and npm 3
 
 *Installation*
  - `npm install`
 
 *Running (dev server)*
- - `npm run watch` then go to `http://localhost:3000`
+ - `npm run watch` 
+ - `npm run watch -- --devtools`  
+  - runs with redux devtools enabled (CTRL+H to show, CTRL+Q to move around)
+
+ then go to `http://localhost:3000`
 
 We are using `npm shrinkwrap` so after upgrade of some dependency (must be done individually e.g. `npm upgrade react-router` or edit package.json to new version and `npm install react-router`) you must run `npm shrinkwrap` which modifies npm-shrinkwrap.json
+
+*Testing*
+ - `npm run test` 
+ - `npm run test:watch`  
+  - rerun tests on file save
+
+*Linting (eslint)*
+ - `npm run lint` 
+
 
 ### Production
 
