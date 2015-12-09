@@ -37,7 +37,8 @@ export default class StyledSelect extends React.Component {
     disabled: React.PropTypes.bool,            // whether the Select is disabled or not
     filterOption: React.PropTypes.func,        // method to filter a single option  (option, filterString)
     filterOptions: React.PropTypes.func,       // method to filter the options array: function ([options], filterString, [values])
-    floatingLabelText: React.PropTypes.string,
+    floatingLabelStyle: React.PropTypes.object,
+    floatingLabelText: React.PropTypes.node,
     fullWidth: React.PropTypes.bool,
     id: React.PropTypes.string,
     ignoreCase: React.PropTypes.bool,          // whether to perform case-insensitive filtering
@@ -139,6 +140,7 @@ export default class StyledSelect extends React.Component {
       disabled,
       filterOption,
       filterOptions,
+      floatingLabelStyle,
       floatingLabelText,
       id,
       ignoreCase,
@@ -185,11 +187,11 @@ export default class StyledSelect extends React.Component {
 
     let floatingLabelTextElement = floatingLabelText ? (
     <label className="SelectLabel"
-    htmlFor={inputId}
-    onTouchTap={this.focus}>
-    {floatingLabelText}
-  </label>
-  ) : null;
+      htmlFor={inputId}
+      onTouchTap={this.focus}
+      style={floatingLabelStyle}>
+      {floatingLabelText}
+    </label>) : null;
 
     return (
       <div className={selectClassName} style={MaterialStyles.mergeAndPrefix(styles.root, this.props.style)}>
