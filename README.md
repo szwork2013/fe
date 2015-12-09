@@ -10,7 +10,9 @@
  - `npm install`
 
 *Running (dev server)*
- - `npm run watch` then go to `http://localhost:3000`
+ - `npm run watch` 
+ - `npm run watch -- --devtools`  - runs with redux devtools enabled (CTRL+H to show, CTRL+Q to move around)
+  then go to `http://localhost:3000`
 
 We are using `npm shrinkwrap` so after upgrade of some dependency (must be done individually e.g. `npm upgrade react-router` or edit package.json to new version and `npm install react-router`) you must run `npm shrinkwrap` which modifies npm-shrinkwrap.json
 
