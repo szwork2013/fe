@@ -21,14 +21,26 @@
       width: 100%;
       height: 100%;
 
+      .Select-placeholder {
+        display: none;
+        padding: 0px;
+        position:absolute;
+        bottom:10px;
+        top: initial !important;
+        line-height: 24px;
+      }
+
       .Select-input {
         // width: 100%;
-        height: 100%;
+        // height: 100%;
+        height: auto !important;
         overflow: hidden;
+        padding: 0px;
+        position:absolute;
+        bottom: 10px;
 
         input {
-          tap-highlight-color: rgba(0,0,0,0);
-          color: rgba(0, 0, 0, 0.87);
+          tap-highlight-color: rgba(0, 0, 0, 0);
           padding: 0;
           position: relative;
           width: 100%;
@@ -38,23 +50,11 @@
         }
       }
 
-      .Select-placeholder {
-        display: block;         // material-ui
-        position: absolute;     // material-ui
-        line-height: 22px;      // material-ui
-        opacity: 1;             // material-ui
-        color: rgba(0,0,0,0.3); // material-ui
-        transition: all 450ms cubic-bezier(0.23, 1, 0.32, 1) 0ms;   // material-ui
-        bottom: 12px;           // material-ui
-        top: initial;           // override
-        left: initial;          // override
-        right: initial;         // override
-        padding: 0;             // override
+      .Select-arrow-zone {
+        position: absolute;
+        bottom: 18px;
+        right: 0px;
       }
-    }
-
-    .Select-value {
-
     }
 
     .Select-menu-outer {
@@ -83,6 +83,23 @@
         }
       }
     }
+  }
+
+  .SelectLabel {
+    display: inline-block; // material-ui
+    position: absolute; // material-ui
+    line-height: 22px; // material-ui
+    opacity: 1; // material-ui
+    color: rgba(0, 0, 0, 0.3); // material-ui
+    transition: all 450ms cubic-bezier(0.23, 1, 0.32, 1) 0ms; // material-ui
+    bottom: 12px; // material-ui
+    top: initial; // override
+    left: initial; // override
+    right: initial; // override
+    padding: 0; // override
+    transform: scale(1) translate3d(0px, 0px, 0px);
+    transform-origin: left top 0px;
+    margin: 0px;
   }
 
   .underscore-grey {
@@ -117,11 +134,22 @@
     transform: scaleX(1) !important;
     z-index: 2;
   }
+
+  .SelectLabel {
+    color: rgb(63,81,181) !important;
+  }
+}
+
+.StyledSelect.is-focused, .StyledSelect.has-value {
+  .SelectLabel {
+    transform: perspective(1px) scale(0.75) translate3d(2px, -28px, 0px) !important;
+  }
 }
 
 .StyledSelect {
   .Select.has-value {
     .Select-placeholder {
+      display: block !important;
       color: rgba(0, 0, 0, 0.87);
     }
   }
@@ -163,6 +191,12 @@
     .Select-control {
       margin-bottom: 16px;
       overflow: visible;
+      bottom: 0px;
+      min-height: 32px;
+
+      .Select-arrow-zone {
+        bottom: 0px !important;
+      }
     }
 
     .Select-placeholder {
