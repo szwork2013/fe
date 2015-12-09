@@ -95,7 +95,8 @@ const definition = {
     name: 'fullName',
     validators: ['required']
   }, {
-    name: 'ico'
+    name: 'ico',
+    style: {fontWeight: 'bold'}
   }, {
     name: 'dic'
   }, {

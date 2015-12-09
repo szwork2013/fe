@@ -71,19 +71,5 @@ export default function createForm(definition, FormComponent) {
     }
   };
 
-
 }
 
-function mapStateToProps(state, ownProps ) {
-  let fieldOptions;
-
-  let {field} = ownProps;
-
-  if (field.hasLocalValueSource()) {
-    let entity =  state.getIn(['metamodel', 'entities', field.valueSource]);
-    if (entity) {
-      fieldOptions = entity.lovItems;
-    }
-  }
-  return {fieldOptions};
-}
