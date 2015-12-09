@@ -26,6 +26,7 @@ export default function createForm(definition, FormComponent) {
       this.fields = definition.fields.reduce((fields, field) => {
         const mdField = entity.fields[field.name];
         const fieldObject = {
+          fullWidth: true,
           floatingLabelText: mdField.label,
           errorText: null,
           name: field.name,

@@ -37,6 +37,7 @@ export default class StyledSelect extends React.Component {
     filterOption: React.PropTypes.func,        // method to filter a single option  (option, filterString)
     filterOptions: React.PropTypes.func,       // method to filter the options array: function ([options], filterString, [values])
     floatingLabelText: React.PropTypes.string,
+    fullWidth: React.PropTypes.bool,
     ignoreCase: React.PropTypes.bool,          // whether to perform case-insensitive filtering
     inputProps: React.PropTypes.object,        // custom attributes for the Input (in the Select-control) e.g: {'data-foo': 'bar'}
     isLoading: React.PropTypes.bool,           // whether the Select is loading externally or not (such as options being loaded)

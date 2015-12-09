@@ -28,21 +28,21 @@ class PartyPoForm extends React.Component {
         {/*  1. row  */}
         <div className="row">
           <div className="col-xs-12">
-            <TextField {...fullName} fullWidth />
+            <TextField {...fullName} />
           </div>
         </div>
 
         {/*  2. row  */}
         <div className="row">
           <div className="col-xs-4">
-            <TextField {...ico} fullWidth />
+            <TextField {...ico} />
           </div>
           <div className="col-xs-4">
-            <TextField {...dic} fullWidth />
+            <TextField {...dic} />
           </div>
           {showForTenant(
             (<div className="col-xs-4">
-              <TextField {...icoDph} fullWidth />
+              <TextField {...icoDph} />
             </div>), 2)}
         </div>
 
