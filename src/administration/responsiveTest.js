@@ -8,19 +8,24 @@ export default class ResponsiveTest extends PageAncestor {
   static title = 'Responsive Test';
   static icon = 'home';
 
-  state = {
-    screenWidth: window.screen.width
-  };
+  state = this._createSizeObject();
+
+  _createSizeObject() {
+    var widths = {
+      screenWidth: window.screen.width,
+      viewportWidth: window.innerWidth,
+      bodyClientWidth: document.body.clientWidth,
+      documentClientWidth: document.documentElement.clientWidth
+    };
+    console.log('widths: ', widths);
+    return widths;
+  }
 
   onResize = (evt) => {
-    console.log('onResize: ', window.screen.width);
-    this.setState({
-      screenWidth: window.screen.width
-    });
+    this.setState(this._createSizeObject());
   };
 
   componentDidMount() {
-    console.log('componentDidMount');
     window.addEventListener('resize', this.onResize);
   }
 
@@ -28,24 +33,108 @@ export default class ResponsiveTest extends PageAncestor {
     window.removeEventListener('resize', this.onResize);
   }
 
+
   render() {
 
-    const {screenWidth} = this.state;
+    const {screenWidth, viewportWidth, bodyClientWidth, documentClientWidth} = this.state;
 
     return (
 
       <main className="main-content">
         <Toolmenu>
           <div>
-            SCREEN WIDTH: {screenWidth}
+            window.screen.width: {screenWidth}
+          </div>
+          <div>
+            window.innerWidth: {viewportWidth}
+          </div>
+          <div>
+            document.body.clientWidth: {bodyClientWidth}
+          </div>
+          <div>
+            document.documentElement.clientWidth: {documentClientWidth}
           </div>
         </Toolmenu>
         <form>
-          <div className="container-fluid">
-            <div className="row">
-
+            <div className="row" >
+              <div className="col-xs-12" >
+                <div className="box" style={{backgroundColor: 'blue', color: 'white', marginTop:10}}>
+                  col-xs  &lt; 768px
+                </div>
+              </div>
             </div>
-          </div>
+            <div className="row" >
+              <div className="col-xs-12">
+                <div className="box" style={{backgroundColor: 'blue', color: 'white'}}>
+                  768px &lt;= col-sm  &lt; 992px
+                </div>
+              </div>
+            </div>
+            <div className="row" >
+              <div className="col-xs-12">
+                <div className="box" style={{backgroundColor: 'blue', color: 'white'}}>
+                  992px &lt;= col-md  &lt; 1200px
+                </div>
+              </div>
+            </div>
+            <div className="row" >
+              <div className="col-xs-12">
+                <div className="box" style={{backgroundColor: 'blue', color: 'white'}}>
+                  1200px &lt;= col-lg
+                </div>
+              </div>
+            </div>
+
+            <div className="row">
+              <div className="col-xs-12">
+                <div className="box" style={{backgroundColor: 'lightGrey', marginTop:10,marginBottom:10}}>
+                  col-xs-12
+                </div>
+              </div>
+            </div>
+            <div className="row">
+              <div className="col-xs-12 col-sm-8">
+                <div className="box" style={{backgroundColor: 'lightGrey', marginTop:10,marginBottom:10}}>
+                  col-xs-12 col-sm-8
+                </div>
+              </div>
+            </div>
+            <div className="row">
+              <div className="col-xs-12 col-sm-8 col-md-6">
+                <div className="box" style={{backgroundColor: 'lightGrey', marginTop:10,marginBottom:10}}>
+                  col-xs-12 col-sm-8 col-md-6
+                </div>
+              </div>
+            </div>
+            <div className="row">
+              <div className="col-xs-12 col-sm-8 col-md-6 col-lg-4">
+                <div className="box" style={{backgroundColor: 'lightGrey', marginTop:10,marginBottom:10}}>
+                  col-xs-12 col-sm-8 col-md-6 col-lg-4
+                </div>
+              </div>
+            </div>
+
+            <hr/>
+
+            <div className="row">
+              <div className="col-xs-12 col-md-6 col-lg-4">
+                <div className="box" style={{backgroundColor: 'yellow', marginTop:10,marginBottom:10}}>
+                  col-xs-12 col-sm-8 col-md-6 col-lg-4
+                </div>
+              </div>
+              <div className="col-xs-12  col-md-6 col-lg-4">
+                <div className="box" style={{backgroundColor: 'yellow', marginTop:10,marginBottom:10}}>
+                  col-xs-12 col-sm-8 col-md-6 col-lg-4
+                </div>
+              </div>
+              <div className="col-xs-12 col-md-6 col-lg-4">
+                <div className="box" style={{backgroundColor: 'yellow', marginTop:10,marginBottom:10}}>
+                  col-xs-12 col-sm-8 col-md-6 col-lg-4
+                </div>
+              </div>
+            </div>
+
+
         </form>
       </main>
     )

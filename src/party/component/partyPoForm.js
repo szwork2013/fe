@@ -22,7 +22,7 @@ class PartyPoForm extends React.Component {
 
     return (
 
-      <div className="col-xs-6">
+      <div className="col-xs-12 col-sm-8">
 
 
         {/*  1. row  */}
@@ -34,50 +34,44 @@ class PartyPoForm extends React.Component {
 
         {/*  2. row  */}
         <div className="row">
-          <div className="col-xs-4">
+          <div className="col-xs-6 col-sm-4">
             <TextField {...ico} />
           </div>
-          <div className="col-xs-4">
+          <div className="col-xs-6 col-sm-4">
             <TextField {...dic} />
           </div>
           {showForTenant(
-            (<div className="col-xs-4">
+            (<div className="col-xs-6 col-sm-4">
               <TextField {...icoDph} />
             </div>), 2)}
         </div>
 
-        {/*  3. row  */}
+        {/*  3. 4. 6. row  */}
         <div className="row">
-          <div className="col-xs-4">
+          <div className="col-xs-6 col-sm-4">
             <StyledSelect {...defaultCurrency}  />
           </div>
-          <div className="col-xs-4">
+          <div className="col-xs-6 col-sm-4">
             <StyledSelect {...defaultLanguage}  />
           </div>
-          <div className="col-xs-4">
+          <div className="col-xs-6 col-sm-4">
             <StyledSelect {...defaultPaymentCond}  />
           </div>
-        </div>
 
-        {/*  4. row  */}
-        <div className="row">
-          <div className="col-xs-4">
+          <div className="col-xs-6 col-sm-4">
             <StyledSelect {...legalForm}  />
           </div>
-          <div className="col-xs-4">
+          <div className="col-xs-6 col-sm-4">
             <StyledSelect {...naceCode}  />
           </div>
-          <div className="col-xs-4">
+          <div className="col-xs-6 col-sm-4">
             <StyledSelect {...marketingSource}  />
           </div>
-        </div>
 
-        {/*  5. row  */}
-        <div className="row">
-          <div className="col-xs-4">
+          <div className="col-xs-6 col-sm-4">
             <StyledSelect {...nationality}  />
           </div>
-          <div className="col-xs-4">
+          <div className="col-xs-6 col-sm-4">
             <StyledSelect {...taxDomicile} />
           </div>
         </div>

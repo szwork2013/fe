@@ -70,9 +70,16 @@ class PartyDetail extends PageAncestor {
       <main className="main-content">
         {this._createToolMenu(partyObject)}
         <form>
-          <div className="container-fluid">
-            <div className="row">
-              { this._mainForm(partyObject, partyEntity, setPartyAction) }
+          <div className="row">
+            <div className="col-xs-12 col-lg-6">
+              <div>
+                <div className="row">
+                  { this._mainForm(partyObject, partyEntity, setPartyAction) }
+                  <div className="col-xs-12 col-sm-4" style={{backgroundColor:'yellow'}}>
+                    contacts
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </form>
