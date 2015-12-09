@@ -44,7 +44,7 @@ export default function createForm(definition, FormComponent) {
             fieldObject.options = [{value: '', label: '---'}, ...valueSourceEntity.lovItems];
           }
           fieldObject.clearable = false;
-          fieldObject.searchable = valueSourceEntity.lovItems.length > 8;
+          fieldObject.searchable = (valueSourceEntity.lovItems.length > 8);
 
         }
 

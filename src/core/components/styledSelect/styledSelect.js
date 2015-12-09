@@ -170,6 +170,7 @@ export default class StyledSelect extends React.Component {
             options={options}
             onChange={onChange}
             clearable={clearable}
+            searchable={searchable}
             multi={multi}
             delimiter={delimiter}
             placeholder={floatingLabelText}

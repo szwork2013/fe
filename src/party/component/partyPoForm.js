@@ -78,7 +78,7 @@ class PartyPoForm extends React.Component {
             <StyledSelect {...nationality}  />
           </div>
           <div className="col-xs-4">
-            <StyledSelect {...taxDomicile}  />
+            <StyledSelect {...taxDomicile} />
           </div>
         </div>
 
