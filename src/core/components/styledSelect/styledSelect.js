@@ -1,6 +1,7 @@
 import React from 'react';
 import Select from 'react-select';
 
+import UniqueId from 'material-ui/lib/utils/unique-id';
 import Styles from 'core/components/styledSelect/styledSelect.less';
 import MaterialStyles from 'material-ui/lib/utils/styles';
 import Transitions from 'material-ui/lib/styles/transitions';
@@ -38,6 +39,7 @@ export default class StyledSelect extends React.Component {
     filterOptions: React.PropTypes.func,       // method to filter the options array: function ([options], filterString, [values])
     floatingLabelText: React.PropTypes.string,
     fullWidth: React.PropTypes.bool,
+    id: React.PropTypes.string,
     ignoreCase: React.PropTypes.bool,          // whether to perform case-insensitive filtering
     inputProps: React.PropTypes.object,        // custom attributes for the Input (in the Select-control) e.g: {'data-foo': 'bar'}
     isLoading: React.PropTypes.bool,           // whether the Select is loading externally or not (such as options being loaded)
@@ -71,7 +73,12 @@ export default class StyledSelect extends React.Component {
 
     this.state = {
       focused: false,
+      value: null,
     }
+  }
+
+  componentDidMount() {
+    this._uniqueId = UniqueId.generate();
   }
 
   getStyles() {
@@ -107,6 +114,13 @@ export default class StyledSelect extends React.Component {
     }
   };
 
+  onChangeEvent = (newValue) => {
+    this.setState({value: newValue});
+    if (this.props.onChange) {
+      this.props.onChange(newValue);
+    }
+  };
+
   render() {
 
     let {
@@ -126,6 +140,7 @@ export default class StyledSelect extends React.Component {
       filterOption,
       filterOptions,
       floatingLabelText,
+      id,
       ignoreCase,
       inputProps,
       isLoading,
@@ -155,34 +170,48 @@ export default class StyledSelect extends React.Component {
       ...other,
       } = this.props;
 
+
+    let inputId = id || this._uniqueId;
+    let selectValue = this.state.value;
+
     let styles = this.getStyles();
     let selectClassName = "StyledSelect";
     if (this.state.focused) {selectClassName += " is-focused";}
+    if ((selectValue && (selectValue.toString().length > 0))) {selectClassName += " has-value";}
     if (errorText) {selectClassName += " is-error";}
     if (multi) {selectClassName += " is-multi";}
 
+    // <input className="rowAligner" type="text" style={{width: '100%', height: '100%', visibility: 'hidden'}} />
+
+    let floatingLabelTextElement = floatingLabelText ? (
+    <label className="SelectLabel"
+    htmlFor={inputId}
+    onTouchTap={this.focus}>
+    {floatingLabelText}
+  </label>
+  ) : null;
+
     return (
-        <div className={selectClassName} style={MaterialStyles.mergeAndPrefix(styles.root, this.props.style)}>
-          <input className="rowAligner" type="text" style={{width: '100%', height: '100%', visibility: 'hidden'}} />
-          <Select ref="select" onFocus={this.onFocusEvent} onBlur={this.onBlurEvent}
-            name={name}
-            valueRenderer={valueRenderer}
-            value={value}
-            options={options}
-            onChange={onChange}
-            clearable={clearable}
-            searchable={searchable}
-            multi={multi}
-            delimiter={delimiter}
-            placeholder={floatingLabelText}
-            disabled={disabled}
-            matchProp="label"
-          />
-          <hr className="underscore-grey"  />
-          <hr className="underscore-blue"  />
-          <div className="errorText">{errorText}</div>
-        </div>
-    )
+      <div className={selectClassName} style={MaterialStyles.mergeAndPrefix(styles.root, this.props.style)}>
+    {floatingLabelTextElement}
+  <input className="rowAligner" type="text" style={{width: '100%', height: '100%', visibility: 'hidden'}} />
+  <Select ref="select" onFocus={this.onFocusEvent} onBlur={this.onBlurEvent} onChange={this.onChangeEvent}
+    name={name}
+    valueRenderer={valueRenderer}
+    value={value}
+    options={options}
+    clearable={clearable}
+    searchable={searchable}
+    multi={multi}
+    delimiter={delimiter}
+    disabled={disabled}
+    matchProp="label"
+      />
+      <hr className="underscore-grey"  />
+      <hr className="underscore-blue"  />
+      <div className="errorText">{errorText}</div>
+      </div>
+  )
   }
 
 
