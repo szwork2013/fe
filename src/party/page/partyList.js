@@ -1,6 +1,4 @@
 import React from 'react';
-import reactMixin from 'react-mixin';
-
 
 import PageAncestor from 'core/common/page/pageAncestor';
 import GridService from 'core/grid/service/gridService';

@@ -103,7 +103,7 @@ function isValid(value) {
  * - pri ztrate focusu (blur) se vyrenderuje hodnota zformatovana dle zadaneho "format"
  * - pri ziskani focusu se vstupni pole vrati do stavu, v jakem ho vyplnil uzivatel
  */
-let NumberInput = React.createClass({
+const NumberInput = React.createClass({
 
   mixins: [StylePropable],
 
@@ -560,4 +560,4 @@ let NumberInput = React.createClass({
 
 });
 
-module.exports = NumberInput;
+export default NumberInput;

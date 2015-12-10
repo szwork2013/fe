@@ -489,9 +489,14 @@ export default class GridComp extends React.Component {
 
             let formattedValue = field.formatValue(gridCell.value);
 
+            let styleObject = {width: this.columnWidths[0][columnIndex]+'%', minWidth: this.columnWidths[1][columnIndex]+'px', maxWidth: this.columnWidths[2][columnIndex]+'px' };
+            if (field.textAlign) {
+              styleObject.textAlign = field.textAlign;
+            }
+
             return (
               <div key={columnIndex} className="md-grid-cell"
-                style={{width: this.columnWidths[0][columnIndex]+'%', minWidth: this.columnWidths[1][columnIndex]+'px', maxWidth: this.columnWidths[2][columnIndex]+'px' }} >
+                style={styleObject} >
 
                 {
                   (detailRoute) ?

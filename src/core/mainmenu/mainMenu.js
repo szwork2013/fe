@@ -125,12 +125,17 @@ export default class MainMenu extends React.Component {
           <MenuItem eventKey='3'>Administration</MenuItem>
         </NavDropdown>
 
-        <NavDropdown id="invoice_menu_dropdown"  title='Assets' onSelect={this.onSelectWithTransition}>
+        <NavDropdown id="assets_menu_dropdown"  title='Assets' onSelect={this.onSelectWithTransition}>
           { this._menuItem("vehicleList") }
           <MenuItem divider/>
           <MenuItem eventKey='3'>Administration</MenuItem>
         </NavDropdown>
 
+        <NavDropdown id="product_menu_dropdown"  title='Products' onSelect={this.onSelectWithTransition}>
+          { this._menuItem("productList") }
+          <MenuItem divider/>
+          <MenuItem eventKey='3'>Administration</MenuItem>
+        </NavDropdown>
 
         <NavDropdown id="administration_dropdown"  title='Administration'>
           <MenuItem eventKey='3' onSelect={this.printAppState}>Print App state</MenuItem>

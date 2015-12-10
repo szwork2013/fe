@@ -1,5 +1,6 @@
 import _ from 'lodash';
 import moment from 'moment';
+import {formatNumber} from 'core/components/numberInput/numberInput';
 
 export default class MdField {
 
@@ -46,6 +47,9 @@ export default class MdField {
     //   BOOLEAN, NUMBER, STRING, DATE,DATETIME
     this.dataType;
 
+    // left,right,center
+    this.textAlign;
+
   }
 
 
@@ -65,7 +69,7 @@ export default class MdField {
       case "DATETIME":
         return moment(value).format('L LTS');
       case "NUMBER":
-        return value;
+        return formatNumber(value, '0,0.00');
       case "BOOLEAN":
         return value;
       default:

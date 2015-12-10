@@ -1,5 +1,8 @@
 import React from 'react';
+import {TextField} from 'material-ui';
 
+import StyledDatePicker from 'core/components/styledDatePicker/styledDatePicker';
+import NumberInput from 'core/components/numberInput/numberInput';
 import PageAncestor from 'core/common/page/pageAncestor';
 import Toolmenu from 'core/components/toolmenu/toolmenu';
 
@@ -133,6 +136,11 @@ export default class ResponsiveTest extends PageAncestor {
                 </div>
               </div>
             </div>
+
+
+          <StyledDatePicker defaultValue={new Date()} culture='en' style={{marginRight: '20px'}} />
+          <TextField defaultValue={'1000'} />
+          <NumberInput />
 
 
         </form>

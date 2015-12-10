@@ -11,8 +11,10 @@ import SalesRepList from 'party/page/salesRepList';
 import PartyDetail from 'party/page/partyDetail';
 
 import InvoiceList from 'invoicing/page/invoiceList';
+import InvoiceDetail from 'invoicing/page/invoiceDetail';
 import VehicleList from 'product/page/vehicleList';
 import VehicleDetail from 'product/page/vehicleDetail';
+import ProductList from 'product/page/productList';
 
 import LoginPage from 'core/security/loginPage';
 
@@ -36,9 +38,11 @@ const routes = (
 
 
     <Route name="invoiceList" path="invoice/grid/:gridId?"  handler={InvoiceList}/>
+    <Route name="invoiceDetail" path="invoice/detail/:id"  handler={InvoiceDetail}/>
 
     <Route name="vehicleList" path="vehicle/grid/:gridId?"  handler={VehicleList}/>
     <Route name="vehicleDetail" path="vehicle/detail/:id"  handler={VehicleDetail}/>
+    <Route name="productList" path="product/grid/:gridId?"  handler={ProductList}/>
 
     <Route name="gridAdmin" path="core/grid/admin/:gridLocation"  handler={GridAdminView}/>
 
