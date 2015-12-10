@@ -32,20 +32,7 @@ class PartyDetail extends PageAncestor {
   static fetchData(routerParams, query) {
     console.log("PartyDetail#fetchData()");
 
-    return MdEntityService.fetchEntities(['Party', 'PartyContact', 'PartyRole', 'Address'], [false])
-      .then(entityMap => {
-        let Party = entityMap.get('Party');
-
-        let allFields = values(entityMap.get('Party').fields).concat(
-          values(entityMap.get('PartyContact').fields), values(entityMap.get('PartyRole').fields), values(entityMap.get('Address').fields));
-
-        let allValueSources = allFields.filter(f => f.hasLocalValueSource()).map(f => f.valueSource);
-        allValueSources.push('PARTYCONTACTCATEGORY');
-
-        let valuesSources = uniq(allValueSources);
-
-        return MdEntityService.fetchEntities(valuesSources, valuesSources.map(v => true));
-      })
+    return MdEntityService.fetchEntityMetadata(['Party', 'PartyContact', 'PartyRole', 'Address'], ['PARTYCONTACTCATEGORY'])
       .then((entityMap) => {
         var partyPromise = (routerParams.id === 'new') ? When(Object.assign({contacts: [], addresses: [], roles: []}, query)) : PartyService.readParty(routerParams.id);
         return partyPromise.then(partyObject => store.dispatch(setPartyAction(partyObject)));
@@ -69,12 +56,11 @@ class PartyDetail extends PageAncestor {
 
     const {
       partyObject,
-      partyEntity,
       entities,
       setPartyAction
       } = this.props;
 
-    const propsForCreateForm = {dataObject: partyObject, entity: partyEntity, entities, setDataAction: setPartyAction};
+    const propsForCreateForm = {dataObject: partyObject, entity: entities.get('Party'), entities, setDataAction: setPartyAction};
 
     return (
 
@@ -137,7 +123,6 @@ class PartyDetail extends PageAncestor {
 function mapStateToProps(state) {
   return {
     partyObject: state.getIn(['party', 'partyObject']),
-    partyEntity: state.getIn(['metamodel', 'entities', 'Party']),
     entities: state.getIn(['metamodel', 'entities'])
   };
 }

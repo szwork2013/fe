@@ -1,13 +1,13 @@
 import {Map, Record} from 'immutable';
 import { combineReducers } from 'redux-immutablejs';
 
-import {setPartyAction} from 'party/partyActions';
+import {setProductAction} from 'product/productActions';
 
 
 
-function partyObject(state = null, action) {
+function productObject(state = null, action) {
   switch (action.type) {
-    case setPartyAction.type:
+    case setProductAction.type:
       return Object.assign({},action.payload);
     default:
       return state;
@@ -18,7 +18,7 @@ function partyObject(state = null, action) {
 
 
 
-export const party = combineReducers({
-  partyObject
+export const product = combineReducers({
+  productObject
 });
 

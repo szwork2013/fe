@@ -1,13 +1,11 @@
 import Axios from 'core/common/config/axios-config';
-
 import When from 'when';
+import {uniq, values, flatten} from 'lodash';
 
 import {updateEntitiesAction} from 'core/metamodel/metamodelActions';
 import {store} from 'core/common/redux/store';
-
 import MdEntity from 'core/metamodel/mdEntity';
 import MdField from 'core/metamodel/mdField';
-
 import Utils from 'core/common/utils/utils';
 
 
@@ -96,6 +94,33 @@ class MdEntityService {
         return entityMap;
       });
   }
+
+
+  /**
+   *
+   * @param mainEntityNames - pole jmen hlavnich entit, ktere dotahneme bez lov a k nim potom dotahneme entity vsech fieldu s localValueSource vcetne lov
+   * @param entityNamesForLov - pole jmen entit ktere dotahneme s lovs
+   * @returns {Promise.<entityObject>|Promise|*}
+   */
+  fetchEntityMetadata(mainEntityNames, entityNamesForLov) {
+    return this.fetchEntities(mainEntityNames)
+      .then(entityMap => {
+
+        let allFields = flatten(mainEntityNames.map(entityName => values(entityMap.get(entityName).fields)));
+        let allValueSources = allFields.filter(f => f.hasLocalValueSource()).map(f => f.valueSource);
+
+        if (entityNamesForLov) {
+          for (let e of entityNamesForLov) {
+            allValueSources.push(e);
+          }
+        }
+
+        let valuesSources = uniq(allValueSources);
+
+        return this.fetchEntities(valuesSources, valuesSources.map(v => true));
+      })
+  }
+
 
 
 }

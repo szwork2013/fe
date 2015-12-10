@@ -1,6 +1,5 @@
 import React from 'react';
 import shouldPureComponentUpdate from 'react-pure-render/function';
-import {uniq, values} from 'lodash';
 import When from 'when';
 import { connect } from 'react-redux';
 import { FlatButton, Styles} from 'material-ui';
@@ -10,12 +9,9 @@ import PageAncestor from 'core/common/page/pageAncestor';
 import Toolmenu from 'core/components/toolmenu/toolmenu';
 import {store} from 'core/common/redux/store';
 import MdEntityService from 'core/metamodel/mdEntityService';
-import InvoiceService from 'invoicing/invoiceService';
-import {setInvoiceAction} from 'invoicing/invoiceActions';
+import InvoiceService from 'invoice/invoiceService';
+import {setInvoiceAction} from 'invoice/invoiceActions';
 
-import PartyFoForm from 'party/component/partyFoForm';
-import PartyPoForm from 'party/component/partyPoForm';
-import PartyContactsForm from 'party/component/partyContactsForm';
 
 
 
@@ -32,18 +28,7 @@ class InvoiceDetail extends PageAncestor {
   static fetchData(routerParams, query) {
     console.log("InvoiceDetail#fetchData()");
 
-    return MdEntityService.fetchEntities(['Invoice', 'InvoiceItem'], [false])
-      .then(entityMap => {
-        let Party = entityMap.get('Party');
-
-        let allFields = values(entityMap.get('Invoice').fields).concat(
-          values(entityMap.get('InvoiceItem').fields));
-
-        let allValueSources = allFields.filter(f => f.hasLocalValueSource()).map(f => f.valueSource);
-        let valuesSources = uniq(allValueSources);
-
-        return MdEntityService.fetchEntities(valuesSources, valuesSources.map(v => true));
-      })
+    return MdEntityService.fetchEntityMetadata(['Invoice', 'InvoiceItem'])
       .then((entityMap) => {
         var invoicePromise = (routerParams.id === 'new') ? When(Object.assign({items: []}, query)) : InvoiceService.readInvoice(routerParams.id);
         return invoicePromise.then(invoiceObject => store.dispatch(setInvoiceAction(invoiceObject)));
@@ -67,12 +52,11 @@ class InvoiceDetail extends PageAncestor {
 
     const {
       invoiceObject,
-      invoiceEntity,
       entities,
       setInvoiceAction
       } = this.props;
 
-    const propsForCreateForm = {dataObject: invoiceObject, entity: invoiceEntity, entities, setDataAction: setInvoiceAction};
+    const propsForCreateForm = {dataObject: invoiceObject, entity: entities.get('Invoice'), entities, setDataAction: setInvoiceAction};
 
     return (
 
@@ -102,7 +86,7 @@ class InvoiceDetail extends PageAncestor {
           <FlatButton onClick={this.onSave}>
             <span className="fa fa-save"/><span> Save Invoice</span>
           </FlatButton>
-        { (partyObject.partyId > 0) ? (
+        { (invoiceObject.invoiceId > 0) ? (
           <FlatButton onClick={this.onDelete}>
             <span className="fa fa-trash"/><span> Delete Invoice</span>
           </FlatButton>
@@ -119,8 +103,7 @@ class InvoiceDetail extends PageAncestor {
 
 function mapStateToProps(state) {
   return {
-    partyObject: state.getIn(['invoice', 'invoiceObject']),
-    invoiceEntity: state.getIn(['metamodel', 'entities', 'Invoice']),
+    invoiceObject: state.getIn(['invoice', 'invoiceObject']),
     entities: state.getIn(['metamodel', 'entities'])
   };
 }
