@@ -1,19 +1,21 @@
 import React from 'react';
 import shouldPureComponentUpdate from 'react-pure-render/function';
-import {uniq,values} from 'lodash';
+import {uniq, values} from 'lodash';
 import When from 'when';
 import { connect } from 'react-redux';
-import { FlatButton} from 'material-ui';
+import { FlatButton, Styles} from 'material-ui';
 
 import hoistNonReactStatics from 'core/common/utils/hoistNonReactStatics';
 import PageAncestor from 'core/common/page/pageAncestor';
+import Toolmenu from 'core/components/toolmenu/toolmenu';
 import {store} from 'core/common/redux/store';
 import MdEntityService from 'core/metamodel/mdEntityService';
 import PartyService from 'party/partyService';
 import {setPartyAction} from 'party/partyActions';
+
 import PartyFoForm from 'party/component/partyFoForm';
 import PartyPoForm from 'party/component/partyPoForm';
-import Toolmenu from 'core/components/toolmenu/toolmenu';
+import PartyContactsForm from 'party/component/partyContactsForm';
 
 
 
@@ -30,16 +32,22 @@ class PartyDetail extends PageAncestor {
   static fetchData(routerParams, query) {
     console.log("PartyDetail#fetchData()");
 
-    return MdEntityService.fetchEntities(['Party'], [false])
+    return MdEntityService.fetchEntities(['Party', 'PartyContact', 'PartyRole', 'Address'], [false])
       .then(entityMap => {
         let Party = entityMap.get('Party');
-        console.debug(Party);
-        let valuesSources = uniq(values(Party.fields).filter(f => f.hasLocalValueSource()).map(f => f.valueSource));
+
+        let allFields = values(entityMap.get('Party').fields).concat(
+          values(entityMap.get('PartyContact').fields), values(entityMap.get('PartyRole').fields), values(entityMap.get('Address').fields));
+
+        let allValueSources = allFields.filter(f => f.hasLocalValueSource()).map(f => f.valueSource);
+        allValueSources.push('PARTYCONTACTCATEGORY');
+
+        let valuesSources = uniq(allValueSources);
 
         return MdEntityService.fetchEntities(valuesSources, valuesSources.map(v => true));
       })
       .then((entityMap) => {
-        var partyPromise = (routerParams.id === 'new') ? When(Object.assign({}, query)) : PartyService.readParty(routerParams.id);
+        var partyPromise = (routerParams.id === 'new') ? When(Object.assign({contacts: [], addresses: [], roles: []}, query)) : PartyService.readParty(routerParams.id);
         return partyPromise.then(partyObject => store.dispatch(setPartyAction(partyObject)));
       });
   }
@@ -62,24 +70,25 @@ class PartyDetail extends PageAncestor {
     const {
       partyObject,
       partyEntity,
+      entities,
       setPartyAction
       } = this.props;
+
+    const propsForCreateForm = {dataObject: partyObject, entity: partyEntity, entities, setDataAction: setPartyAction};
 
     return (
 
       <main className="main-content">
         {this._createToolMenu(partyObject)}
-        <form>
+        <form style={{marginTop: 10}}>
           <div className="row">
             <div className="col-xs-12 col-lg-6">
-              <div>
                 <div className="row">
-                  { this._mainForm(partyObject, partyEntity, setPartyAction) }
-                  <div className="col-xs-12 col-sm-4" style={{backgroundColor:'yellow'}}>
-                    contacts
+                  { this._mainForm(partyObject, propsForCreateForm) }
+                  <div className="col-xs-12 col-sm-4">
+                    <PartyContactsForm {...propsForCreateForm} />
                   </div>
                 </div>
-              </div>
             </div>
           </div>
         </form>
@@ -92,15 +101,17 @@ class PartyDetail extends PageAncestor {
     );
   }
 
-  _mainForm = (partyObject, partyEntity, setPartyAction) => {
-    const props = {dataObject: partyObject, entity: partyEntity, setDataAction: setPartyAction};
+  _mainForm = (partyObject, propsForCreateForm) => {
+
     switch (partyObject.partyCategory) {
       case 'PO':
-        return <PartyPoForm {...props} /> ;
+        return <PartyPoForm {...propsForCreateForm} /> ;
       case 'FO':
-        return <PartyFoForm {...props} /> ;
+        return <PartyFoForm {...propsForCreateForm} /> ;
     }
   };
+
+
 
   _createToolMenu(partyObject) {
     return (
@@ -126,7 +137,8 @@ class PartyDetail extends PageAncestor {
 function mapStateToProps(state) {
   return {
     partyObject: state.getIn(['party', 'partyObject']),
-    partyEntity: state.getIn(['metamodel', 'entities', 'Party'])
+    partyEntity: state.getIn(['metamodel', 'entities', 'Party']),
+    entities: state.getIn(['metamodel', 'entities'])
   };
 }
 

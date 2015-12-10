@@ -1,13 +1,12 @@
 import React from 'react';
 import shouldPureComponentUpdate from 'react-pure-render/function';
 
-import {store} from 'core/common/redux/store';
-
 
 export default function createForm(definition, FormComponent) {
 
   const defaultStyle = {
-    fontSize: 14
+    fontSize: 14,
+    height: 54
   };
 
   return class extends React.Component {
@@ -16,12 +15,13 @@ export default function createForm(definition, FormComponent) {
     static propTypes = {
       dataObject: React.PropTypes.object.isRequired,
       entity: React.PropTypes.object.isRequired,
+      entities: React.PropTypes.object.isRequired,
       setDataAction: React.PropTypes.func.isRequired
     };
 
     constructor(props) {
       super(props);
-      const {dataObject, entity, setDataAction} = props;
+      const {dataObject, entity, entities, setDataAction} = props;
 
       this.fields = definition.fields.reduce((fields, field) => {
         const mdField = entity.fields[field.name];
@@ -40,7 +40,7 @@ export default function createForm(definition, FormComponent) {
         };
 
         if (mdField.hasLocalValueSource()) {
-          let valueSourceEntity =  store.getState().getIn(['metamodel', 'entities', mdField.valueSource]);
+          let valueSourceEntity =  entities.get(mdField.valueSource);
           if (valueSourceEntity) {
             fieldObject.options = [{value: '', label: '---'}, ...valueSourceEntity.lovItems];
           }
@@ -48,6 +48,15 @@ export default function createForm(definition, FormComponent) {
           fieldObject.searchable = (valueSourceEntity.lovItems.length > 8);
 
         }
+
+        // TextField style overrides (zmenseni)
+        // dame to ted na vsechny jine nez StyledSelect, mozna budeme dale vyhazovat
+        if (!mdField.valueSourceType) {
+          fieldObject.hintStyle = {lineHeight: 24};
+          fieldObject.floatingLabelStyle = {marginBottom: 0, top: 'initial', bottom: 12};
+          fieldObject.inputStyle = {marginTop: 0, paddingTop: 6};
+        }
+
 
         fields[field.name] = fieldObject;
         return fields;
