@@ -15,7 +15,7 @@ import {setPartyAction} from 'party/partyActions';
 
 import PartyFoForm from 'party/component/partyFoForm';
 import PartyPoForm from 'party/component/partyPoForm';
-import PartyContactsForm from 'party/component/partyContactsForm';
+import PartyContactList from 'party/component/partyContactList';
 
 import BlockComp from 'core/components/blockComp/blockComp';
 
@@ -61,7 +61,7 @@ class PartyDetail extends PageAncestor {
       setPartyAction
       } = this.props;
 
-    const propsForCreateForm = {dataObject: partyObject, entity: entities.get('Party'), entities, setDataAction: setPartyAction};
+    const propsForCreateForm = {dataObject: partyObject, rootObject: partyObject, entity: entities.get('Party'), entities, setDataAction: setPartyAction};
 
     return (
 
@@ -75,7 +75,7 @@ class PartyDetail extends PageAncestor {
                     { this._mainForm(partyObject, propsForCreateForm) }
                   </div>
                   <div className="col-xs-12 col-sm-4">
-                    <PartyContactsForm {...propsForCreateForm} />
+                    <PartyContactList partyObject={partyObject} entities={entities} setPartyAction={setPartyAction} />
                     <BlockComp header="Ahoj">
                       <div>content</div>
                     </BlockComp>

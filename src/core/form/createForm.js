@@ -11,9 +11,11 @@ export default function createForm(definition, FormComponent) {
 
   return class extends React.Component {
     shouldComponentUpdate = shouldPureComponentUpdate;
+    displayName = FormComponent.name;
 
     static propTypes = {
       dataObject: React.PropTypes.object.isRequired,
+      rootObject: React.PropTypes.object.isRequired,
       entity: React.PropTypes.object.isRequired,
       entities: React.PropTypes.object.isRequired,
       setDataAction: React.PropTypes.func.isRequired
@@ -21,7 +23,9 @@ export default function createForm(definition, FormComponent) {
 
     constructor(props) {
       super(props);
-      const {dataObject, entity, entities, setDataAction} = props;
+      const {dataObject, rootObject, entity, entities, setDataAction} = props;
+
+      console.log('createForm props: %o', props);
 
       this.fields = definition.fields.reduce((fields, field) => {
         console.debug('createForm: field: %o on entity %o', field, entity);
@@ -35,7 +39,7 @@ export default function createForm(definition, FormComponent) {
             let value = (typeof evt === 'object' && evt.target) ? evt.target.value : evt;
             console.log('Form ' + definition.form + " onChange event on " + field.name + ", value = " + value);
             dataObject[field.name] = value;
-            setDataAction(dataObject);
+            setDataAction(rootObject);
           },
           style: Object.assign({}, defaultStyle, field.style)
         };

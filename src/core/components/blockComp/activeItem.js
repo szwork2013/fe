@@ -1,43 +1,54 @@
 import React from 'react';
 import {Styles} from 'material-ui';
 import {customizeTheme}  from 'core/common/config/mui-theme';
-import ColorManipulator from 'material-ui/lib/utils/color-manipulator';
+import {ZzIconButton} from 'core/components/toolmenu/toolmenu';
 
 const Colors = Styles.Colors;
 
 export default class ActiveItem extends React.Component {
 
-
-  //static defaultProps = {
-  //  zDepth: 1
-  //};
-
-  state = {
-    hovered: false,
-    focused: false,
-    open: false
+  static propTypes = {
+    dataObject: React.PropTypes.object.isRequired,
+    rootObject: React.PropTypes.object.isRequired,
+    entities: React.PropTypes.object.isRequired,
+    setDataAction: React.PropTypes.func.isRequired,
+    lastValue: React.PropTypes.bool,
+    index: React.PropTypes.number
   };
+
 
 
   onMouseEnter = (evt) => {
-    console.log('onMouseEnter');
-    this.setState({hovered:true});
+    this.props.dataObject.$hovered = true;
+    this.props.setDataAction(this.props.rootObject);
+    console.log('onMouseEnter %o', this.props.dataObject);
   };
   onMouseLeave = (evt) => {
-    console.log('onMouseLeave');
-    this.setState({hovered:false});
+    this.props.dataObject.$hovered = false;
+    this.props.setDataAction(this.props.rootObject);
+    console.log('onMouseLeave %o', this.props.dataObject);
   };
   onFocus = (evt) => {
-    console.log('onFocus');
-    this.setState({focused:true});
+    this.props.dataObject.$focused = true;
+    this.props.setDataAction(this.props.rootObject);
+    console.log('onFocus %o', this.props.dataObject);
   };
   onBlur = (evt) => {
-    console.log('onBlur');
-    this.setState({focused:false});
+    this.props.dataObject.$focused = false;
+    this.props.setDataAction(this.props.rootObject);
+    console.log('onBlur %o', this.props.dataObject);
   };
   onClick = (evt) => {
-    console.log('onClick');
-    this.setState({open:true});
+    this.props.dataObject.$open = true;
+    this.props.setDataAction(this.props.rootObject);
+    console.log('onClick %o', this.props.dataObject);
+  };
+
+  onCommit = (evt) => {
+    evt.stopPropagation();
+    Object.assign(this.props.dataObject, {$open: false, $focused: false, $hovered: false});
+    this.props.setDataAction(this.props.rootObject);
+    console.log('onCommit %o', this.props.dataObject);
   };
 
   componentWillMount() {
@@ -46,18 +57,42 @@ export default class ActiveItem extends React.Component {
 
   render() {
 
+
+
     let {
-      children,
-      style,
+      lastValue,
+      dataObject,
       openContent,
+      closedContent,
       ...other
       } = this.props;
 
-    const newStyle = Object.assign({}, style, {backgroundColor: (this.state.focused || this.state.hovered) ? Colors.grey300 : null});
+    console.log('render %o', dataObject);
+
+    const style = {paddingTop: 10, paddingLeft: 5, paddingRight: 5};
+
+    // kdyz neni posledni v seznamu
+    if (!lastValue) Object.assign(style, {
+      borderBottom: '1px solid',
+      borderBottomColor: Colors.grey300,
+      paddingBottom: 10
+    });
+
+    // highlighted
+    if ((dataObject.$focused || dataObject.$hovered) && !dataObject.$open) {
+      style.backgroundColor = Colors.grey300;
+    }
+
+    // opened
+    if (dataObject.$open) {
+      style.border = '2px solid';
+      style.borderColor = Colors.blue500;
+    }
+
 
     let finalProps = {
       ...other,
-      style: newStyle,
+      style,
       onMouseEnter: this.onMouseEnter,
       onMouseLeave: this.onMouseLeave,
       onFocus: this.onFocus,
@@ -65,11 +100,18 @@ export default class ActiveItem extends React.Component {
       onClick: this.onClick
     };
 
-    return (
+
+    return (dataObject.$open) ? (
       <div {...finalProps}>
-        { (this.state.open) ? openContent : children }
+        {openContent}
+        <ZzIconButton fontIcon="fa fa-check"  iconStyle={{color: Colors.green500, fontSize: 18}} onClick={this.onCommit} />
+      </div>
+    ) : (
+      <div {...finalProps}>
+        {closedContent}
       </div>
     );
+
 
   }
 
