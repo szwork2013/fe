@@ -17,6 +17,7 @@ import PartyFoForm from 'party/component/partyFoForm';
 import PartyPoForm from 'party/component/partyPoForm';
 import PartyContactsForm from 'party/component/partyContactsForm';
 
+import BlockComp from 'core/components/blockComp/blockComp';
 
 
 class PartyDetail extends PageAncestor {
@@ -70,9 +71,14 @@ class PartyDetail extends PageAncestor {
           <div className="row">
             <div className="col-xs-12 col-lg-6">
                 <div className="row">
-                  { this._mainForm(partyObject, propsForCreateForm) }
+                  <div className="col-xs-12 col-sm-8">
+                    { this._mainForm(partyObject, propsForCreateForm) }
+                  </div>
                   <div className="col-xs-12 col-sm-4">
                     <PartyContactsForm {...propsForCreateForm} />
+                    <BlockComp header="Ahoj">
+                      <div>content</div>
+                    </BlockComp>
                   </div>
                 </div>
             </div>

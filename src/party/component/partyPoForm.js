@@ -7,6 +7,7 @@ import { Alert } from 'react-bootstrap';
 import createForm from 'core/form/createForm';
 import {showForTenant} from 'core/form/formUtils';
 import StyledSelect from 'core/components/styledSelect/styledSelect';
+import BlockComp from 'core/components/blockComp/blockComp';
 
 class PartyPoForm extends React.Component {
   shouldComponentUpdate = shouldPureComponentUpdate;
@@ -22,7 +23,7 @@ class PartyPoForm extends React.Component {
 
     return (
 
-      <div className="col-xs-12 col-sm-8">
+      <BlockComp>
 
 
         {/*  1. row  */}
@@ -77,7 +78,7 @@ class PartyPoForm extends React.Component {
         </div>
 
 
-      </div>
+      </BlockComp>
 
     );
   }

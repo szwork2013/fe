@@ -24,6 +24,7 @@ export default function createForm(definition, FormComponent) {
       const {dataObject, entity, entities, setDataAction} = props;
 
       this.fields = definition.fields.reduce((fields, field) => {
+        console.debug('createForm: field: %o on entity %o', field, entity);
         const mdField = entity.fields[field.name];
         const fieldObject = {
           fullWidth: true,

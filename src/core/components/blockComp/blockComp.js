@@ -1,11 +1,10 @@
 import React from 'react';
 import {Styles, Paper} from 'material-ui';
 import {customizeTheme}  from 'core/common/config/mui-theme';
-import styles from 'core/components/blockComp/blockComp.less';
+import css from 'core/components/blockComp/blockComp.less';
 
 
 const Colors = Styles.Colors;
-const Typography = Styles.Typography;
 
 export default class BlockComp extends React.Component {
 
@@ -15,7 +14,8 @@ export default class BlockComp extends React.Component {
 
   static propTypes = {
     zDepth: React.PropTypes.number.isRequired,
-    header: React.PropTypes.string
+    header: React.PropTypes.string,
+    style: React.PropTypes.object
   };
 
 
@@ -41,16 +41,20 @@ export default class BlockComp extends React.Component {
       ...other,
       } = this.props;
 
-
-    return (
-
-    <Paper className="block-comp" zDepth={zDepth}>
-      <h5>{header}</h5>
-      <div>{children}</div>
-    </Paper>
-
-
-    )
+    if (header) {
+      return (
+        <Paper className="block-comp" zDepth={zDepth} style={style}>
+          <h5 style={{marginTop: 0, fontSize: '18px'}}>{header}</h5>
+          <div>{children}</div>
+        </Paper>
+      );
+    } else {
+      return (
+        <Paper className="block-comp" zDepth={zDepth} style={style}>
+          {children}
+        </Paper>
+      );
+    }
   }
 
 

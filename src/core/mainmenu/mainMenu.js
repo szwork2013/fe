@@ -106,7 +106,6 @@ export default class MainMenu extends React.Component {
 
     var mainMenuFrag = (
       <Nav navbar eventKey={11}>
-        <NavItem href={this.context.router.makeHref('home')} eventKey={'home'} onClick={this.onHome}>Home</NavItem>
         <NavDropdown id="party_menu_dropdown" title='Party' onSelect={this.onSelectWithTransition}>
 
           { this._menuItem("partyList") }
@@ -150,7 +149,7 @@ export default class MainMenu extends React.Component {
 
         <Navbar.Header>
           <Navbar.Brand>
-            <a href="#">Zauzoo</a>
+            <a href={this.context.router.makeHref('home')} eventKey={'home'} onClick={this.onHome}>Zauzoo</a>
           </Navbar.Brand>
           <Navbar.Toggle />
         </Navbar.Header>

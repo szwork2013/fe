@@ -479,7 +479,7 @@ class GridAdminView extends PageAncestor {
 
             { (_.isEmpty(errorMessages)) ? '' : this._createErrorMessagesElement(errorMessages) }
 
-            <BlockComp header="1. Změna názvu sestavy">
+            <BlockComp header="1. Změna názvu sestavy" style={{marginBottom: 30}}>
               <div style={{display: 'flex', whiteSpace: 'nowrap'}}>
                 <div style={{display: 'flex', alignItems: 'baseline'}}>
                   <TextField name="gridName"
@@ -497,7 +497,7 @@ class GridAdminView extends PageAncestor {
               </div>
             </BlockComp>
 
-            <BlockComp header="2. Zvol sloupce sestavy">
+            <BlockComp header="2. Zvol sloupce sestavy" style={{marginBottom: 30}}>
               <DualSelector allObjects={_.values(grid.$entityRef.fields).filter(field => field.visible)}
                             selectedObjects={editedGridConfig.$columnRefs}
                             optionValuePropertyName="fieldName"
@@ -510,7 +510,7 @@ class GridAdminView extends PageAncestor {
                             onDown={this.onDownColumn}/>
             </BlockComp>
 
-            <BlockComp header="3. Aplikuj výběrové filtry">
+            <BlockComp header="3. Aplikuj výběrové filtry" style={{marginBottom: 30}}>
               <table className="table">
                 <thead>
                   <tr>
@@ -563,7 +563,7 @@ class GridAdminView extends PageAncestor {
               </RaisedButton>
             </BlockComp>
 
-            <BlockComp header="4. Urči řazení v sestavě">
+            <BlockComp header="4. Urči řazení v sestavě" style={{marginBottom: 30}}>
               <table className="table">
                 <thead>
                 <tr>
@@ -605,7 +605,7 @@ class GridAdminView extends PageAncestor {
               </RaisedButton>
             </BlockComp>
 
-            <BlockComp header="5. Pokročilé nastavení">
+            <BlockComp header="5. Pokročilé nastavení"  style={{marginBottom: 30}}>
               <div style={{display: 'flex'}}>
                 <TextField name="gridScrollSize"
                            floatingLabelText="Max scroll Size"

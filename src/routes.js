@@ -29,26 +29,26 @@ const routes = (
     <DefaultRoute name="home" handler={Home}/>
 
 
-    <Route name="loginPage" path="login"  handler={LoginPage}/>
+    <Route name="loginPage" path="login" handler={LoginPage}/>
 
-    <Route name="partyList" path="party/grid/customer/:gridId?"  handler={PartyList}/>
-    <Route name="contactPersonList" path="party/grid/contact-person/:gridId?"  handler={ContactPersonList}/>
-    <Route name="salesRepList" path="party/grid/sales-rep/:gridId?"  handler={SalesRepList}/>
+    <Route name="partyList" path="party/grid/customer/:gridId?" handler={PartyList}/>
+    <Route name="contactPersonList" path="party/grid/contact-person/:gridId?" handler={ContactPersonList}/>
+    <Route name="salesRepList" path="party/grid/sales-rep/:gridId?" handler={SalesRepList}/>
 
-    <Route name="partyDetail" path="party/detail/:id"  handler={PartyDetail}/>
+    <Route name="partyDetail" path="party/detail/:id" handler={PartyDetail}/>
 
 
-    <Route name="invoiceList" path="invoice/grid/:gridId?"  handler={InvoiceList}/>
-    <Route name="invoiceDetail" path="invoice/detail/:id"  handler={InvoiceDetail}/>
+    <Route name="invoiceList" path="invoice/grid/:gridId?" handler={InvoiceList}/>
+    <Route name="invoiceDetail" path="invoice/detail/:id" handler={InvoiceDetail}/>
 
-    <Route name="vehicleList" path="vehicle/grid/:gridId?"  handler={VehicleList}/>
-    <Route name="vehicleDetail" path="vehicle/detail/:id"  handler={VehicleDetail}/>
-    <Route name="productList" path="product/grid/:gridId?"  handler={ProductList}/>
-    <Route name="productDetail" path="product/detail/:id"  handler={ProductDetail}/>
+    <Route name="vehicleList" path="vehicle/grid/:gridId?" handler={VehicleList}/>
+    <Route name="vehicleDetail" path="vehicle/detail/:id" handler={VehicleDetail}/>
+    <Route name="productList" path="product/grid/:gridId?" handler={ProductList}/>
+    <Route name="productDetail" path="product/detail/:id" handler={ProductDetail}/>
 
-    <Route name="gridAdmin" path="core/grid/admin/:gridLocation"  handler={GridAdminView}/>
+    <Route name="gridAdmin" path="core/grid/admin/:gridLocation" handler={GridAdminView}/>
 
-    <Route name="responsiveTest" path="administration/responsive-test"  handler={ResponsiveTest}/>
+    <Route name="responsiveTest" path="administration/responsive-test" handler={ResponsiveTest}/>
 
 
   </Route>
