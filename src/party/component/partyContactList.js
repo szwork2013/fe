@@ -22,7 +22,8 @@ export default class PartyContactList extends React.Component {
   addContact = () => {
     console.debug('addContact');
     const {partyObject, setPartyAction} = this.props;
-    partyObject.contacts.push({$open: true});
+    let newContact = {$open: true};
+    partyObject.contacts.push(newContact);
     setPartyAction(partyObject);
   };
 
@@ -73,7 +74,7 @@ class PartyContactForm extends React.Component {
     const openContent = (
       <div style={{display: 'flex', flexDirection: 'column'}}>
         <div style={{display: 'flex', flexDirection: 'row'}}>
-          <TextField {...value} />
+          <TextField {...value}   />
           <StyledSelect {...contactType}/>
         </div>
         <TextField {...comment}/>
@@ -81,7 +82,7 @@ class PartyContactForm extends React.Component {
     );
 
     const closedContent = (
-      <div style={{display: 'flex', fontSize: 14, lineHeight: '14px'}}>
+      <div style={{display: 'flex', fontSize: 14, lineHeight: '14px', cursor: 'pointer'}}>
         <FontIcon className={get(catLov, 'params[0]')} color={Colors.indigo500} style={{fontSize:16}}/>
         <div style={{display: 'flex', flexDirection: 'column', marginLeft: '20'}}>
           <div>{dataObject.value}</div>
