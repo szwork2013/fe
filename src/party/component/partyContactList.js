@@ -43,7 +43,7 @@ export default class PartyContactList extends React.Component {
         }
 
         <div style={{display: 'flex', justifyContent: 'flex-end'}}>
-          <FloatingActionButton iconClassName="fa fa-plus" mini={true} onClick={this.addContact} />
+          <FloatingActionButton iconClassName="fa fa-plus" mini={true} secondary={true} onClick={this.addContact} />
         </div>
 
       </BlockComp>

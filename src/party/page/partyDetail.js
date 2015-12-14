@@ -12,6 +12,7 @@ import {store} from 'core/common/redux/store';
 import MdEntityService from 'core/metamodel/mdEntityService';
 import PartyService from 'party/partyService';
 import {setPartyAction} from 'party/partyActions';
+import {customizeTheme}  from 'core/common/config/mui-theme';
 
 import PartyFoForm from 'party/component/partyFoForm';
 import PartyPoForm from 'party/component/partyPoForm';
@@ -29,7 +30,8 @@ class PartyDetail extends PageAncestor {
   static icon = 'user';
 
   static contextTypes = {
-    router: React.PropTypes.func.isRequired
+    router: React.PropTypes.func.isRequired,
+    muiTheme: React.PropTypes.object
   };
 
   static fetchData(routerParams, query) {
@@ -41,6 +43,16 @@ class PartyDetail extends PageAncestor {
         return partyPromise.then(partyObject => store.dispatch(setPartyAction(partyObject)));
       });
   }
+
+  componentWillMount() {
+    customizeTheme(this.context.muiTheme, {
+      floatingActionButton: {
+      /*  buttonSize: 56, */
+        miniSize: 30
+      }
+    });
+  }
+
 
   onSave = (evt) => {
     console.log('onSave');

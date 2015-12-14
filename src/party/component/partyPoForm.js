@@ -89,8 +89,7 @@ const definition = {
     name: 'fullName',
     validators: ['required']
   }, {
-    name: 'ico',
-    style: {fontWeight: 'bold'}
+    name: 'ico'
   }, {
     name: 'dic'
   }, {

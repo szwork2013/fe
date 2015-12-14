@@ -43,7 +43,7 @@ export default class PartyRoleList extends React.Component {
         }
 
         <div style={{display: 'flex', justifyContent: 'flex-end'}}>
-          <FloatingActionButton iconClassName="fa fa-plus" mini={true} onClick={this.addRole} />
+          <FloatingActionButton iconClassName="fa fa-plus" mini={true} secondary={true} onClick={this.addRole} />
         </div>
 
       </BlockComp>

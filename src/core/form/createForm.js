@@ -37,7 +37,7 @@ export default function createForm(definition, FormComponent) {
           name: field.name,
           onChange: (evt) => {
             let value = (typeof evt === 'object' && evt.target) ? evt.target.value : evt;
-            console.log('Form ' + definition.form + " onChange event on " + field.name + ", value = " + value);
+            //console.log('Form ' + definition.form + " onChange event on " + field.name + ", value = " + value);
             dataObject[field.name] = value;
             setDataAction(rootObject);
           },

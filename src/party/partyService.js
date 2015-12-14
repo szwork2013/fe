@@ -26,7 +26,7 @@ class PartyService  {
       + ((address.city || address.zip)? ',' : '')
       + ((address.city)? ' ' + address.city : '')
       + ((address.zip)? ' ' + address.zip : '')
-      + ((address.country)? ', ' + countryEntity.getLovItem(address.country) : '');
+      + ((address.country)? ', ' + countryEntity.getLovItem(address.country).label : '');
   }
 
 

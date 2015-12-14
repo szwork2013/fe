@@ -1,6 +1,5 @@
 import React from 'react';
 import {Styles} from 'material-ui';
-import {customizeTheme}  from 'core/common/config/mui-theme';
 import {ZzIconButton} from 'core/components/toolmenu/toolmenu';
 
 import css from 'core/components/blockComp/activeItem.less';
