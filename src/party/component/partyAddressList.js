@@ -3,6 +3,7 @@ import {get, pull} from 'lodash';
 import shouldPureComponentUpdate from 'react-pure-render/function';
 import {Styles, TextField, FontIcon, FloatingActionButton} from 'material-ui';
 
+import PartyService from 'party/partyService';
 import createForm from 'core/form/createForm';
 import StyledSelect from 'core/components/styledSelect/styledSelect';
 import BlockComp from 'core/components/blockComp/blockComp';
@@ -10,7 +11,7 @@ import ActiveItem from 'core/components/blockComp/activeItem';
 
 const Colors = Styles.Colors;
 
-export default class PartyContactList extends React.Component {
+export default class PartyAddressList extends React.Component {
   shouldComponentUpdate = shouldPureComponentUpdate;
 
   static propTypes = {
@@ -19,11 +20,11 @@ export default class PartyContactList extends React.Component {
     setPartyAction: React.PropTypes.func.isRequired
   };
 
-  addContact = () => {
-    console.debug('addContact');
+  addAddress = () => {
+    console.debug('addAddress');
     const {partyObject, setPartyAction} = this.props;
-    let newContact = {$open: true};
-    partyObject.contacts.push(newContact);
+    let newAddress = {$open: true};
+    partyObject.addresses.push(newAddress);
     setPartyAction(partyObject);
   };
 
@@ -34,16 +35,16 @@ export default class PartyContactList extends React.Component {
     const {partyObject, entities, setPartyAction} = this.props;
 
     return (
-      <BlockComp header="Contacts" style={{display: 'flex', flexDirection: 'column'}}>
+      <BlockComp header="Addresses" style={{display: 'flex', flexDirection: 'column'}}>
 
         {
-          partyObject.contacts.map((contact, index, array) => <PartyContactForm dataObject={contact} rootObject={partyObject} key={index}
-                                                                         entities={entities} entity={entities.get('PartyContact')}
+          partyObject.addresses.map((address, index, array) => <PartyAddressForm dataObject={contact} rootObject={partyObject} key={index}
+                                                                         entities={entities} entity={entities.get('Address')}
                                                                          setDataAction={setPartyAction} lastValue={(array.length === index + 1)} index={index} /> )
         }
 
         <div style={{display: 'flex', justifyContent: 'flex-end'}}>
-          <FloatingActionButton iconClassName="fa fa-plus" mini={true} onClick={this.addContact} />
+          <FloatingActionButton iconClassName="fa fa-plus" mini={true} onClick={this.addAddress} />
         </div>
 
       </BlockComp>
@@ -52,13 +53,13 @@ export default class PartyContactList extends React.Component {
 }
 
 
-class PartyContactForm extends React.Component {
+class PartyAddressForm extends React.Component {
   shouldComponentUpdate = shouldPureComponentUpdate;
 
   onDelete = (evt) => {
     evt.stopPropagation();
     console.log('onDelete %o', this.props.dataObject);
-    pull(this.props.rootObject.contacts, this.props.dataObject);
+    pull(this.props.rootObject.addresses, this.props.dataObject);
     this.props.setDataAction(this.props.rootObject);
   };
 
@@ -68,34 +69,34 @@ class PartyContactForm extends React.Component {
 
 
     const {dataObject, rootObject, lastValue, index, entities, fields: {
-      value, comment, contactType
+      addressType, name, street
       }} = this.props;
 
-    const PartyContactType = entities.get('PartyContactType');
-    let typeLov = PartyContactType.getLovItem(dataObject.contactType);
+    const ADDRESSTYPE = entities.get('ADDRESSTYPE');
+    let typeLov = ADDRESSTYPE.getLovItem(dataObject.addressType);
 
-    const PARTYCONTACTCATEGORY = entities.get('PARTYCONTACTCATEGORY');
-    let catLov = PARTYCONTACTCATEGORY.getLovItem(get(typeLov, 'params[0]'));
-
+    const Country = entities.get('Country');
 
     const openContent = (
       <div style={{display: 'flex', flexDirection: 'column'}}>
         <div style={{display: 'flex', flexDirection: 'row'}}>
-          <TextField {...value}   />
-          <StyledSelect {...contactType}/>
+          <StyledSelect {...addressType}/>
+          <TextField {...name}   />
         </div>
-        <TextField {...comment}/>
+        <TextField {...street}/>
       </div>
     );
 
     const closedContent = (
       <div style={{display: 'flex', fontSize: 14, lineHeight: '14px', cursor: 'pointer'}}>
-        <FontIcon className={get(catLov, 'params[0]')} color={Colors.indigo500} style={{fontSize:16}}/>
+        <FontIcon className="fa fa-envelope-o" color={get(typeLov, 'params[0]')} style={{fontSize:16}}/>
         <div style={{display: 'flex', flexDirection: 'column', marginLeft: '20'}}>
-          <div>{dataObject.value}</div>
-          <div style={{fontSize:12, color: Colors.grey500, marginTop: 2}}>{get(typeLov, 'label')}</div>
-          { (dataObject.comment) ? (
-            <div style={{fontSize:12, color: Colors.grey500, marginTop: 2}}>{dataObject.comment}</div>) : ''}
+          { (dataObject.name) ? <div>{dataObject.name}</div> : ''}
+          <div>{PartyService.addressLine(dataObject, Country)}</div>
+          { (dataObject.toHands || dataObject.comment) ? (
+            <div style={{fontSize:12, color: Colors.grey500, marginTop: 2}}>
+              {  [((dataObject.toHands)? ('To hands: ' + dataObject.toHands) : ''), dataObject.comment].filter(v => v).join(', ') }
+            </div>) : ''}
         </div>
       </div>
     );
@@ -107,7 +108,7 @@ class PartyContactForm extends React.Component {
 }
 
 const definition = {
-  form: 'PartyContactForm',
+  form: 'PartyAddressForm',
   fields: [{
     name: 'value',
     validators: ['required'],
@@ -119,5 +120,5 @@ const definition = {
   }]
 };
 
-PartyContactForm = createForm(definition, PartyContactForm);
+PartyAddressForm = createForm(definition, PartyAddressForm);
 

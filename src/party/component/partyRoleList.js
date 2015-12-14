@@ -72,7 +72,7 @@ class PartyRoleForm extends React.Component {
       }} = this.props;
 
     const PartyRoleType = entities.get('PartyRoleType');
-    let typeLov = PartyRoleType.lovItems.find(lov => lov.value === dataObject.roleType);
+    let typeLov = PartyRoleType.getLovItem(dataObject.roleType);
 
     // vyhazu ze option selectu role ktere uz na customerovi existuji, krome te me co zrovna edituji
     let roleTypeArray = rootObject.roles.map(role => role.roleType);

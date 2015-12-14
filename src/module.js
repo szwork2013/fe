@@ -2,6 +2,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import Router from 'react-router';
+import monitor from 'when/monitor/console';
 import When from 'when/keys';
 import {Provider} from 'react-redux';
 

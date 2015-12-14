@@ -17,6 +17,7 @@ import PartyFoForm from 'party/component/partyFoForm';
 import PartyPoForm from 'party/component/partyPoForm';
 import PartyContactList from 'party/component/partyContactList';
 import PartyRoleList from 'party/component/partyRoleList';
+import PartyAddressList from 'party/component/partyAddressList';
 
 import BlockComp from 'core/components/blockComp/blockComp';
 
@@ -74,6 +75,7 @@ class PartyDetail extends PageAncestor {
                 <div className="row">
                   <div className="col-xs-12 col-sm-8">
                     { this._mainForm(partyObject, propsForCreateForm) }
+                    <PartyAddressList partyObject={partyObject} entities={entities} setPartyAction={setPartyAction} />
                   </div>
                   <div className="col-xs-12 col-sm-4">
                     <PartyContactList partyObject={partyObject} entities={entities} setPartyAction={setPartyAction} />

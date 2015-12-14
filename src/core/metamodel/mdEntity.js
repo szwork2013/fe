@@ -14,6 +14,10 @@ export default class MdEntity {
     this.lovItems;
   }
 
+  getLovItem(id) {
+    return this.lovItems.find(lov => lov.value === id);
+  }
+
 
 
   getField(fieldName) {
