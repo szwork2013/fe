@@ -19,7 +19,6 @@ class PartyPoForm extends React.Component {
       }
       } = this.props;
 
-    console.log("PartyPoForm.render() : ", fullName);
 
     return (
 

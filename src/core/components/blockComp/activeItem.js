@@ -3,6 +3,8 @@ import {Styles} from 'material-ui';
 import {customizeTheme}  from 'core/common/config/mui-theme';
 import {ZzIconButton} from 'core/components/toolmenu/toolmenu';
 
+import css from 'core/components/blockComp/activeItem.less';
+
 const Colors = Styles.Colors;
 
 export default class ActiveItem extends React.Component {
@@ -51,6 +53,7 @@ export default class ActiveItem extends React.Component {
     console.log('onCommit %o', this.props.dataObject);
   };
 
+
   componentWillMount() {
     //this.setState(style=);
   }
@@ -64,10 +67,10 @@ export default class ActiveItem extends React.Component {
       dataObject,
       openContent,
       closedContent,
+      onDelete,
       ...other
       } = this.props;
 
-    console.log('render %o', dataObject);
 
     const style = {paddingTop: 10, paddingLeft: 5, paddingRight: 5};
 
@@ -78,15 +81,22 @@ export default class ActiveItem extends React.Component {
       paddingBottom: 10
     });
 
+    const deleteIconStyle = {};
+
     // highlighted
     if ((dataObject.$focused || dataObject.$hovered) && !dataObject.$open) {
       style.backgroundColor = Colors.grey300;
+    } else {
+      deleteIconStyle.display = 'none';
     }
 
     // opened
     if (dataObject.$open) {
       style.border = '2px solid';
       style.borderColor = Colors.blue500;
+    } else {
+      // closed
+      Object.assign(style, {display: 'flex', justifyContent: 'space-between'});
     }
 
 
@@ -104,16 +114,18 @@ export default class ActiveItem extends React.Component {
     return (dataObject.$open) ? (
       <div {...finalProps}>
         {openContent}
-        <ZzIconButton fontIcon="fa fa-check"  iconStyle={{color: Colors.green500, fontSize: 18}} onClick={this.onCommit} />
+        <ZzIconButton fontIcon="fa fa-check" className="active-item--check"  iconStyle={{color: Colors.green500, fontSize: 18}} onClick={this.onCommit} />
       </div>
     ) : (
       <div {...finalProps}>
         {closedContent}
+        <span className="active-item--delete fa fa-times" style={deleteIconStyle} onClick={onDelete}></span>
+
       </div>
     );
 
 
   }
 
-
+ // <ZzIconButton fontIcon="fa fa-times" style={deleteIconStyle} iconStyle={{color: Colors.red500, fontSize: 18}} onClick={this.onDelete} />
 }

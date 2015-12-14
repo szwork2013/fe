@@ -53,8 +53,8 @@ export default class Toolmenu extends React.Component {
 
 }
 
-export const ZzIconButton = ({tooltip, fontIcon, style, iconStyle, onClick}) => (
-  <IconButton onClick={onClick} tooltip={tooltip} style={Object.assign({
+export const ZzIconButton = ({tooltip, fontIcon, style, iconStyle, onClick, className}) => (
+  <IconButton onClick={onClick} tooltip={tooltip} className={className} style={Object.assign({
       height: 40,
       width: 40
     }, style)} iconStyle={Object.assign({fontSize: 15}, iconStyle)}>

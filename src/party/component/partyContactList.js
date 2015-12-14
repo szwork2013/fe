@@ -1,5 +1,5 @@
 import React from 'react';
-import {get} from 'lodash';
+import {get, pull} from 'lodash';
 import shouldPureComponentUpdate from 'react-pure-render/function';
 import {Styles, TextField, FontIcon, FloatingActionButton} from 'material-ui';
 
@@ -37,7 +37,7 @@ export default class PartyContactList extends React.Component {
       <BlockComp header="Contacts" style={{display: 'flex', flexDirection: 'column'}}>
 
         {
-          partyObject.contacts.map((contact, index, array) => <PartyContactForm dataObject={contact} rootObject={partyObject}
+          partyObject.contacts.map((contact, index, array) => <PartyContactForm dataObject={contact} rootObject={partyObject} key={index}
                                                                          entities={entities} entity={entities.get('PartyContact')}
                                                                          setDataAction={setPartyAction} lastValue={(array.length === index + 1)} index={index} /> )
         }
@@ -55,12 +55,19 @@ export default class PartyContactList extends React.Component {
 class PartyContactForm extends React.Component {
   shouldComponentUpdate = shouldPureComponentUpdate;
 
+  onDelete = (evt) => {
+    evt.stopPropagation();
+    console.log('onDelete %o', this.props.dataObject);
+    pull(this.props.rootObject.contacts, this.props.dataObject);
+    this.props.setDataAction(this.props.rootObject);
+  };
+
 
   render() {
 
 
 
-    const {dataObject, lastValue, index, entities, fields: {
+    const {dataObject, rootObject, lastValue, index, entities, fields: {
       value, comment, contactType
       }} = this.props;
 
@@ -94,7 +101,7 @@ class PartyContactForm extends React.Component {
     );
 
     return (
-      <ActiveItem openContent={openContent} closedContent={closedContent} key={index} lastValue={lastValue} tabIndex={0} {...this.props} />
+      <ActiveItem openContent={openContent} closedContent={closedContent} key={index} lastValue={lastValue} onDelete={this.onDelete} tabIndex={0} {...this.props} />
     );
   }
 }
