@@ -23,22 +23,22 @@ export default class ActiveItem extends React.Component {
   onMouseEnter = (evt) => {
     this.props.dataObject.$hovered = true;
     this.props.setDataAction(this.props.rootObject);
-    console.log('onMouseEnter %o', this.props.dataObject);
+    //console.log('onMouseEnter %o', this.props.dataObject);
   };
   onMouseLeave = (evt) => {
     this.props.dataObject.$hovered = false;
     this.props.setDataAction(this.props.rootObject);
-    console.log('onMouseLeave %o', this.props.dataObject);
+    //console.log('onMouseLeave %o', this.props.dataObject);
   };
   onFocus = (evt) => {
     this.props.dataObject.$focused = true;
     this.props.setDataAction(this.props.rootObject);
-    console.log('onFocus %o', this.props.dataObject);
+    //console.log('onFocus %o', this.props.dataObject);
   };
   onBlur = (evt) => {
     this.props.dataObject.$focused = false;
     this.props.setDataAction(this.props.rootObject);
-    console.log('onBlur %o', this.props.dataObject);
+    //console.log('onBlur %o', this.props.dataObject);
   };
   onClick = (evt) => {
     this.props.dataObject.$open = true;
@@ -54,13 +54,8 @@ export default class ActiveItem extends React.Component {
   };
 
 
-  componentWillMount() {
-    //this.setState(style=);
-  }
 
   render() {
-
-
 
     let {
       lastValue,
@@ -127,5 +122,5 @@ export default class ActiveItem extends React.Component {
 
   }
 
- // <ZzIconButton fontIcon="fa fa-times" style={deleteIconStyle} iconStyle={{color: Colors.red500, fontSize: 18}} onClick={this.onDelete} />
+
 }
