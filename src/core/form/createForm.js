@@ -25,7 +25,7 @@ export default function createForm(definition, FormComponent) {
       super(props);
       const {dataObject, rootObject, entity, entities, setDataAction} = props;
 
-      console.log('createForm props: %o', props);
+      //console.log('createForm props: %o', props);
 
       this.fields = definition.fields.reduce((fields, field) => {
         console.debug('createForm: field: %o on entity %o', field, entity);

@@ -23,7 +23,7 @@ import GridService from 'core/grid/service/gridService';
   fetchData(grid) {
 
   //  this.dispatch(grid); // this dispatches the action
-    return Axios.get('/core/grid/' + grid.activeGridConfig.gridId, {params: Object.assign({searchTerm: grid.searchTerm, sort: grid.sort}, grid.getConditionQueryObject())})
+    return Axios.get('/core/grid/' + grid.activeGridConfig.gridId, {params: Object.assign({searchTerm: grid.searchTerm, sort: grid.sort, masterId: grid.masterId}, grid.getConditionQueryObject())})
       .then((response) => {
         grid.data = response.data;
         grid.gridWidths = GridService.computeGridWidths(grid.data, grid.activeGridConfig);

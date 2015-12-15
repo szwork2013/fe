@@ -35,6 +35,8 @@ export default class Grid {
     // aktualni [gridConfigCondition, ....]
     this.conditionArray = null;
 
+    // id na master entitu u seznamu na detailech
+    this.masterId;
 
   }
 
@@ -152,6 +154,7 @@ export default class Grid {
     this.searchTerm = null;
     this.activeGridConfig = null;
     this.sortArray = null;
+    this.masterId = null;
   }
 
 

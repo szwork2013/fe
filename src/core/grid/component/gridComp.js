@@ -34,6 +34,7 @@ export default class GridComp extends React.Component {
 
   static propTypes = {
     gridLocation: React.PropTypes.string.isRequired,
+    uiLocation: React.PropTypes.string.isRequired,
 
     // from store
     grid: React.PropTypes.instanceOf(Grid),
@@ -127,6 +128,7 @@ export default class GridComp extends React.Component {
           this.refs.VirtualList.forceUpdate();
         }
         this.onResize();
+        this.forceUpdate(); // TODO: HACK - odstranit po prepsani gridu na redux, je to zde nutne kvuli gridu na detailu
       }, () => {
         this.setState({loading: false});
       });
@@ -334,19 +336,17 @@ export default class GridComp extends React.Component {
 
     let {
       grid,
-      children
+      children,
+      uiLocation
       } = this.props;
 
-    var classes = classNames({
-      'grid-comp--loading': this.state.loading
-    });
 
     let dropdownId = this.props.gridLocation + "_dropdown";
 
 
     if (!grid.activeGridConfig) {
       return (
-        <div className="md-grid">
+        <div className={classNames('md-grid', 'md-grid--' + uiLocation)} className="md-grid">
           <Navbar fluid style={{marginBottom: 10, minHeight: 'initial', fontSize: 14}}>
             <Nav>
               <NavItem eventKey={3} href={this.context.router.makeHref('gridAdmin', {gridLocation: this.props.gridLocation})} onClick={this.onSelectGridManage}>Create Grid</NavItem>
@@ -386,7 +386,7 @@ export default class GridComp extends React.Component {
     return (
 
 
-      <div className="md-grid">
+      <div className={classNames('md-grid', 'md-grid--' + uiLocation)}>
 
         <Navbar fluid  style={{marginBottom: 10, minHeight: 'initial', fontSize: 14}}>
           <Nav navbar>
