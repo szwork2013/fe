@@ -91,7 +91,7 @@ class PartyContactForm extends React.Component {
     const closedContent = (
       <div style={{display: 'flex', fontSize: 14, lineHeight: '14px', cursor: 'pointer'}}>
         <FontIcon className={get(catLov, 'params[0]')} color={Colors.indigo500} style={{fontSize:16}}/>
-        <div style={{display: 'flex', flexDirection: 'column', marginLeft: '20'}}>
+        <div style={{display: 'flex', flexDirection: 'column', marginLeft: '20', wordBreak: 'break-all'}}>
           <div>{dataObject.value}</div>
           <div style={{fontSize:12, color: Colors.grey500, marginTop: 2}}>{get(typeLov, 'label')}</div>
           { (dataObject.comment) ? (
