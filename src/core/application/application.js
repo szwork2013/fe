@@ -11,6 +11,7 @@ import MainMenu from 'core/mainmenu/mainMenu';
 import 'core/application/application.less';
 
 
+
 const ToastMessageFactory = React.createFactory(ToastMessage.animation);
 
 

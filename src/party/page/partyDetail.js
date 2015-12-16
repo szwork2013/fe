@@ -144,7 +144,7 @@ class PartyDetail extends PageAncestor {
 
     return (
 
-      <main className="main-content">
+      <main className="main-content" style={{display:'flex', flexDirection:'column', height: '100%'}}>
         {this._createToolMenu(partyObject)}
         <form style={{marginTop: 10}}>
           <div className="row">
@@ -162,7 +162,7 @@ class PartyDetail extends PageAncestor {
             </div>
           </div>
         </form>
-        <div className="row">
+        <div className="row" style={{flexBasis: '100%'}}>
           <div className="col-xs-12 col-lg-6">
             <Tabs tabItemContainerStyle={{height:tabHeight}} contentContainerStyle={{width: '100%', height: '100%'}} style={{width: '100%', height: '100%'}} >
               <Tab label="Vehicles" style={{height:tabHeight}}>
