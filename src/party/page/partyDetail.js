@@ -19,7 +19,7 @@ import PartyContactList from 'party/component/partyContactList';
 import PartyRoleList from 'party/component/partyRoleList';
 import PartyAddressList from 'party/component/partyAddressList';
 
-import GridService from 'core/grid/service/gridService';
+import GridService from 'core/grid/gridService';
 import GridComp from 'core/grid/component/gridComp';
 import {updateGridAction} from 'core/grid/gridActions';
 

@@ -15,7 +15,7 @@ import Grid from 'core/grid/domain/grid';
 import GridConfig from 'core/grid/domain/gridConfig';
 import GridConfigCondition from 'core/grid/domain/gridConfigCondition';
 import GridConfigSort from 'core/grid/domain/gridConfigSort';
-import GridService from 'core/grid/service/gridService';
+import GridService from 'core/grid/gridService';
 import Utils from 'core/common/utils/utils';
 import ArrayUtils from 'core/common/utils/arrayUtils';
 import MdEntityService from 'core/metamodel/mdEntityService';

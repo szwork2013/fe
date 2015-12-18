@@ -4,7 +4,7 @@ import Utils from 'core/common/utils/utils';
 import MdField from 'core/metamodel/mdField';
 import GridConfigCondition from 'core/grid/domain/gridConfigCondition';
 import GridConfigSort from 'core/grid/domain/gridConfigSort';
-import GridService from 'core/grid/service/gridService';
+import GridService from 'core/grid/gridService';
 
 export default class GridConfig {
 

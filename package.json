@@ -7,7 +7,7 @@
   "repository": "https://github.com/zauzoo/fe",
   "scripts": {
     "lint": "eslint src",
-    "test": "mocha --compilers js:babel-core/register,less:./test/less-null-compiler.js  --require ./test/test_helper.js --recursive",
+    "test": "set NODE_ENV=test&& mocha --compilers js:babel-core/register,less:./test/less-null-compiler.js  --require ./test/test_helper.js --recursive",
     "test:watch": "npm run test -- --watch",
     "clean": "rimraf build",
     "build:webpack": "webpack --progress --colors --config webpack.config.prod.js",

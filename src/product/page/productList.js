@@ -1,7 +1,7 @@
 import React from 'react';
 
 import PageAncestor from 'core/common/page/pageAncestor';
-import GridService from 'core/grid/service/gridService';
+import GridService from 'core/grid/gridService';
 import GridCompConnected from 'core/grid/component/gridCompConnected';
 
 var gridLocation = 'productList';

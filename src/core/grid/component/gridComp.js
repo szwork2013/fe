@@ -11,7 +11,7 @@ import {Checkbox, IconButton, FontIcon, Styles} from 'material-ui';
 import Axios from 'core/common/config/axios-config';
 import {store} from 'core/common/redux/store';
 import {updateGridAction} from 'core/grid/gridActions';
-import GridService from 'core/grid/service/gridService';
+import GridService from 'core/grid/gridService';
 
 import VirtualList from 'core/components/virtualList/virtualList';
 import {customizeTheme}  from 'core/common/config/mui-theme';

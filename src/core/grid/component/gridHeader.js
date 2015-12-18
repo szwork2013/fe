@@ -13,7 +13,7 @@ import GridConfig from 'core/grid/domain/gridConfig';
 import StyledSelect from 'core/components/styledSelect/styledSelect';
 import MdEntityService from 'core/metamodel/mdEntityService';
 import ConditionValue from 'core/grid/component/conditionValue';
-import GridService from 'core/grid/service/gridService';
+import GridService from 'core/grid/gridService';
 
 /**
  *
