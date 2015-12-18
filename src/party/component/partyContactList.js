@@ -1,6 +1,6 @@
 import React from 'react';
 import {get, pull} from 'lodash';
-import shouldPureComponentUpdate from 'react-pure-render/function';
+import PureRenderMixin from 'react-addons-pure-render-mixin';
 import {Styles, TextField, FontIcon, FloatingActionButton} from 'material-ui';
 
 import createForm from 'core/form/createForm';
@@ -11,7 +11,7 @@ import ActiveItem from 'core/components/blockComp/activeItem';
 const Colors = Styles.Colors;
 
 export default class PartyContactList extends React.Component {
-  shouldComponentUpdate = shouldPureComponentUpdate;
+  shouldComponentUpdate = PureRenderMixin.shouldComponentUpdate.bind(this);
 
   static propTypes = {
     partyObject: React.PropTypes.object.isRequired,
@@ -53,7 +53,7 @@ export default class PartyContactList extends React.Component {
 
 
 class PartyContactForm extends React.Component {
-  shouldComponentUpdate = shouldPureComponentUpdate;
+  shouldComponentUpdate = PureRenderMixin.shouldComponentUpdate.bind(this);
 
   onDelete = (evt) => {
     evt.stopPropagation();

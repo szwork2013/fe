@@ -1,6 +1,6 @@
 import React, { PropTypes } from 'react';
 import {Record, List} from 'immutable';
-import shouldPureComponentUpdate from 'react-pure-render/function';
+import PureRenderMixin from 'react-addons-pure-render-mixin';
 import {TextField, RaisedButton, SelectField} from 'material-ui';
 import {FieldRecord, enhanceFormRecord} from 'core/form/fieldRecord';
 import { Alert } from 'react-bootstrap';
@@ -44,7 +44,7 @@ enhanceFormRecord(LoginFormRecord);
 
 
 export class LoginForm extends React.Component {
-  shouldComponentUpdate = shouldPureComponentUpdate;
+  shouldComponentUpdate = PureRenderMixin.shouldComponentUpdate.bind(this);
 
   render() {
 
@@ -75,8 +75,7 @@ export class LoginForm extends React.Component {
 
           <div className="row">
             <div className="col-xs-offset-1 col-xs-10">
-              <h4>Please login</h4>
-            </div>
+              <h4>Please login</h4></div>
           </div>
 
 

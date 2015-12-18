@@ -1,10 +1,9 @@
 import React from 'react';
-import shouldPureComponentUpdate from 'react-pure-render/function';
+import PureRenderMixin from 'react-addons-pure-render-mixin';
 import When from 'when';
 import { connect } from 'react-redux';
 import { FlatButton, Styles} from 'material-ui';
 
-import hoistNonReactStatics from 'core/common/utils/hoistNonReactStatics';
 import PageAncestor from 'core/common/page/pageAncestor';
 import Toolmenu from 'core/components/toolmenu/toolmenu';
 import {store} from 'core/common/redux/store';
@@ -14,9 +13,17 @@ import {setProductAction} from 'product/productActions';
 
 
 
+function mapStateToProps(state) {
+  return {
+    productObject: state.getIn(['product', 'productObject']),
+    entities: state.getIn(['metamodel', 'entities'])
+  };
+}
 
-class ProductDetail extends PageAncestor {
-  shouldComponentUpdate = shouldPureComponentUpdate;
+
+@connect(mapStateToProps, {setProductAction})
+export default class ProductDetail extends PageAncestor {
+  shouldComponentUpdate = PureRenderMixin.shouldComponentUpdate.bind(this);
 
   static title = 'Product';
   static icon = 'cube';
@@ -100,14 +107,4 @@ class ProductDetail extends PageAncestor {
 
 
 }
-
-function mapStateToProps(state) {
-  return {
-    productObject: state.getIn(['product', 'productObject']),
-    entities: state.getIn(['metamodel', 'entities'])
-  };
-}
-
-export default hoistNonReactStatics(connect(mapStateToProps, {setProductAction})(ProductDetail), ProductDetail);
-
 

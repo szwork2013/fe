@@ -2,6 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import _ from 'lodash';
 import classNames from 'classnames';
+import PureRenderMixin from 'react-addons-pure-render-mixin';
 
 import {RaisedButton} from 'material-ui';
 import {Tooltip, OverlayTrigger, Overlay, Popover} from 'react-bootstrap';
@@ -18,6 +19,7 @@ import GridService from 'core/grid/service/gridService';
  *
  */
 export default class GridHeader extends React.Component {
+  // shouldComponentUpdate = PureRenderMixin.shouldComponentUpdate.bind(this); // zatim byt nemuze, dokud jsou v props/state komplexni objekty, ktere nejsou immutable
 
   static propTypes = {
     field: React.PropTypes.instanceOf(MdField).isRequired,

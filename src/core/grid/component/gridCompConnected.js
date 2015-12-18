@@ -1,25 +1,34 @@
 import React from 'react';
 import _ from 'lodash';
+import PureRenderMixin from 'react-addons-pure-render-mixin';
+import { connect } from 'react-redux';
 
-import GridStore from 'core/grid/store/gridStore';
-import GridActions from 'core/grid/action/gridActions';
+import {updateGridAction} from 'core/grid/gridActions';
 import GridComp from 'core/grid/component/gridComp';
 
 
+function mapStateToProps(state, ownProps) {
+  return {
+    grid: state.getIn(['grid', 'grids', ownProps.gridLocation])
+  };
+}
+
+
+@connect(mapStateToProps, {updateGridAction})
 export default class GridCompConnected extends React.Component {
+  shouldComponentUpdate = PureRenderMixin.shouldComponentUpdate.bind(this);
+
 
   static contextTypes = {
     router: React.PropTypes.func.isRequired
   };
 
-  static defaultProps = {
-
-  };
 
   static propTypes = {
     gridLocation: React.PropTypes.string.isRequired,
     gridId: React.PropTypes.string,
-    query: React.PropTypes.object
+    query: React.PropTypes.object,
+    grid: React.PropTypes.object
   };
 
 
@@ -29,7 +38,7 @@ export default class GridCompConnected extends React.Component {
   }
 
   onGridChange = (grid) => {
-    console.debug('onGridChange(%o)',grid);
+    console.debug('onGridChange(%o)', grid);
 
     var routeName = _.last(this.context.router.getCurrentRoutes()).name,
       params = this.context.router.getCurrentParams();
@@ -46,17 +55,11 @@ export default class GridCompConnected extends React.Component {
     this.context.router.replaceWith(routeName, params, query);
   };
 
-  shouldComponentUpdate(nextProps, nextState) {
-    return false;
-  }
-
 
   componentWillMount() {
     console.debug('componentWillMount, props: %o', this.props);
 
-    let query = this.props.query;
-
-    let grid = GridStore.getGrid(this.props.gridLocation);
+    let {query, grid} = this.props;
 
     grid.searchTerm = query.searchTerm;
     grid.activeGridConfig = grid.getActiveGridConfig(this.props.gridId);
@@ -66,21 +69,18 @@ export default class GridCompConnected extends React.Component {
 
     grid.setConditionQueryObject(query);
 
-
-
-
-    GridActions.updateGrid(grid);
+    updateGridAction(grid);
   }
+
 
   render() {
     console.debug('GridCompConnected#render, props: %o', this.props);
     return (
-      <GridComp gridLocation={this.props.gridLocation} uiLocation="page" onGridChange={this.onGridChange}>
+      <GridComp grid={this.props.grid} uiLocation="page" onGridChange={this.onGridChange}>
         {this.props.children}
       </GridComp>
     );
   }
-
 
 
 }

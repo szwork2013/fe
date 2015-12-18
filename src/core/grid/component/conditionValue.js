@@ -1,6 +1,7 @@
 import React from 'react';
 import _ from 'lodash';
 import classNames from 'classnames';
+import PureRenderMixin from 'react-addons-pure-render-mixin';
 
 import {Tooltip, OverlayTrigger, Overlay, Popover} from 'react-bootstrap';
 import {TextField} from 'material-ui';
@@ -12,6 +13,7 @@ import FilterFieldComp from 'core/grid/component/filterFieldComp';
 
 
 export default class ConditionValue extends React.Component {
+  //shouldComponentUpdate = PureRenderMixin.shouldComponentUpdate.bind(this); // zatim byt nemuze, dokud jsou v props komplexni objekty, ktere nejsou immutable
 
   static propTypes = {
     condition: React.PropTypes.instanceOf(GridConfigCondition),

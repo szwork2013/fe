@@ -1,13 +1,13 @@
 import React from 'react';
 import {Record, List} from 'immutable';
-import shouldPureComponentUpdate from 'react-pure-render/function';
+import PureRenderMixin from 'react-addons-pure-render-mixin';
 import {TextField, RaisedButton, SelectField} from 'material-ui';
 import { Alert } from 'react-bootstrap';
 
 import createForm from 'core/form/createForm';
 
 class PartyFoForm extends React.Component {
-  shouldComponentUpdate = shouldPureComponentUpdate;
+  shouldComponentUpdate = PureRenderMixin.shouldComponentUpdate.bind(this);
 
   render() {
 

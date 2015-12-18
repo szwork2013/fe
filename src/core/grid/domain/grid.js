@@ -5,6 +5,10 @@ import GridConfigCondition from 'core/grid/domain/gridConfigCondition';
 
 export default class Grid {
 
+  static clone(grid) {
+    return Object.assign(new Grid({}), grid);
+  }
+
   constructor (gridLocationDto) {
     // string gridLocation
     this.gridLocation = gridLocationDto.gridLocation;
@@ -38,11 +42,13 @@ export default class Grid {
     // id na master entitu u seznamu na detailech
     this.masterId;
 
+    this.loading;
+
   }
 
 
   getGridConfig(gridId) {
-    return _(this.gridConfigs).find(gc => gc.gridId == gridId);
+    return this.gridConfigs.find(gc => gc.gridId == gridId);
   }
 
   deleteGridConfig(gridId) {
@@ -66,7 +72,7 @@ export default class Grid {
   getActiveGridConfig(gridId) {
     let agc;
     if (gridId) {
-      agc = _(this.gridConfigs).find(gc => gc.gridId == gridId);
+      agc = this.gridConfigs.find(gc => gc.gridId == gridId);
     }
 
     if (!agc) {
@@ -155,6 +161,7 @@ export default class Grid {
     this.activeGridConfig = null;
     this.sortArray = null;
     this.masterId = null;
+    this.loading = false;
   }
 
 

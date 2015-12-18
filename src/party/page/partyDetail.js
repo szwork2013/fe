@@ -1,11 +1,10 @@
 import React from 'react';
-import shouldPureComponentUpdate from 'react-pure-render/function';
+import PureRenderMixin from 'react-addons-pure-render-mixin';
 import {uniq, values} from 'lodash';
 import When from 'when';
 import { connect } from 'react-redux';
 import { FlatButton, Styles, Tabs, Tab} from 'material-ui';
 
-import hoistNonReactStatics from 'core/common/utils/hoistNonReactStatics';
 import PageAncestor from 'core/common/page/pageAncestor';
 import Toolmenu from 'core/components/toolmenu/toolmenu';
 import {store} from 'core/common/redux/store';
@@ -21,21 +20,33 @@ import PartyRoleList from 'party/component/partyRoleList';
 import PartyAddressList from 'party/component/partyAddressList';
 
 import GridService from 'core/grid/service/gridService';
-import GridStore from 'core/grid/store/gridStore';
-import GridActions from 'core/grid/action/gridActions';
 import GridComp from 'core/grid/component/gridComp';
-
+import {updateGridAction} from 'core/grid/gridActions';
 
 const Colors = Styles.Colors;
 const Typography = Styles.Typography;
 const vehicleGridLocation = 'partyVehicleList';
 const invoiceGridLocation = 'partyInvoiceList';
 
-class PartyDetail extends PageAncestor {
-  shouldComponentUpdate = shouldPureComponentUpdate;
+
+function mapStateToProps(state) {
+  return {
+    partyObject: state.getIn(['party', 'partyObject']),
+    entities: state.getIn(['metamodel', 'entities']),
+    vehicleGrid: state.getIn(['grid', 'grids', vehicleGridLocation]),
+    invoiceGrid: state.getIn(['grid', 'grids', invoiceGridLocation])
+  };
+}
+
+
+@connect(mapStateToProps, {setPartyAction, updateGridAction})
+export default class PartyDetail extends React.Component {
+  shouldComponentUpdate = PureRenderMixin.shouldComponentUpdate.bind(this);
 
   static title = 'Customer';
   static icon = 'user';
+  static willTransitionFrom = PageAncestor.willTransitionFrom;
+  static willTransitionTo = PageAncestor.willTransitionTo;
 
   static contextTypes = {
     router: React.PropTypes.func.isRequired,
@@ -60,7 +71,7 @@ class PartyDetail extends PageAncestor {
   }
 
   componentWillMount() {
-    console.debug('componentWillMount, props: %o', this.props);
+    console.debug('partyDetail#componentWillMount, props: %o', this.props);
 
     customizeTheme(this.context.muiTheme, {
       floatingActionButton: {
@@ -75,12 +86,12 @@ class PartyDetail extends PageAncestor {
     });
 
 
-    let vehicleGrid = GridStore.getGrid(vehicleGridLocation);
+    let vehicleGrid = this.props.vehicleGrid;
     vehicleGrid.activeGridConfig = vehicleGrid.getActiveGridConfig();
     vehicleGrid.masterId = this.props.partyObject.partyId;
 
-    console.log(vehicleGrid.activeGridConfig);
-    GridActions.updateGrid(vehicleGrid);
+    //console.log(vehicleGrid.activeGridConfig);
+    updateGridAction(vehicleGrid);
   }
 
   onGridChange = (grid) => {
@@ -103,13 +114,13 @@ class PartyDetail extends PageAncestor {
 
   onActiveInvoice = (tab) => {
     console.debug('onActiveInvoice(%o)', tab);
-    let invoiceGrid = GridStore.getGrid(invoiceGridLocation);
+    let invoiceGrid = this.props.invoiceGrid;
     invoiceGrid.activeGridConfig = invoiceGrid.getActiveGridConfig();
     invoiceGrid.masterId = this.props.partyObject.partyId;
 
     console.log(invoiceGrid.activeGridConfig);
-    GridActions.updateGrid(invoiceGrid);
-    this.forceUpdate();
+    updateGridAction(invoiceGrid);
+    //this.forceUpdate();
   };
 
 
@@ -131,7 +142,9 @@ class PartyDetail extends PageAncestor {
     const {
       partyObject,
       entities,
-      setPartyAction
+      setPartyAction,
+      vehicleGrid,
+      invoiceGrid
       } = this.props;
 
     const propsForCreateForm = {
@@ -166,10 +179,10 @@ class PartyDetail extends PageAncestor {
           <div className="col-xs-12 col-lg-6">
             <Tabs tabItemContainerStyle={{height:tabHeight}} contentContainerStyle={{width: '100%', height: '100%'}} style={{width: '100%', height: '100%'}} >
               <Tab label="Vehicles" style={{height:tabHeight}}>
-                <GridComp gridLocation={vehicleGridLocation} uiLocation="tab" onGridChange={this.onGridChange}/>
+                <GridComp grid={vehicleGrid} uiLocation="tab" onGridChange={this.onGridChange}/>
               </Tab>
               <Tab label="Invoices" style={{height:tabHeight}} onActive={this.onActiveInvoice}>
-                <GridComp gridLocation={invoiceGridLocation} uiLocation="tab" onGridChange={this.onGridChange}/>
+                {/*<GridComp grid={invoiceGrid} uiLocation="tab" onGridChange={this.onGridChange}/> */}
               </Tab>
               <Tab
                 label="Item Three"
@@ -216,14 +229,5 @@ class PartyDetail extends PageAncestor {
 
 
 }
-
-function mapStateToProps(state) {
-  return {
-    partyObject: state.getIn(['party', 'partyObject']),
-    entities: state.getIn(['metamodel', 'entities'])
-  };
-}
-
-export default hoistNonReactStatics(connect(mapStateToProps, {setPartyAction})(PartyDetail), PartyDetail);
 
 

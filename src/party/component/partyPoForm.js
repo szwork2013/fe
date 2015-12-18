@@ -1,6 +1,6 @@
 import React from 'react';
 import {Record, List} from 'immutable';
-import shouldPureComponentUpdate from 'react-pure-render/function';
+import PureRenderMixin from 'react-addons-pure-render-mixin';
 import {TextField, RaisedButton, SelectField} from 'material-ui';
 import { Alert } from 'react-bootstrap';
 
@@ -10,7 +10,7 @@ import StyledSelect from 'core/components/styledSelect/styledSelect';
 import BlockComp from 'core/components/blockComp/blockComp';
 
 class PartyPoForm extends React.Component {
-  shouldComponentUpdate = shouldPureComponentUpdate;
+  shouldComponentUpdate = PureRenderMixin.shouldComponentUpdate.bind(this);
 
   render() {
 

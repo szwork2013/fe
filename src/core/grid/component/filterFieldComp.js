@@ -1,6 +1,7 @@
 import React from 'react';
 import _ from 'lodash';
 import classNames from 'classnames';
+import PureRenderMixin from 'react-addons-pure-render-mixin';
 
 import {TextField, Checkbox} from 'material-ui';
 import { connect } from 'react-redux'
@@ -26,6 +27,7 @@ function mapStateToProps(state, ownProps ) {
 
 @connect(mapStateToProps)
 export default class FilterFieldComp extends React.Component {
+  shouldComponentUpdate = PureRenderMixin.shouldComponentUpdate.bind(this);
 
   static propTypes = {
     name: React.PropTypes.string.isRequired,

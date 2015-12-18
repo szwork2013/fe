@@ -1,5 +1,5 @@
 import React from 'react';
-import shouldPureComponentUpdate from 'react-pure-render/function';
+import PureRenderMixin from 'react-addons-pure-render-mixin';
 
 
 export default function createForm(definition, FormComponent) {
@@ -10,7 +10,7 @@ export default function createForm(definition, FormComponent) {
   };
 
   return class extends React.Component {
-    shouldComponentUpdate = shouldPureComponentUpdate;
+    shouldComponentUpdate = PureRenderMixin.shouldComponentUpdate.bind(this);
     displayName = FormComponent.name;
 
     static propTypes = {
@@ -25,10 +25,10 @@ export default function createForm(definition, FormComponent) {
       super(props);
       const {dataObject, rootObject, entity, entities, setDataAction} = props;
 
-      //console.log('createForm props: %o', props);
+      console.log('createForm props: %o', props);
 
       this.fields = definition.fields.reduce((fields, field) => {
-        console.debug('createForm: field: %o on entity %o', field, entity);
+        //console.debug('createForm: field: %o on entity %o', field, entity);
         const mdField = entity.fields[field.name];
         const fieldObject = {
           fullWidth: true,

@@ -1,9 +1,11 @@
 import Axios from 'core/common/config/axios-config';
 import When from 'when';
-import _ from 'lodash';
+import {uniq, isEmpty, sum} from 'lodash';
+import {Map} from 'immutable';
 
-import GridStore from 'core/grid/store/gridStore';
-import GridActions from 'core/grid/action/gridActions';
+import {store} from 'core/common/redux/store';
+import {updateGridsAction} from 'core/grid/gridActions';
+
 import Grid from 'core/grid/domain/grid';
 import GridConfig from 'core/grid/domain/gridConfig';
 import GridConfigCondition from 'core/grid/domain/gridConfigCondition';
@@ -30,49 +32,41 @@ class GridService {
    * @returns {*}
    */
   fetchGrids(...gridLocations) {
-    var gridObject = {};
+    const gridMap = store.getState().getIn(['grid', 'grids']);
 
-    // pripravime pole Promise<Grid) pro gridy ktere nejsou v GridStore
-    let promises = [];
-    for (let gl of gridLocations) {
-      let grid = GridStore.getGrid(gl);
-      if (grid) {
-        gridObject[gl] = grid;
-      } else {
-        promises.push(Axios.get('/core/grid-config', {params: {gridLocation: gl}})
-          .then((response) => {
-            return new Grid(response.data);
-          }));
-      }
+    let unresolvedGridLocations = gridLocations.filter(v => !gridMap.has(v));
+
+    console.debug('gridService#fetchGrids unresolvedGridLocations = %o', unresolvedGridLocations);
+
+    if (unresolvedGridLocations.length === 0) {
+      return When(gridMap);
     }
 
-    // pokud nejaky takovy existuje
-    if (promises.length > 0) {
-      return When.all(promises).then(gridArray => {
-        var entities = [];
-        for(let grid of gridArray) {
-          entities.push(grid.entityName);
-          gridObject[grid.gridLocation] = grid;
-        }
-        return MdEntityService.fetchEntities(_.uniq(entities));
+    var gridArray;
+    return Axios.get('/core/grid-config', {params: {gridLocation: unresolvedGridLocations}})
+      .then( response => response.data.map(g => new Grid(g)) )
+      .then( _gridArray => {
+        gridArray = _gridArray;
+        return MdEntityService.fetchEntities(uniq(gridArray.map(g => g.entityName)))
       })
-        .then( (entityMap) => {
-          for(let gridLocation in gridObject) {
-            let grid = gridObject[gridLocation];
-            grid.$entityRef = entityMap.get(grid.entityName);
+      .then( entityMap => {
+        let gridObject = gridArray.reduce( (acc, grid) => {
+          grid.$entityRef = entityMap.get(grid.entityName);
+          // doplnime gridConfig.$columnRefs: MdField[]
 
-            // doplnime gridConfig.$columnRefs: MdField[]
-
-            for(let gridConfig of grid.gridConfigs) {
-              GridConfig.clasifyJson(gridConfig, grid);
-            }
+          for(let gridConfig of grid.gridConfigs) {
+            GridConfig.clasifyJson(gridConfig, grid);
           }
-          console.log("fetchGrids promise resolved: %o", gridObject);
-          return GridActions.updateGrids(gridObject);
-        });
-    } else {
-      return When(gridObject);
-    }
+
+          acc[grid.gridLocation] = grid;
+          return acc;
+        }, {});
+
+        console.log("fetchGrids promise resolved: %o", gridObject);
+        store.dispatch(updateGridsAction(Map(gridObject)));
+
+        return gridMap.merge(gridObject);
+      });
   }
 
   /*
@@ -115,7 +109,7 @@ class GridService {
 
     //let absoluteLengths = _.zip(...matrix).map(col => _.max(col));
 
-    // let absoluteMax = _.sum(absoluteLengths);
+    // let absoluteMax = sum(absoluteLengths);
 
     // puvodni vypocet sirky sloupcu - podle nejdelsich textu
     // let gridWidths = absoluteLengths.map(v => Math.round(10000 * v / absoluteMax)/100 + "%");
@@ -133,7 +127,7 @@ class GridService {
     });
 
     // udelame sumu minWidths
-    let sumGridMinWidths = _.sum(gridMinWidthsPX);
+    let sumGridMinWidths = sum(gridMinWidthsPX);
     // spocitame width pro sloupce tak, aby odpovidaly pomerum min-width
     let gridWidthsPrct = gridMinWidthsPX.map(v => ((100*v)/sumGridMinWidths));
 
@@ -157,12 +151,12 @@ class GridService {
     let operatorLov = allOperators.find(li => li.value === condition.operator);
     let cardinality = operatorLov.params[0];
     if (cardinality == 1 || cardinality == "N") {
-      if (_.isEmpty(condition.values) || !condition.values[0]) {
+      if (isEmpty(condition.values) || !condition.values[0]) {
         errorMessages.push( (index+1) + ". výběrový filtr musí mít vyplněnou hodnotu");
         return false;
       }
     }  else if (cardinality == 2) {
-      if (_.isEmpty(condition.values) || condition.values.length < 2 || !condition.values[0] || !condition.values[1]) {
+      if (isEmpty(condition.values) || condition.values.length < 2 || !condition.values[0] || !condition.values[1]) {
         errorMessages.push( (index+1) + ". výběrový filtr musí mít vyplněné obě hodnoty");
         return false;
       }

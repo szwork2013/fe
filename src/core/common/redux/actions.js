@@ -32,7 +32,7 @@ export function createPromiseAction(type, thunk, actionCreator) {
     var outerArguments = [].slice.call(arguments);
     return function(dispatch, getState) {
       outerArguments.unshift.apply(outerArguments, [dispatch, getState, types]);
-      thunk.apply(null, outerArguments);
+      return thunk.apply(null, outerArguments);
     };
   };
 

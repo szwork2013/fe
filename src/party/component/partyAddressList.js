@@ -1,6 +1,6 @@
 import React from 'react';
 import {get, pull} from 'lodash';
-import shouldPureComponentUpdate from 'react-pure-render/function';
+import PureRenderMixin from 'react-addons-pure-render-mixin';
 import {Styles, TextField, FontIcon, FloatingActionButton} from 'material-ui';
 
 import PartyService from 'party/partyService';
@@ -12,7 +12,7 @@ import ActiveItem from 'core/components/blockComp/activeItem';
 const Colors = Styles.Colors;
 
 export default class PartyAddressList extends React.Component {
-  shouldComponentUpdate = shouldPureComponentUpdate;
+  shouldComponentUpdate = PureRenderMixin.shouldComponentUpdate.bind(this);
 
   static propTypes = {
     partyObject: React.PropTypes.object.isRequired,
@@ -57,7 +57,7 @@ export default class PartyAddressList extends React.Component {
 
 
 class PartyAddressForm extends React.Component {
-  shouldComponentUpdate = shouldPureComponentUpdate;
+  shouldComponentUpdate = PureRenderMixin.shouldComponentUpdate.bind(this);
 
   onDelete = (evt) => {
     evt.stopPropagation();

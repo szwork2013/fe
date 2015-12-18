@@ -3,7 +3,7 @@ import reactMixin from 'react-mixin';
 import { connect } from 'react-redux'
 import {Navbar, Nav, NavItem, NavDropdown, MenuItem, CollapsibleNav } from 'react-bootstrap';
 import Router from 'react-router';
-import shouldPureComponentUpdate from 'react-pure-render/function';
+import PureRenderMixin from 'react-addons-pure-render-mixin';
 
 import SecurityService from 'core/security/securityService';
 import * as securityActions from 'core/security/securityActions';
@@ -22,7 +22,7 @@ function mapStateToProps(state) {
 
 @connect(mapStateToProps, securityActions)
 export default class MainMenu extends React.Component {
-  shouldComponentUpdate = shouldPureComponentUpdate;
+  shouldComponentUpdate = PureRenderMixin.shouldComponentUpdate.bind(this);
 
   static contextTypes = {
     router: React.PropTypes.func.isRequired

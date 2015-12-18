@@ -1,19 +1,16 @@
 import React from 'react';
 import {Alert} from 'react-bootstrap';
 import { FlatButton, SelectField, TextField, RaisedButton, Checkbox } from 'material-ui';
-import connectToStores from 'alt/utils/connectToStores';
 import reactMixin from 'react-mixin';
 import Router from 'react-router';
 import _ from 'lodash';
 import When from 'when';
+import PureRenderMixin from 'react-addons-pure-render-mixin';
 
-import hoistNonReactStatics from 'core/common/utils/hoistNonReactStatics';
 import PageAncestor from 'core/common/page/pageAncestor';
 import Axios from 'core/common/config/axios-config';
 import { connect } from 'react-redux';
 
-import GridStore from 'core/grid/store/gridStore';
-import GridActions from 'core/grid/action/gridActions';
 import Grid from 'core/grid/domain/grid';
 import GridConfig from 'core/grid/domain/gridConfig';
 import GridConfigCondition from 'core/grid/domain/gridConfigCondition';
@@ -24,7 +21,7 @@ import ArrayUtils from 'core/common/utils/arrayUtils';
 import MdEntityService from 'core/metamodel/mdEntityService';
 import ConditionValue from 'core/grid/component/conditionValue';
 import CommonService from 'core/common/service/commonService';
-
+import {updateGridAction} from 'core/grid/gridActions';
 
 import Toolmenu from 'core/components/toolmenu/toolmenu';
 import BlockComp from 'core/components/blockComp/blockComp';
@@ -32,10 +29,23 @@ import LocalizeField from 'core/components/localizeField/localizeField';
 import DualSelector from 'core/components/dualSelector/dualSelector';
 import StyledSelect from 'core/components/styledSelect/styledSelect';
 
-class GridAdminView extends PageAncestor {
+
+function mapStateToProps(state, ownProps) {
+  return {
+    allOperators: state.getIn(['metamodel', 'entities', 'FILTEROPERATOR']).lovItems,
+    grid: state.getIn(['grid', 'grids', ownProps.params.gridLocation])
+  };
+}
+
+
+@connect(mapStateToProps, {updateGridAction})
+export default class GridAdminView extends React.Component {
+  // shouldComponentUpdate = PureRenderMixin.shouldComponentUpdate.bind(this); // zatim byt nemuze dokud jsou ve state objekty
 
   static title = 'Manage Grid';
   static icon = 'wrench';
+  static willTransitionFrom = PageAncestor.willTransitionFrom;
+  static willTransitionTo = PageAncestor.willTransitionTo;
 
   static contextTypes = {
     router: React.PropTypes.func.isRequired
@@ -58,16 +68,6 @@ class GridAdminView extends PageAncestor {
   };
 
 
-  static getStores(props) {
-    return [GridStore];
-  }
-
-  // multiple stores @see https://github.com/goatslacker/alt/issues/420
-  static getPropsFromStores(props) {
-    let grid = GridStore.getGrid(props.params.gridLocation);
-    return {grid};
-  }
-
   state = {
     gridId: null,
     editedGridConfig: null,
@@ -83,7 +83,7 @@ class GridAdminView extends PageAncestor {
   onChangeGridConfig = (evt) => {
     let gridId = evt.target.value;
     console.log('onChangeGridConfig gridId = %s', gridId);
-    this.setState({gridId});
+    //this.setState({gridId});
     let gridConfig = this.props.grid.getGridConfig(gridId);
     let clonedGridConfig = gridConfig.clone();
 
@@ -94,7 +94,7 @@ class GridAdminView extends PageAncestor {
 
     MdEntityService.fetchEntities(valueSources, valueSources.map(v => true) )
     .then(() => {
-      this.setState({editedGridConfig: clonedGridConfig});
+      this.setState({gridId, editedGridConfig: clonedGridConfig});
     });
   };
 
@@ -111,7 +111,7 @@ class GridAdminView extends PageAncestor {
           let editedGridConfig = response.data;
           GridConfig.clasifyJson(editedGridConfig, grid);
           grid.replaceGridConfig(editedGridConfig);
-          GridActions.updateGrid(grid);
+          updateGridAction(grid);
 
           CommonService.loading(false);
 
@@ -185,7 +185,7 @@ class GridAdminView extends PageAncestor {
     Axios.delete('/core/grid-config/' + gridId)
     .then(response => {
       grid.deleteGridConfig(gridId);
-      GridActions.updateGrid(grid);
+      updateGridAction(grid);
       CommonService.loading(false);
       this.setState({
         gridId: null,
@@ -523,7 +523,7 @@ class GridAdminView extends PageAncestor {
                 <tbody>
                 {
                   editedGridConfig.conditions.map( (condition, index) => {
-
+                    console.debug('all operators: ', allOperators);
                     let operatorOptions = (condition.$columnRef) ? allOperators
                       .filter(li => _.includes(condition.$columnRef.availableOperators, li.value)) : [];
 
@@ -686,13 +686,4 @@ class GridAdminView extends PageAncestor {
 
 
 }
-
-function mapStateToProps(state) {
-  return {
-    allOperators: state.getIn(['metamodel', 'entities', 'FILTEROPERATOR']).lovItems
-  }
-}
-
-// pokud ma "connectToStores" componenta fetchData nebo jinou statickou metodu musi se patchnout pomoci hoistNonReactStatics, protoze connectToStores by ji vyrusila...
-export default hoistNonReactStatics(connectToStores( connect(mapStateToProps)(GridAdminView) ), GridAdminView);
 

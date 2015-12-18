@@ -28,7 +28,6 @@ Router.run(routes, Router.HistoryLocation, (Root, state) => {
 
   document.title =  lastRoute.handler.title;  // 'ZZ ' + routes.map(r => r.handler.title).join(' / ');
 
-
   var promises = state.routes.filter((route) => route.handler.fetchData)
     .reduce((promises, route) => {
       promises[route.name] = route.handler.fetchData(state.params, state.query);
@@ -38,9 +37,9 @@ Router.run(routes, Router.HistoryLocation, (Root, state) => {
   When.all(promises)
     .then((data) => {
         ReactDOM.render(
-            <Provider store={store} key="provider">
-              <Root {...state}/>
-            </Provider>, document.body);
+          <Provider store={store} key="provider">
+            <Root {...state}/>
+          </Provider>, document.body);
     });
 
 });

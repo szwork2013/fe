@@ -1,10 +1,9 @@
 import React from 'react';
-import shouldPureComponentUpdate from 'react-pure-render/function';
+import PureRenderMixin from 'react-addons-pure-render-mixin';
 import When from 'when';
 import { connect } from 'react-redux';
 import { FlatButton, Styles} from 'material-ui';
 
-import hoistNonReactStatics from 'core/common/utils/hoistNonReactStatics';
 import PageAncestor from 'core/common/page/pageAncestor';
 import Toolmenu from 'core/components/toolmenu/toolmenu';
 import {store} from 'core/common/redux/store';
@@ -13,10 +12,16 @@ import InvoiceService from 'invoice/invoiceService';
 import {setInvoiceAction} from 'invoice/invoiceActions';
 
 
+function mapStateToProps(state) {
+  return {
+    invoiceObject: state.getIn(['invoice', 'invoiceObject']),
+    entities: state.getIn(['metamodel', 'entities'])
+  };
+}
 
-
-class InvoiceDetail extends PageAncestor {
-  shouldComponentUpdate = shouldPureComponentUpdate;
+@connect(mapStateToProps, {setInvoiceAction})
+export default class InvoiceDetail extends PageAncestor {
+  shouldComponentUpdate = PureRenderMixin.shouldComponentUpdate.bind(this);
 
   static title = 'Invoice';
   static icon = 'money';
@@ -100,14 +105,4 @@ class InvoiceDetail extends PageAncestor {
 
 
 }
-
-function mapStateToProps(state) {
-  return {
-    invoiceObject: state.getIn(['invoice', 'invoiceObject']),
-    entities: state.getIn(['metamodel', 'entities'])
-  };
-}
-
-export default hoistNonReactStatics(connect(mapStateToProps, {setInvoiceAction})(InvoiceDetail), InvoiceDetail);
-
 

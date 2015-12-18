@@ -63,14 +63,19 @@ var VirtualList = React.createClass({
     return state;
   },
   shouldComponentUpdate: function(nextProps, nextState) {
-    if (this.state.bufferStart !== nextState.bufferStart) return true;
-
-    if (this.state.height !== nextState.height) return true;
-
+    if (this.state.bufferStart !== nextState.bufferStart) {
+      console.log('state.bufferStart se lisi, returning TRUE');
+      return true;
+    }
+    if (this.state.height !== nextState.height) {
+      console.log('state.height se lisi, returning TRUE');
+      return true;
+    }
     var equal = utils.areArraysEqual(this.state.items, nextState.items);
-
+    console.log('state.items array returning ' + !equal);
     return !equal;
   },
+
   componentWillReceiveProps: function(nextProps) {
     console.log('virtualList#componentWillReceiveProps %o', nextProps);
     var state = this.getVirtualState(nextProps);
@@ -146,6 +151,7 @@ var VirtualList = React.createClass({
   },
 
   render: function() {
+    console.log("VirtualList#render: items.length = " + this.state.items.length);
     try {
       return (
         <this.props.tagName {...this.props} style={{boxSizing: 'border-box', height: this.state.height, paddingTop: this.state.bufferStart }} >

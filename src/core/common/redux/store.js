@@ -14,7 +14,7 @@ function finalCreateStore() {
 
   if (__REDUXDEVTOOLS__) {
     const { persistState } = require('redux-devtools');
-    const DevTools = require('core/common/redux/devtools');
+    const DevTools = require('core/common/redux/devtools').default;
 
     _finalCreateStore = compose(
       // Enables your middleware: any Redux middleware, e.g. redux-thunk
@@ -30,7 +30,7 @@ function finalCreateStore() {
     // Hot reload reducers (requires Webpack or Browserify HMR to be enabled)
     if (module.hot) {
       module.hot.accept('core/common/redux/reducer', () =>
-        _store.replaceReducer(require('core/common/redux/reducer')/*.default if you use Babel 6+ */)
+        _store.replaceReducer(require('core/common/redux/reducer').default)
       );
     }
     return _store;

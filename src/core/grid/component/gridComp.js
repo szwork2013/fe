@@ -1,17 +1,18 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import reactMixin from 'react-mixin';
-import {Router, Link} from 'react-router';
-import connectToStores from 'alt/utils/connectToStores';
+import {Router,Link} from 'react-router';
+import PureRenderMixin from 'react-addons-pure-render-mixin';
 import _ from 'lodash';
 import classNames from 'classnames';
 import {Navbar, Nav, NavItem, NavDropdown, MenuItem, CollapsibleNav, Input} from 'react-bootstrap';
 import {Checkbox, IconButton, FontIcon, Styles} from 'material-ui';
 
+import {store} from 'core/common/redux/store';
+import {updateGridAction, fetchDataAction} from 'core/grid/gridActions';
+
 import VirtualList from 'core/components/virtualList/virtualList';
 import {customizeTheme}  from 'core/common/config/mui-theme';
-import GridStore from 'core/grid/store/gridStore';
-import GridActions from 'core/grid/action/gridActions';
 import Grid from 'core/grid/domain/grid';
 import GridHeader from 'core/grid/component/gridHeader';
 import {ZzIconButton} from 'core/components/toolmenu/toolmenu';
@@ -20,20 +21,16 @@ import {ZzIconButton} from 'core/components/toolmenu/toolmenu';
 import styles from 'core/grid/component/gridComp.less';
 
 
-@connectToStores
 export default class GridComp extends React.Component {
+  shouldComponentUpdate = PureRenderMixin.shouldComponentUpdate.bind(this);
 
   static contextTypes = {
     router: React.PropTypes.func.isRequired,
     muiTheme: React.PropTypes.object
   };
 
-  static defaultProps = {
-
-  };
 
   static propTypes = {
-    gridLocation: React.PropTypes.string.isRequired,
     uiLocation: React.PropTypes.string.isRequired,
 
     // from store
@@ -42,16 +39,6 @@ export default class GridComp extends React.Component {
   };
 
 
-  static getStores(props) {
-    return [GridStore];
-  }
-
-  // multiple stores @see https://github.com/goatslacker/alt/issues/420
-  static getPropsFromStores(props) {
-    let grid = GridStore.getGrid(props.gridLocation);
-    return {grid};
-  }
-
 
   constructor(props) {
     super(props);
@@ -59,28 +46,19 @@ export default class GridComp extends React.Component {
     console.debug('GridComp#constructor, props: %o', props);
 
     this.state = {
-      loading: false,
       showSelection: false,
       selectedRows: new Map(),
       selectedAllRows: false,
       lastClickedRow: undefined,
-      searchTerm: undefined,
-      headerPaddingRight: 0,
+      headerPaddingRight: 0
     }
   }
 
   componentWillReceiveProps(nextProps) {
-    console.debug('componentWillReceiveProps oldProps: %o, nextProps: %o', this.props, nextProps);
-    this.setState({
-      loading: false,
-      searchTerm: nextProps.grid.searchTerm
-    });
+    console.debug('GridComp#componentWillReceiveProps, dataCount = ' +  ((nextProps.grid && nextProps.grid.data) ? nextProps.grid.data.totalCount : 'undefined') );
   }
 
-
   componentWillMount() {
-    console.debug('componentWillMount');
-
     customizeTheme(this.context.muiTheme, {
       flatButton: {
         color: Styles.Colors.blueGrey50
@@ -88,13 +66,14 @@ export default class GridComp extends React.Component {
     });
 
     this.onResizeDebounced = _.debounce(this.onResize, 100);
+
     if (this.props.grid.activeGridConfig) {
       this.search();
     }
   }
 
   componentDidMount() {
-    console.debug('componentDidMount');
+    console.debug('gridComp#componentDidMount()');
     this.container = ReactDOM.findDOMNode(this.refs.rowContainer);
     this.gridHeader = ReactDOM.findDOMNode(this.refs.gridHeader);
     window.addEventListener('resize', this.onResizeDebounced);
@@ -106,7 +85,7 @@ export default class GridComp extends React.Component {
 
     let grid = this.props.grid;
     grid.reset();
-    GridActions.updateGrid(grid);
+    store.dispatch(updateGridAction(grid));
   }
 
 
@@ -118,19 +97,15 @@ export default class GridComp extends React.Component {
     console.debug("running search with gridId = %s, searchTerm = %s", grid.activeGridConfig.gridId, grid.searchTerm);
     this.setState({
       selectedRows: new Map(),
-      selectedAllRows: false,
-      loading: true});
-    GridActions.fetchData(grid)
+      selectedAllRows: false});
+    store.dispatch(fetchDataAction(grid))
       .then(() => {
         console.debug('data received');
         if (scrollToTop && this.refs.VirtualList) {
           this.refs.VirtualList.scrollTop();
-          this.refs.VirtualList.forceUpdate();
+          //this.refs.VirtualList.forceUpdate();
         }
         this.onResize();
-        this.forceUpdate(); // TODO: HACK - odstranit po prepsani gridu na redux, je to zde nutne kvuli gridu na detailu
-      }, () => {
-        this.setState({loading: false});
       });
   }
 
@@ -212,19 +187,19 @@ export default class GridComp extends React.Component {
 
   onSelectGridManage = (evt) => {
     evt.preventDefault();
-    this.context.router.transitionTo('gridAdmin', {gridLocation: this.props.gridLocation});
+    this.context.router.transitionTo('gridAdmin', {gridLocation: this.props.grid.gridLocation});
   };
 
   onSearchTermChange = evt => {
-    this.setState({searchTerm: evt.target.value});
+    let grid = this.props.grid;
+    grid.searchTerm = evt.target.value;
+    store.dispatch(updateGridAction(grid));
   };
 
   onSearchTermSubmit = evt => {
     evt.preventDefault();
-    console.log('onSearchTermSubmit: %s', this.state.searchTerm);
-
     let grid = this.props.grid;
-    grid.searchTerm = this.state.searchTerm;
+    console.log('onSearchTermSubmit: %s', grid.searchTerm);
 
     if (this.props.onGridChange) {
       this.props.onGridChange(grid);
@@ -341,7 +316,7 @@ export default class GridComp extends React.Component {
       } = this.props;
 
 
-    let dropdownId = this.props.gridLocation + "_dropdown";
+    let dropdownId = grid.gridLocation + "_dropdown";
 
 
     if (!grid.activeGridConfig) {
@@ -349,7 +324,7 @@ export default class GridComp extends React.Component {
         <div className={classNames('md-grid', 'md-grid--' + uiLocation)} className="md-grid">
           <Navbar fluid style={{marginBottom: 10, minHeight: 'initial', fontSize: 14}}>
             <Nav>
-              <NavItem eventKey={3} href={this.context.router.makeHref('gridAdmin', {gridLocation: this.props.gridLocation})} onClick={this.onSelectGridManage}>Create Grid</NavItem>
+              <NavItem eventKey={3} href={this.context.router.makeHref('gridAdmin', {gridLocation: grid.gridLocation})} onClick={this.onSelectGridManage}>Create Grid</NavItem>
             </Nav>
           </Navbar>
         </div>
@@ -366,7 +341,7 @@ export default class GridComp extends React.Component {
               })
             }
             <MenuItem divider/>
-            <MenuItem href={this.context.router.makeHref('gridAdmin', {gridLocation: this.props.gridLocation})} onSelect={this.onSelectGridManage}> Manage </MenuItem>
+            <MenuItem href={this.context.router.makeHref('gridAdmin', {gridLocation: grid.gridLocation})} onSelect={this.onSelectGridManage}> Manage </MenuItem>
           </NavDropdown>
     );
 
@@ -401,12 +376,12 @@ export default class GridComp extends React.Component {
           {children}
 
           <form className="navbar-form navbar-right" role="search" onSubmit={this.onSearchTermSubmit}>
-            <Input type="text"  placeholder='Search' onChange={this.onSearchTermChange} value={this.state.searchTerm}
+            <Input type="text"  placeholder='Search' onChange={this.onSearchTermChange} value={grid.searchTerm}
                    bsSize="small"/>
           </form>
         </Navbar>
 
-        { (this.state.loading) ? loadingElement : '' }
+        { (grid.loading) ? loadingElement : '' }
           <div className="md-grid-header-wrapper" style={{paddingRight: this.state.headerPaddingRight}}>
             <div className="md-grid-header" ref="gridHeader">
 

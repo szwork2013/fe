@@ -86,7 +86,7 @@ export default class DualSelector extends React.Component {
 
     let selectedObjectsFixed = (selectedObjects) ? selectedObjects : [];
     let selectedObjectsNames = selectedObjectsFixed.map(v => v.fieldName);
-    let allObjectsFiltered = allObjects.filter(v => !_.includes(selectedObjectsNames, v.fieldName));
+    let allObjectsFiltered = allObjects.filter(v => !selectedObjectsNames.includes(v.fieldName));
 
     let addButtonStyle = {fontWeight: 'normal', marginTop: 10, marginBottom: 10};
     let sortButtonStyle = {fontWeight: 'normal', width: 40, minWidth: 40};

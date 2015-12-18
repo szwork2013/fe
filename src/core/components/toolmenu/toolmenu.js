@@ -1,4 +1,6 @@
 import React from 'react';
+import PureRenderMixin from 'react-addons-pure-render-mixin';
+import {} from 'react-addons-pure-render-mixin';
 import {Styles, IconButton, FontIcon} from 'material-ui';
 import {customizeTheme}  from 'core/common/config/mui-theme';
 import styles from 'core/components/toolmenu/toolmenu.less';
@@ -8,6 +10,7 @@ const Colors = Styles.Colors;
 const Typography = Styles.Typography;
 
 export default class Toolmenu extends React.Component {
+  shouldComponentUpdate = PureRenderMixin.shouldComponentUpdate.bind(this);
 
   static contextTypes = {
     muiTheme: React.PropTypes.object

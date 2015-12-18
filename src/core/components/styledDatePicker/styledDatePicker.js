@@ -5,9 +5,6 @@ import Popup from 'react-widgets/lib/Popup';
 import 'react-widgets/lib/less/react-widgets.less';
 import 'core/components/styledDatePicker/styledDatePicker.less';
 
-//require('react-widgets/lib/less/react-widgets.less');
-//require('core/components/styledDatePicker/styledDatePicker.less');
-
 
 export default class StyledDatePicker extends React.Component {
 

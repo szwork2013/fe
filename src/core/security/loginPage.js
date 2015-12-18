@@ -2,7 +2,7 @@ import React, {PropTypes} from 'react';
 import ReactDOM from 'react-dom';
 import Router from 'react-router';
 import { connect } from 'react-redux';
-import shouldPureComponentUpdate from 'react-pure-render/function';
+import PureRenderMixin from 'react-addons-pure-render-mixin';
 
 import SecurityService from 'core/security/securityService';
 import * as securityActions from 'core/security/securityActions';
@@ -20,7 +20,7 @@ function mapStateToProps(state) {
 
 @connect(mapStateToProps, securityActions)
 export default class LoginPage extends React.Component {
-  shouldComponentUpdate = shouldPureComponentUpdate;
+  shouldComponentUpdate = PureRenderMixin.shouldComponentUpdate.bind(this);
 
   static title = 'Zauzoo Login';
   static icon = 'lock';
@@ -49,7 +49,6 @@ export default class LoginPage extends React.Component {
         .then((response) => {
           setCurrentUserAction(response.data);
           this.context.router.transitionTo((redirectAfterLogin && redirectAfterLogin !== '/') ? redirectAfterLogin : 'home');
-          //dispatch(setLoginFormDataAction(new LoginFormRecord()));
         }, (err) => {
           console.log('login error: ' +  err.status + " - " + err.statusText);
           // po neuspesnem loginu vynulujeme policka a chybove hlasky a nastavime focus na user (v callbacku, protoze az po rerender after setState()
