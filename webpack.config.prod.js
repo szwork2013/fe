@@ -14,7 +14,7 @@ module.exports = {
 
   entry : {
     module: ["assets/less/main.less", "font-awesome/less/font-awesome.less", 'babel-polyfill', path.join(srcPath, 'module.js')],
-    common: ["alt", "axios", "classnames", "events", "material-ui", "moment", "numeral", "react",
+    common: ["axios", "classnames", "events", "material-ui", "moment", "numeral", "react",
       "react-addons-linked-state-mixin", "react-bootstrap", "react-dom", "react-mixin", "react-router", "react-select", "react-tap-event-plugin", "react-toastr", "react-widgets", "when"]
   },
 

@@ -6,15 +6,13 @@
   "license": "ISC",
   "repository": "https://github.com/zauzoo/fe",
   "scripts": {
-    "build-old": "set NODE_ENV=production&& rm -Rf build/* && webpack -p --progress --profile --colors --devtool source-map --optimize-dedupe",
-    "build-linux": "export NODE_ENV=production&& rm -Rf build/* && webpack -p --progress --profile --colors --devtool source-map --optimize-dedupe",
     "lint": "eslint src",
     "test": "mocha --compilers js:babel-core/register,less:./test/less-null-compiler.js  --require ./test/test_helper.js --recursive",
     "test:watch": "npm run test -- --watch",
-    "watch": "set NODE_ENV=development&& rm -Rf build/* && webpack-dev-server --hot --inline --progress --colors",
     "clean": "rimraf build",
-    "build:webpack": "set NODE_ENV=production&& webpack --progress --colors --config webpack.config.prod.js",
-    "build": "npm run clean && npm run build:webpack",
+    "build:webpack": "webpack --progress --colors --config webpack.config.prod.js",
+    "build": "set NODE_ENV=production&& npm run clean && npm run build:webpack",
+    "build-linux": "export NODE_ENV=production&& npm run clean && npm run build:webpack",
     "start": "node devServer.js"
   },
   "devDependencies": {
