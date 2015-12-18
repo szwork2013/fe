@@ -34,7 +34,7 @@ function mapStateToProps(state) {
     partyObject: state.getIn(['party', 'partyObject']),
     entities: state.getIn(['metamodel', 'entities']),
     vehicleGrid: state.getIn(['grid', 'grids', vehicleGridLocation]),
-    invoiceGrid: state.getIn(['grid', 'grids', invoiceGridLocation])
+    //invoiceGrid: state.getIn(['grid', 'grids', invoiceGridLocation])
   };
 }
 
@@ -91,7 +91,7 @@ export default class PartyDetail extends React.Component {
     vehicleGrid.masterId = this.props.partyObject.partyId;
 
     //console.log(vehicleGrid.activeGridConfig);
-    updateGridAction(vehicleGrid);
+    //updateGridAction(vehicleGrid);
   }
 
   onGridChange = (grid) => {
@@ -157,7 +157,7 @@ export default class PartyDetail extends React.Component {
 
     return (
 
-      <main className="main-content" style={{display:'flex', flexDirection:'column', height: '100%'}}>
+      <main className="main-content" >
         {this._createToolMenu(partyObject)}
         <form style={{marginTop: 10}}>
           <div className="row">
@@ -177,9 +177,10 @@ export default class PartyDetail extends React.Component {
         </form>
         <div className="row" style={{flexBasis: '100%'}}>
           <div className="col-xs-12 col-lg-6">
+
             <Tabs tabItemContainerStyle={{height:tabHeight}} contentContainerStyle={{width: '100%', height: '100%'}} style={{width: '100%', height: '100%'}} >
               <Tab label="Vehicles" style={{height:tabHeight}}>
-                <GridComp grid={vehicleGrid} uiLocation="tab" onGridChange={this.onGridChange}/>
+
               </Tab>
               <Tab label="Invoices" style={{height:tabHeight}} onActive={this.onActiveInvoice}>
                 {/*<GridComp grid={invoiceGrid} uiLocation="tab" onGridChange={this.onGridChange}/> */}
@@ -192,6 +193,9 @@ export default class PartyDetail extends React.Component {
           </div>
         </div>
 
+        <div style={{height: 400}}>
+          <GridComp grid={vehicleGrid} uiLocation="tab" onGridChange={this.onGridChange}/>
+        </div>
 
       </main>
 

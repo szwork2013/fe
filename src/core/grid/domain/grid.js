@@ -44,6 +44,12 @@ export default class Grid {
 
     this.loading;
 
+    this.showSelection = false;
+    this.selectedRows = new Map();
+    this.selectedAllRows = false;
+    this.lastClickedRow;
+    this.headerPaddingRight = 0;
+
   }
 
 
@@ -131,6 +137,16 @@ export default class Grid {
     }
   }
 
+  getTotalCount() {
+    if (typeof this.data === 'undefined') {
+      return 'undefined';
+    } else if (!this.data) {
+      return 'null';
+    } else {
+      return this.data.totalCount;
+    }
+  }
+
   /**
    * setne conditionArray (pole gridConfigCondition) z { filter: [fieldName1_EQUAL, fieldName2_IN, ...],  fieldName1: [value11, value12, ...], fieldName2: [value21, value22, ...], .... }
    */
@@ -162,6 +178,11 @@ export default class Grid {
     this.sortArray = null;
     this.masterId = null;
     this.loading = false;
+    this.showSelection = false;
+    this.selectedRows = new Map();
+    this.selectedAllRows = false;
+    this.lastClickedRow = undefined;
+    this.headerPaddingRight = 0;
   }
 
 

@@ -42,6 +42,7 @@ var VirtualList = React.createClass({
     var container = props.container;
 
     var viewHeight = typeof container.innerHeight !== 'undefined' ? container.innerHeight : container.clientHeight;
+    console.log('%c virtualList viewHeight = ' + viewHeight, "background-color: yellow");
 
     // no space to render
     if (viewHeight <= 0) return state;
@@ -77,7 +78,7 @@ var VirtualList = React.createClass({
   },
 
   componentWillReceiveProps: function(nextProps) {
-    console.log('virtualList#componentWillReceiveProps %o', nextProps);
+    console.log('virtualList#componentWillReceiveProps %O', nextProps);
     var state = this.getVirtualState(nextProps);
 
     if (this.props.scrollDelay != nextProps.scrollDelay) {
@@ -94,7 +95,9 @@ var VirtualList = React.createClass({
 
     this.setState(state);
   },
+
   componentWillMount: function() {
+    console.log('virtualList#componentWillMount %O', this.props);
     var state = this.getVirtualState(this.props);
     this.setState(state);
 
@@ -102,6 +105,7 @@ var VirtualList = React.createClass({
     this.onResizeDebounced = utils.debounce(this.onResize, this.props.resizeDelay, false);
   },
   componentDidMount: function() {
+    console.log('virtualList#componentDidMount %O', this.props);
     var state = this.getVirtualState(this.props);
 
     this.setState(state);
@@ -151,7 +155,7 @@ var VirtualList = React.createClass({
   },
 
   render: function() {
-    console.log("VirtualList#render: items.length = " + this.state.items.length);
+    console.log("%cVirtualList#render: items.length = " + this.state.items.length, "background-color: red");
     try {
       return (
         <this.props.tagName {...this.props} style={{boxSizing: 'border-box', height: this.state.height, paddingTop: this.state.bufferStart }} >
@@ -218,6 +222,7 @@ VirtualList.getItems = function(viewTop, viewHeight, listTop, itemHeight, itemCo
     itemsInView: itemsInView,
   };
 
+  console.log('VirtualList.getItems state = %O', result);
   return result;
 };
 

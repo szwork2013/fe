@@ -8,8 +8,10 @@ import classNames from 'classnames';
 import {Navbar, Nav, NavItem, NavDropdown, MenuItem, CollapsibleNav, Input} from 'react-bootstrap';
 import {Checkbox, IconButton, FontIcon, Styles} from 'material-ui';
 
+import Axios from 'core/common/config/axios-config';
 import {store} from 'core/common/redux/store';
-import {updateGridAction, fetchDataAction} from 'core/grid/gridActions';
+import {updateGridAction} from 'core/grid/gridActions';
+import GridService from 'core/grid/service/gridService';
 
 import VirtualList from 'core/components/virtualList/virtualList';
 import {customizeTheme}  from 'core/common/config/mui-theme';
@@ -45,17 +47,10 @@ export default class GridComp extends React.Component {
 
     console.debug('GridComp#constructor, props: %o', props);
 
-    this.state = {
-      showSelection: false,
-      selectedRows: new Map(),
-      selectedAllRows: false,
-      lastClickedRow: undefined,
-      headerPaddingRight: 0
-    }
   }
 
   componentWillReceiveProps(nextProps) {
-    console.debug('GridComp#componentWillReceiveProps, dataCount = ' +  ((nextProps.grid && nextProps.grid.data) ? nextProps.grid.data.totalCount : 'undefined') );
+    console.debug('GridComp#componentWillReceiveProps, dataCount = ' +  nextProps.grid.getTotalCount());
   }
 
   componentWillMount() {
@@ -66,17 +61,12 @@ export default class GridComp extends React.Component {
     });
 
     this.onResizeDebounced = _.debounce(this.onResize, 100);
-
-    if (this.props.grid.activeGridConfig) {
-      this.search();
-    }
   }
 
   componentDidMount() {
     console.debug('gridComp#componentDidMount()');
-    this.container = ReactDOM.findDOMNode(this.refs.rowContainer);
-    this.gridHeader = ReactDOM.findDOMNode(this.refs.gridHeader);
     window.addEventListener('resize', this.onResizeDebounced);
+    this.search();
   }
 
   componentWillUnmount() {
@@ -94,41 +84,61 @@ export default class GridComp extends React.Component {
 
   search(scrollToTop) {
     let grid = this.props.grid;
-    console.debug("running search with gridId = %s, searchTerm = %s", grid.activeGridConfig.gridId, grid.searchTerm);
-    this.setState({
-      selectedRows: new Map(),
-      selectedAllRows: false});
-    store.dispatch(fetchDataAction(grid))
-      .then(() => {
-        console.debug('data received');
+    if (!grid.activeGridConfig) return;
+
+    console.debug("%c running search with gridId = %s, searchTerm = %s, masterId = %s", "background-color: green", grid.activeGridConfig.gridId, grid.searchTerm, grid.masterId);
+
+    grid.selectedRows = new Map();
+    grid.loading = true;
+    grid.selectedAllRows = false;
+
+    store.dispatch(updateGridAction(grid));
+
+
+    //  this.dispatch(grid); // this dispatches the action
+    Axios.get('/core/grid/' + grid.activeGridConfig.gridId, {params: Object.assign({searchTerm: grid.searchTerm, sort: grid.sort, masterId: grid.masterId}, grid.getConditionQueryObject())})
+      .then((response) => {
+        grid.data = response.data;
+        grid.gridWidths = GridService.computeGridWidths(grid.data, grid.activeGridConfig);
+        grid.loading = false;
+
+        console.debug('data received count = ' + grid.data.totalCount);
         if (scrollToTop && this.refs.VirtualList) {
           this.refs.VirtualList.scrollTop();
-          //this.refs.VirtualList.forceUpdate();
         }
-        this.onResize();
+        grid.headerPaddingRight = this._computeNewHPR();
+
+        store.dispatch(updateGridAction(grid));
+      }, (err) => {
+        grid.loading = false;
+        store.dispatch(updateGridAction(grid));
       });
   }
 
+  _computeNewHPR() {
+    let _cont = this.refs.rowContainer;
+    return (_cont.scrollHeight > _cont.clientHeight) ? 15 : 0;
+  }
+
   onResize = () => {
-    let _cont = this.container;
-    let oldHPR = this.state.headerPaddingRight;
-    let newHPR = (_cont.scrollHeight > _cont.clientHeight) ? 15 : 0;
-    if (oldHPR !== newHPR) {
-      this.setState({
-        headerPaddingRight: (_cont.scrollHeight > _cont.clientHeight) ? 15 : 0
-      });
+    let grid = this.props.grid;
+    let newHPR = this._computeNewHPR();
+    if (grid.headerPaddingRight !== newHPR) {
+      grid.headerPaddingRight = newHPR;
+      store.dispatch(updateGridAction(grid));
     }
   };
 
   processRowSelection = (clickedRowId, e) => {
+    let grid = this.props.grid;
     console.debug("processRowSelection: %o", clickedRowId);
     // provedeme pouze pokud je zapnuto oznacovani radku
-    if (this.state.showSelection) {
+    if (grid.showSelection) {
       // odstranime vsechny oznaceni
       window.getSelection().removeAllRanges();
       // zkopirujeme si mapu oznacenych radku
-      let clonedMap = new Map(this.state.selectedRows);
-      let lastSelected = this.state.lastClickedRow;
+      let clonedMap = new Map(grid.selectedRows);
+      let lastSelected = grid.lastClickedRow;
 
       if (clonedMap.has(clickedRowId)) {
         // pokud jsme klikli na oznaceny radek, odebereme ho z oznaceni
@@ -158,11 +168,10 @@ export default class GridComp extends React.Component {
           });
       }
       // nastavime stav
-      this.setState({
-        selectedRows: clonedMap,
-        selectedAllRows: (clonedMap.size ===  this.props.grid.data.totalCount),
-        lastClickedRow: clickedRowId
-      });
+      grid.selectedRows = clonedMap;
+      grid.selectedAllRows = (clonedMap.size ===  this.props.grid.data.totalCount);
+      grid.lastClickedRow = clickedRowId;
+      store.dispatch(updateGridAction(grid));
     }
   };
 
@@ -258,11 +267,13 @@ export default class GridComp extends React.Component {
 
   onClickCheck = (evt) => {
     console.log('onCheckSquare %o', evt);
-    this.setState({
-      selectedRows: new Map(),
-      selectedAllRows: false,
-      showSelection: !this.state.showSelection
-    });
+    let grid = this.props.grid;
+
+    grid.selectedRows = new Map();
+    grid.selectedAllRows = false;
+    grid.showSelection = !grid.showSelection;
+
+    store.dispatch(updateGridAction(grid));
 
     if (this.refs.VirtualList) {
       this.refs.VirtualList.forceUpdate();
@@ -280,40 +291,40 @@ export default class GridComp extends React.Component {
     if (this.refs.VirtualList) {
       this.refs.VirtualList.forceUpdate();
     }
-  }
+  };
 
   onCheckCbxAll = (e) => {
-    if (this.state.selectedRows.size !== this.props.grid.data.totalCount) {
-      let keyValues = this.props.grid.data.rows.map(row => {
+    let grid = this.props.grid;
+
+    if (grid.selectedRows.size !== grid.data.totalCount) {
+      let keyValues = grid.data.rows.map(row => {
         return [row.rowId, true];
       });
-      this.setState({
-        selectedRows: new Map(keyValues),
-        selectedAllRows: true
-      });
+      grid.selectedRows = new Map(keyValues);
+      grid.selectedAllRows = true;
     } else {
-      this.setState({
-        selectedRows: new Map(),
-        selectedAllRows: false
-      });
+      grid.selectedRows = new Map();
+      grid.selectedAllRows = false;
     }
+
+    store.dispatch(updateGridAction(grid));
 
     if (this.refs.VirtualList) {
       this.refs.VirtualList.forceUpdate();
     }
-  }
+  };
 
   /* *******   REACT METHODS ************ */
 
 
   render() {
-    console.debug("gridComp rendering: " + Date.now());
-
     let {
       grid,
       children,
       uiLocation
       } = this.props;
+
+    console.debug("gridComp rendering: dataCount = " + grid.getTotalCount());
 
 
     let dropdownId = grid.gridLocation + "_dropdown";
@@ -355,8 +366,6 @@ export default class GridComp extends React.Component {
 
 
 
-    let _gridData = grid.data;
-
 
     return (
 
@@ -367,11 +376,11 @@ export default class GridComp extends React.Component {
           <Nav navbar>
             {gridConfigMenu}
           </Nav>
-          <ZzIconButton tooltip="Show selection" fontIcon={classNames('fa', {'fa-check-square': this.state.showSelection, 'fa-check-square-o': !this.state.showSelection})}
+          <ZzIconButton tooltip="Show selection" fontIcon={classNames('fa', {'fa-check-square': grid.showSelection, 'fa-check-square-o': !grid.showSelection})}
                         onClick={this.onClickCheck} />
           <ZzIconButton tooltip="Refresh" fontIcon="fa fa-refresh" onClick={this.onClickRefresh} />
 
-          { (_gridData && _gridData.totalCount) ? (_gridData.totalCount + ' rows') : '' }
+          { (grid.data && grid.data.totalCount) ? (grid.data.totalCount + ' rows') : '' }
 
           {children}
 
@@ -382,21 +391,21 @@ export default class GridComp extends React.Component {
         </Navbar>
 
         { (grid.loading) ? loadingElement : '' }
-          <div className="md-grid-header-wrapper" style={{paddingRight: this.state.headerPaddingRight}}>
+          <div className="md-grid-header-wrapper" style={{paddingRight: grid.headerPaddingRight}}>
             <div className="md-grid-header" ref="gridHeader">
 
               {
-                ( (this.state.showSelection) ? (
+                ( (grid.showSelection) ? (
                   <div className="md-grid-header-cell" style={{float: 'left', minWidth: '28px', width: '28px'}}>
                     <Checkbox name="selectAllCheckbox"
                       onCheck={this.onCheckCbxAll}
-                      checked={this.state.selectedAllRows}
+                      checked={grid.selectedAllRows}
                     />
                   </div>
                 ) : '')
               }
 
-              <div className="md-grid-data-row" style={{marginRight: this.state.showSelection?'28px':'0px'}}>
+              <div className="md-grid-data-row" style={{marginRight: grid.showSelection?'28px':'0px'}}>
               {
                 grid.activeGridConfig.$columnRefs.map((mdField, columnIndex) => {
 
@@ -417,12 +426,11 @@ export default class GridComp extends React.Component {
 
           <div ref="rowContainer" className="md-grid-body">
             {
-              ( _gridData) ? (( _gridData.totalCount === 0) ? 'No data found'
+              ( grid.data) ? (( grid.data.totalCount === 0) ? 'No data found'
                   :
-                  //this._tableRowsElement(_gridData.rows, columnWidths)) : ''
-                  (<VirtualList ref="VirtualList" items={ _gridData.rows} renderItem={this.renderItem}
+                  (<VirtualList ref="VirtualList" items={ grid.data.rows} renderItem={this.renderItem}
                                 itemHeight={28}
-                                container={this.container} scrollDelay={15} resizeDelay={15} header={this.gridHeader} useRAF={true} /> )
+                                container={this.refs.rowContainer} scrollDelay={15} resizeDelay={15} header={this.refs.gridHeader} useRAF={true} /> )
               ) : ''
             }
           </div>
@@ -432,10 +440,11 @@ export default class GridComp extends React.Component {
 
 
   renderItem = (item) => {
-    let activeGridConfig = this.props.grid.activeGridConfig;
+    let grid = this.props.grid;
+    let activeGridConfig = grid.activeGridConfig;
     let rowClass = "md-grid-row";
 
-    let selected = this.state.selectedRows.has(item.rowId);
+    let selected = grid.selectedRows.has(item.rowId);
     if (selected) {rowClass += " md-grid-row-selected";}
 
     let showRowHover = activeGridConfig.showRowHower;
@@ -444,7 +453,7 @@ export default class GridComp extends React.Component {
     return (
       <div key={item.rowId} className={rowClass}>
         {
-          ( (this.state.showSelection) ? (
+          ( (grid.showSelection) ? (
             <div className="md-grid-cell" style={{float: 'left', minWidth: '28px', width: '28px'}}>
               <Checkbox
                   name="selectRowCheckbox"
@@ -455,7 +464,7 @@ export default class GridComp extends React.Component {
           ) : '')
         }
 
-        <div className="md-grid-data-row" style={{marginRight: this.state.showSelection?'28px':'0px'}}>
+        <div className="md-grid-data-row" style={{marginRight: grid.showSelection?'28px':'0px'}}>
         {
           item.cells.map( (gridCell, columnIndex) => {
 

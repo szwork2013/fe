@@ -2,7 +2,7 @@ import {Map} from 'immutable';
 import { combineReducers } from 'redux-immutablejs';
 
 import Grid from 'core/grid/domain/grid';
-import {updateGridAction, updateGridsAction, fetchDataAction} from 'core/grid/gridActions';
+import {updateGridAction, updateGridsAction} from 'core/grid/gridActions';
 
 
 // [gridLocation] -> Grid
@@ -12,10 +12,6 @@ function grids(state = new Map(), action) {
       return state.set(action.payload.gridLocation, Grid.clone(action.payload));
     case updateGridsAction.type:
       return state.merge(action.payload);
-    case fetchDataAction.loading:
-    case fetchDataAction.success:
-    case fetchDataAction.error:
-      return state.set(action.payload.gridLocation, Grid.clone(action.payload));
     default:
       return state;
   }
