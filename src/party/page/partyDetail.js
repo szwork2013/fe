@@ -79,7 +79,7 @@ export default class PartyDetail extends React.Component {
         miniSize: 30
       },
       tabs: {
-        backgroundColor: Colors.grey100,
+        backgroundColor: 'white',
         textColor: Typography.textLightBlack,
         selectedTextColor: Typography.textDarkBlack
       }
@@ -177,28 +177,26 @@ export default class PartyDetail extends React.Component {
         </form>
 
 
+        <div className="detail-grid" style={{height: 400}}>
 
-        <div className="row">
+          <Tabs tabItemContainerStyle={{height:tabHeight}} contentContainerStyle={{width: '100%', height: '100%'}} style={{width: '100%', height: '100%'}} >
+            <Tab label="Vehicles" style={{height:tabHeight}}>
+              <GridComp grid={vehicleGrid} uiLocation="tab" onGridChange={this.onGridChange}/>
+            </Tab>
+            <Tab label="Invoices" style={{height:tabHeight}} onActive={this.onActiveInvoice}>
+              {/*<GridComp grid={invoiceGrid} uiLocation="tab" onGridChange={this.onGridChange}/> */}
+            </Tab>
+            <Tab
+              label="Item Three"
+              route="home"
+              onActive={this._handleTabActive} style={{height:tabHeight}}/>
+          </Tabs>
 
-          <div className="col-xs-12 col-lg-6">
-            <GridComp grid={vehicleGrid} uiLocation="tab" onGridChange={this.onGridChange}/>
-          </div>
 
-          <div className="col-xs-12 col-lg-6">
 
-            <Tabs tabItemContainerStyle={{height:tabHeight}} contentContainerStyle={{width: '100%', height: '100%'}} style={{width: '100%', height: '100%'}} >
-              <Tab label="Vehicles" style={{height:tabHeight}}>
-              </Tab>
-              <Tab label="Invoices" style={{height:tabHeight}} onActive={this.onActiveInvoice}>
-                {/*<GridComp grid={invoiceGrid} uiLocation="tab" onGridChange={this.onGridChange}/> */}
-              </Tab>
-              <Tab
-                label="Item Three"
-                route="home"
-                onActive={this._handleTabActive} style={{height:tabHeight}}/>
-            </Tabs>
-          </div>
         </div>
+
+
 
 
       </main>
