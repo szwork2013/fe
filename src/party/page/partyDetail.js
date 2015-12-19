@@ -175,12 +175,19 @@ export default class PartyDetail extends React.Component {
             </div>
           </div>
         </form>
-        <div className="row" style={{flexBasis: '100%'}}>
+
+
+
+        <div className="row">
+
+          <div className="col-xs-12 col-lg-6">
+            <GridComp grid={vehicleGrid} uiLocation="tab" onGridChange={this.onGridChange}/>
+          </div>
+
           <div className="col-xs-12 col-lg-6">
 
             <Tabs tabItemContainerStyle={{height:tabHeight}} contentContainerStyle={{width: '100%', height: '100%'}} style={{width: '100%', height: '100%'}} >
               <Tab label="Vehicles" style={{height:tabHeight}}>
-
               </Tab>
               <Tab label="Invoices" style={{height:tabHeight}} onActive={this.onActiveInvoice}>
                 {/*<GridComp grid={invoiceGrid} uiLocation="tab" onGridChange={this.onGridChange}/> */}
@@ -193,9 +200,6 @@ export default class PartyDetail extends React.Component {
           </div>
         </div>
 
-        <div style={{height: 400}}>
-          <GridComp grid={vehicleGrid} uiLocation="tab" onGridChange={this.onGridChange}/>
-        </div>
 
       </main>
 
