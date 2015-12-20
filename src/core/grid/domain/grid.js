@@ -50,6 +50,9 @@ export default class Grid {
     this.lastClickedRow;
     this.headerPaddingRight = 0;
 
+    // pro pouziti v tabbed gridech na detailu - priznak ze jiz byl grid lazy loaded
+    this.tabOpened;
+
   }
 
 
@@ -183,6 +186,7 @@ export default class Grid {
     this.selectedAllRows = false;
     this.lastClickedRow = undefined;
     this.headerPaddingRight = 0;
+    this.tabOpened = false;
   }
 
 

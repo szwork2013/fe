@@ -34,9 +34,33 @@ function mapStateToProps(state) {
     partyObject: state.getIn(['party', 'partyObject']),
     entities: state.getIn(['metamodel', 'entities']),
     vehicleGrid: state.getIn(['grid', 'grids', vehicleGridLocation]),
-    //invoiceGrid: state.getIn(['grid', 'grids', invoiceGridLocation])
+    invoiceGrid: state.getIn(['grid', 'grids', invoiceGridLocation])
   };
 }
+
+
+const TabTemplate = React.createClass({
+
+  render() {
+    let styles = {
+      'width': '100%',
+      minHeight: 0,
+      flexGrow: 1
+    };
+
+    if (this.props.selected) {
+      styles.display = 'flex';
+    } else {
+      styles.display = 'none';
+    }
+
+    return (
+      <div style={styles}>
+        {this.props.children}
+      </div>
+    );
+  },
+});
 
 
 @connect(mapStateToProps, {setPartyAction, updateGridAction})
@@ -70,6 +94,7 @@ export default class PartyDetail extends React.Component {
     return When.all([metadataPromise, partyPromise, gridPromise]);
   }
 
+
   componentWillMount() {
     console.debug('partyDetail#componentWillMount, props: %o', this.props);
 
@@ -89,10 +114,8 @@ export default class PartyDetail extends React.Component {
     let vehicleGrid = this.props.vehicleGrid;
     vehicleGrid.activeGridConfig = vehicleGrid.getActiveGridConfig();
     vehicleGrid.masterId = this.props.partyObject.partyId;
-
-    //console.log(vehicleGrid.activeGridConfig);
-    //updateGridAction(vehicleGrid);
   }
+
 
   onGridChange = (grid) => {
     console.debug('onGridChange(%o)', grid);
@@ -115,12 +138,12 @@ export default class PartyDetail extends React.Component {
   onActiveInvoice = (tab) => {
     console.debug('onActiveInvoice(%o)', tab);
     let invoiceGrid = this.props.invoiceGrid;
+    invoiceGrid.tabOpened = true;
     invoiceGrid.activeGridConfig = invoiceGrid.getActiveGridConfig();
     invoiceGrid.masterId = this.props.partyObject.partyId;
 
-    console.log(invoiceGrid.activeGridConfig);
-    updateGridAction(invoiceGrid);
-    //this.forceUpdate();
+    console.log('onActiveInvoice invoiceGrid = ', invoiceGrid);
+    this.props.updateGridAction(invoiceGrid);
   };
 
 
@@ -134,6 +157,8 @@ export default class PartyDetail extends React.Component {
     console.log('onBack');
     this.context.router.goBack();
   };
+
+
 
 
   render() {
@@ -155,9 +180,12 @@ export default class PartyDetail extends React.Component {
       setDataAction: setPartyAction
     };
 
+
+    console.log('invoiceGrid in render: ', invoiceGrid);
+
     return (
 
-      <main className="main-content" >
+      <main className="main-content" style={{display: 'flex', flexDirection: 'column', height: '100%'}} >
         {this._createToolMenu(partyObject)}
         <form style={{marginTop: 10}}>
           <div className="row">
@@ -177,24 +205,23 @@ export default class PartyDetail extends React.Component {
         </form>
 
 
-        <div className="detail-grid" style={{height: 400}}>
-
-          <Tabs tabItemContainerStyle={{height:tabHeight}} contentContainerStyle={{width: '100%', height: '100%'}} style={{width: '100%', height: '100%'}} >
-            <Tab label="Vehicles" style={{height:tabHeight}}>
-              <GridComp grid={vehicleGrid} uiLocation="tab" onGridChange={this.onGridChange}/>
-            </Tab>
-            <Tab label="Invoices" style={{height:tabHeight}} onActive={this.onActiveInvoice}>
-              {/*<GridComp grid={invoiceGrid} uiLocation="tab" onGridChange={this.onGridChange}/> */}
-            </Tab>
-            <Tab
-              label="Item Three"
-              route="home"
-              onActive={this._handleTabActive} style={{height:tabHeight}}/>
-          </Tabs>
-
+        <Tabs  className="detail-grid" tabTemplate={TabTemplate} tabItemContainerStyle={{height:tabHeight}} contentContainerStyle={{width: '100%', flexGrow: 1, display: 'flex', minHeight: 0}} >
+          <Tab label="Vehicles" style={{height:tabHeight}}>
+             <GridComp grid={vehicleGrid} uiLocation="tab" onGridChange={this.onGridChange}/>
+          </Tab>
+          <Tab label="Invoices" style={{height:tabHeight}} onActive={this.onActiveInvoice}>
+            {(invoiceGrid.tabOpened) ?
+              <GridComp grid={invoiceGrid} uiLocation="tab" onGridChange={this.onGridChange}/>
+            : ''}
+          </Tab>
+          <Tab label="Item Three" style={{height:tabHeight}}>
+            <div>Ahoj 3</div>
+          </Tab>
+        </Tabs>
 
 
-        </div>
+
+
 
 
 

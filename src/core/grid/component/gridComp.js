@@ -390,7 +390,7 @@ export default class GridComp extends React.Component {
           </form>
         </Navbar>
 
-        { (grid.loading) ? loadingElement : '' }
+
           <div className="md-grid-header-wrapper" style={{paddingRight: grid.headerPaddingRight}}>
             <div className="md-grid-header" ref="gridHeader">
 
@@ -425,12 +425,14 @@ export default class GridComp extends React.Component {
           </div>
 
           <div ref="rowContainer" className="md-grid-body">
+            { (grid.loading) ? loadingElement : '' }
             {
               ( grid.data) ? (( grid.data.totalCount === 0) ? 'No data found'
-                  :
+                  : ( (grid.data.totalCount > 50) ?
                   (<VirtualList ref="VirtualList" items={ grid.data.rows} renderItem={this.renderItem}
                                 itemHeight={28}
                                 container={this.refs.rowContainer} scrollDelay={15} resizeDelay={15} header={this.refs.gridHeader} useRAF={true} /> )
+                  : grid.data.rows.map(row => this.renderItem(row)))
               ) : ''
             }
           </div>

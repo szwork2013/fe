@@ -23,16 +23,18 @@
   font-size: 13px;
   display: flex;
   flex-direction: column;
-  height: 100%;
-  //width: 100%;
 }
 
 .md-grid--page {
   padding: 10px;
+  height: 100%;
 }
 
 .md-grid--tab {
   padding: 5px 0 0 0;
+  width: 100%;
+  min-height: 0;
+  flexGrow: 1;
 }
 
 .md-grid-row {
@@ -69,6 +71,7 @@
   flex: 1 1 auto;
   min-height: 0;
   white-space: nowrap;
+  position: relative;
 }
 
 .md-grid-header {

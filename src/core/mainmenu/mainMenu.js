@@ -137,6 +137,7 @@ export default class MainMenu extends React.Component {
         </NavDropdown>
 
         <NavDropdown id="administration_dropdown"  title='Administration'>
+          { this._menuItem("userList") }
           <MenuItem eventKey='3' onSelect={this.printAppState}>Print App state</MenuItem>
         </NavDropdown>
 
