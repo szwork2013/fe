@@ -1,5 +1,6 @@
 import React from 'react';
 import PureRenderMixin from 'react-addons-pure-render-mixin';
+import History from 'react-router/lib/History';
 import {uniq, values} from 'lodash';
 import When from 'when';
 import { connect } from 'react-redux';
@@ -224,7 +225,7 @@ export default class PartyDetail extends React.Component {
     console.log('onDelete');
   };
   onBack = (evt) => {
-    console.log('onBack');
+    console.log('onBack %O', this.context.router);
     this.context.router.goBack();
   };
 
@@ -346,7 +347,7 @@ export default class PartyDetail extends React.Component {
             <span className="fa fa-trash"/><span> Delete Customer</span>
           </FlatButton>
         ) : <div/>}
-        <FlatButton onClick={this.onBack}>
+        <FlatButton onClick={this.onBack} disabled={History.length <= 1}>
           <span className="fa fa-chevron-left"/><span> Back</span>
         </FlatButton>
       </Toolmenu>

@@ -60,7 +60,12 @@ export default class GridComp extends React.Component {
   }
 
   componentDidMount() {
-    console.debug('gridComp#componentDidMount()');
+    console.debug('gridComp %s componentDidMount()', this.props.grid.gridLocation);
+
+    // tohle je hack nutny kvuli zmene rozliseni > 1200 - vytrzeni gridu, tam i zpet
+    if (this.refs.VirtualList) {
+      this.refs.VirtualList.remountScroll(this.refs.rowContainer);
+    }
     window.addEventListener('resize', this.onResizeDebounced);
   }
 

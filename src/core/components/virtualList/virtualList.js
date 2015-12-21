@@ -78,7 +78,7 @@ var VirtualList = React.createClass({
   },
 
   componentWillReceiveProps: function(nextProps) {
-    //console.log('virtualList#componentWillReceiveProps %O', nextProps);
+    console.log('virtualList#componentWillReceiveProps %O', nextProps);
     var state = this.getVirtualState(nextProps);
 
     if (this.props.scrollDelay != nextProps.scrollDelay) {
@@ -105,7 +105,7 @@ var VirtualList = React.createClass({
     this.onResizeDebounced = utils.debounce(this.onResize, this.props.resizeDelay, false);
   },
   componentDidMount: function() {
-    //console.log('virtualList#componentDidMount %O', this.props);
+    //console.log('virtualList#componentDidMount %O', this.props.container);
     var state = this.getVirtualState(this.props);
 
     this.setState(state);
@@ -115,11 +115,19 @@ var VirtualList = React.createClass({
     window.addEventListener('resize', this.onResizeDebounced);
 
   },
+  remountScroll: function(container) {  // hack kvuli remountovani pri zmene rozliseni
+    console.log('remountScroll %O', container);
+    container.addEventListener('scroll', this.onScrollDebounced);
+  },
+
   componentWillUnmount: function() {
+    //console.log('virtualList#componentWillUnmount %O', this.props);
     this.props.container.removeEventListener('scroll', this.onScrollDebounced);
     window.removeEventListener('resize', this.onResizeDebounced);
   },
   onScroll: function() {
+
+    //console.log('onScroll %O', this.props.container);
 
     var fn = () => {
       var state = this.getVirtualState(this.props);
