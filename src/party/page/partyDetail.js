@@ -25,8 +25,10 @@ import {updateGridAction} from 'core/grid/gridActions';
 
 const Colors = Styles.Colors;
 const Typography = Styles.Typography;
+
 const vehicleGridLocation = 'partyVehicleList';
 const invoiceGridLocation = 'partyInvoiceList';
+const partyRelGridLocation = 'partyRelList';
 
 
 function mapStateToProps(state) {
@@ -34,7 +36,8 @@ function mapStateToProps(state) {
     partyObject: state.getIn(['party', 'partyObject']),
     entities: state.getIn(['metamodel', 'entities']),
     vehicleGrid: state.getIn(['grid', 'grids', vehicleGridLocation]),
-    invoiceGrid: state.getIn(['grid', 'grids', invoiceGridLocation])
+    invoiceGrid: state.getIn(['grid', 'grids', invoiceGridLocation]),
+    partyRelGrid: state.getIn(['grid', 'grids', partyRelGridLocation])
   };
 }
 
@@ -69,8 +72,20 @@ export default class PartyDetail extends React.Component {
 
   static title = 'Customer';
   static icon = 'user';
-  static willTransitionFrom = PageAncestor.willTransitionFrom;
+
   static willTransitionTo = PageAncestor.willTransitionTo;
+
+  static willTransitionFrom(transition, component) {
+    PageAncestor.willTransitionFrom(transition, component);
+    //
+    //let {vehicleGrid, invoiceGrid, partyRelGrid} = component.props;
+    //console.log("partyDetail#willTransitionFrom() - resetting grids");
+    //vehicleGrid.reset();
+    //invoiceGrid.reset();
+    //partyRelGrid.reset();
+    //
+  }
+
 
   static contextTypes = {
     router: React.PropTypes.func.isRequired,
@@ -89,7 +104,7 @@ export default class PartyDetail extends React.Component {
     }, query)) : PartyService.readParty(routerParams.id))
       .then(partyObject => store.dispatch(setPartyAction(partyObject)));
 
-    let gridPromise = GridService.fetchGrids(vehicleGridLocation, invoiceGridLocation);
+    let gridPromise = GridService.fetchGrids(vehicleGridLocation, invoiceGridLocation, partyRelGridLocation);
 
     return When.all([metadataPromise, partyPromise, gridPromise]);
   }
@@ -110,40 +125,60 @@ export default class PartyDetail extends React.Component {
       }
     });
 
+    const {partyObject, vehicleGrid} = this.props;
+    partyObject.$openedTabs = {};
 
-    let vehicleGrid = this.props.vehicleGrid;
     vehicleGrid.activeGridConfig = vehicleGrid.getActiveGridConfig();
-    vehicleGrid.masterId = this.props.partyObject.partyId;
+    vehicleGrid.masterId = partyObject.partyId;
+    partyObject.$openedTabs[vehicleGridLocation] = true;
   }
 
+  componentWillReceiveProps(nextProps) {
+    let {partyObject, vehicleGrid, invoiceGrid, partyRelGrid, updateGridAction} = this.props;
+    if (nextProps.partyObject.partyId && nextProps.partyObject.partyId !== partyObject.partyId) {
+      console.log("partyDetail#componentWillReceiveProps() - change of party, resetting grids");
+      nextProps.partyObject.$openedTabs = {};
+      nextProps.partyObject.$openedTabs[partyRelGridLocation] = true;
+      partyRelGrid.masterId = nextProps.partyObject.partyId;
+      this.refs[partyRelGridLocation].search(true);
+    }
+  }
 
-  onGridChange = (grid) => {
-    console.debug('onGridChange(%o)', grid);
-    //
-    //var routeName = _.last(this.context.router.getCurrentRoutes()).name,
-    //  params = this.context.router.getCurrentParams();
-    //
-    //if (grid.activeGridConfig) params.gridId = grid.activeGridConfig.gridId;
-    //
-    //let query = Object.assign({
-    //  searchTerm: grid.searchTerm,
-    //  sort: grid.sort
-    //}, grid.getConditionQueryObject());
-    //
-    //console.debug('replaceWith %s, %o, %o', routeName, params, query);
-    //
-    //this.context.router.replaceWith(routeName, params, query);
+  onActiveVehicle = (tab) => {
+    let {vehicleGrid, partyObject, setPartyAction, updateGridAction} = this.props;
+
+    vehicleGrid.activeGridConfig = vehicleGrid.getActiveGridConfig();
+    vehicleGrid.masterId = partyObject.partyId;
+    partyObject.$openedTabs[vehicleGridLocation] = true;
+
+    console.log('onActiveVehicle vehicleGrid = ', vehicleGrid);
+    setPartyAction(partyObject);
+    updateGridAction(vehicleGrid);
   };
 
   onActiveInvoice = (tab) => {
-    console.debug('onActiveInvoice(%o)', tab);
-    let invoiceGrid = this.props.invoiceGrid;
-    invoiceGrid.tabOpened = true;
+    let {invoiceGrid, partyObject, setPartyAction, updateGridAction} = this.props;
+
     invoiceGrid.activeGridConfig = invoiceGrid.getActiveGridConfig();
-    invoiceGrid.masterId = this.props.partyObject.partyId;
+    invoiceGrid.masterId = partyObject.partyId;
+    partyObject.$openedTabs[invoiceGridLocation] = true;
 
     console.log('onActiveInvoice invoiceGrid = ', invoiceGrid);
-    this.props.updateGridAction(invoiceGrid);
+    setPartyAction(partyObject);
+    updateGridAction(invoiceGrid);
+  };
+
+  onActivePartyRel = (tab) => {
+    let {partyRelGrid, partyObject, setPartyAction, updateGridAction} = this.props;
+
+    partyRelGrid.activeGridConfig = partyRelGrid.getActiveGridConfig();
+    partyRelGrid.masterId = this.props.partyObject.partyId;
+
+    partyObject.$openedTabs[partyRelGridLocation] = true;
+
+    console.log('onActivePartyRel partyRelGrid = ', partyRelGrid);
+    setPartyAction(partyObject);
+    updateGridAction(partyRelGrid);
   };
 
 
@@ -162,6 +197,8 @@ export default class PartyDetail extends React.Component {
 
 
   render() {
+    console.debug('%c partyDetail render', 'background-color: yellow');
+
     const tabHeight = 36;
 
     const {
@@ -169,7 +206,8 @@ export default class PartyDetail extends React.Component {
       entities,
       setPartyAction,
       vehicleGrid,
-      invoiceGrid
+      invoiceGrid,
+      partyRelGrid
       } = this.props;
 
     const propsForCreateForm = {
@@ -181,7 +219,8 @@ export default class PartyDetail extends React.Component {
     };
 
 
-    console.log('invoiceGrid in render: ', invoiceGrid);
+
+
 
     return (
 
@@ -206,16 +245,20 @@ export default class PartyDetail extends React.Component {
 
 
         <Tabs  className="detail-grid" tabTemplate={TabTemplate} tabItemContainerStyle={{height:tabHeight}} contentContainerStyle={{width: '100%', flexGrow: 1, display: 'flex', minHeight: 0}} >
-          <Tab label="Vehicles" style={{height:tabHeight}}>
-             <GridComp grid={vehicleGrid} uiLocation="tab" onGridChange={this.onGridChange}/>
+          <Tab label="Vehicles" style={{height:tabHeight}} onActive={this.onActiveVehicle}>
+            {(partyObject.$openedTabs[vehicleGridLocation]) ?
+             <GridComp grid={vehicleGrid} uiLocation="tab"/>
+              : ''}
           </Tab>
           <Tab label="Invoices" style={{height:tabHeight}} onActive={this.onActiveInvoice}>
-            {(invoiceGrid.tabOpened) ?
-              <GridComp grid={invoiceGrid} uiLocation="tab" onGridChange={this.onGridChange}/>
+            {(partyObject.$openedTabs[invoiceGridLocation]) ?
+              <GridComp grid={invoiceGrid} uiLocation="tab" />
             : ''}
           </Tab>
-          <Tab label="Item Three" style={{height:tabHeight}}>
-            <div>Ahoj 3</div>
+          <Tab label="Relationships" style={{height:tabHeight}} onActive={this.onActivePartyRel}>
+            {(partyObject.$openedTabs[partyRelGridLocation]) ?
+              <GridComp ref={partyRelGridLocation} grid={partyRelGrid} uiLocation="tab" />
+              : ''}
           </Tab>
         </Tabs>
 

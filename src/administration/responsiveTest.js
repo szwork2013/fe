@@ -3,10 +3,10 @@ import {TextField} from 'material-ui';
 
 import StyledDatePicker from 'core/components/styledDatePicker/styledDatePicker';
 import NumberInput from 'core/components/numberInput/numberInput';
-import PageAncestor from 'core/common/page/pageAncestor';
 import Toolmenu from 'core/components/toolmenu/toolmenu';
+import {screenLg} from 'core/common/config/variables';
 
-export default class ResponsiveTest extends PageAncestor {
+export default class ResponsiveTest extends React.Component {
 
   static title = 'Responsive Test';
   static icon = 'home';
@@ -30,10 +30,28 @@ export default class ResponsiveTest extends PageAncestor {
 
   componentDidMount() {
     window.addEventListener('resize', this.onResize);
+
+
+    this.mq = window.matchMedia('only screen and (min-width: ' + screenLg + 'px)');
+    if(this.mq.matches) {
+      console.log('the width of browser is more then ' + screenLg);
+    } else {
+      console.log('the width of browser is less then ' + screenLg);
+    }
+
+    this.mq.addListener((changed) => {
+      if(changed.matches) {
+        console.log('the width of browser is more then ' + screenLg);
+      } else {
+        console.log('the width of browser is less then ' + screenLg);
+      }
+    });
+
   }
 
   componentWillUnmount() {
     window.removeEventListener('resize', this.onResize);
+    this.mq.removeListener();
   }
 
 

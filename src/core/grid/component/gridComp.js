@@ -70,10 +70,12 @@ export default class GridComp extends React.Component {
   }
 
   componentWillUnmount() {
-    console.debug('componentWillUnmount');
     window.removeEventListener('resize', this.onResizeDebounced);
-
     let grid = this.props.grid;
+
+    console.debug('componentWillUnmount grid ' + grid.gridLocation);
+
+
     grid.reset();
     store.dispatch(updateGridAction(grid));
   }
@@ -84,9 +86,12 @@ export default class GridComp extends React.Component {
 
   search(scrollToTop) {
     let grid = this.props.grid;
-    if (!grid.activeGridConfig) return;
+    if (!grid.activeGridConfig) {
+      console.debug('GridComp#search(): activeGridConfig not set, ending for grid ' + grid.gridLocation);
+      return;
+    }
 
-    console.debug("%c running search with gridId = %s, searchTerm = %s, masterId = %s", "background-color: green", grid.activeGridConfig.gridId, grid.searchTerm, grid.masterId);
+    console.debug("%c running search with gridLocation = %s, gridId = %s, searchTerm = %s, masterId = %s", "background-color: green", grid.gridLocation, grid.activeGridConfig.gridId, grid.searchTerm, grid.masterId);
 
     grid.selectedRows = new Map();
     grid.loading = true;
@@ -99,10 +104,12 @@ export default class GridComp extends React.Component {
     Axios.get('/core/grid/' + grid.activeGridConfig.gridId, {params: Object.assign({searchTerm: grid.searchTerm, sort: grid.sort, masterId: grid.masterId}, grid.getConditionQueryObject())})
       .then((response) => {
         grid.data = response.data;
-        grid.gridWidths = GridService.computeGridWidths(grid.data, grid.activeGridConfig);
         grid.loading = false;
-
         console.debug('data received count = ' + grid.data.totalCount);
+
+        grid.gridWidths = GridService.computeGridWidths(grid.data, grid.activeGridConfig);
+
+
         if (scrollToTop && this.refs.VirtualList) {
           this.refs.VirtualList.scrollTop();
         }
@@ -186,6 +193,8 @@ export default class GridComp extends React.Component {
     grid.searchTerm = null;
     grid.sortArray = null;
     grid.conditionArray = null;
+    grid.data = null;
+    grid.widths = null;
 
     if (this.props.onGridChange) {
       this.props.onGridChange(grid);

@@ -75,7 +75,7 @@ class GridService {
    * return Array[widths, min-widths, max-widths]
    */
   computeGridWidths(gridData, gridConfig) {
-    console.time("computeGridWidths");
+    //console.time("computeGridWidths");
     // maximalni hodnota, kterou muze nabyvat min-width
     var MAXIMAL_COLUMN_MIN_WIDTH_PX = gridConfig.maxColumnWidth;
     // hodnata pro max-width sloupcu
@@ -92,7 +92,7 @@ class GridService {
     });
 
     matrix.push.apply(matrix, headers);
-    console.log("Array: %o", matrix);
+    //console.log("Array: %o", matrix);
 
     if (gridData) {
       for(let row of gridData.rows) {
@@ -105,7 +105,7 @@ class GridService {
       }
     }
 
-    console.log("Array: %o", matrix);
+    //console.log("Array: %o", matrix);
 
     //let absoluteLengths = _.zip(...matrix).map(col => _.max(col));
 
@@ -134,10 +134,10 @@ class GridService {
     // spocitame maxWidths (jen vytvorime array)
     let gridMaxWidthsPX = Array.from(new Array(gridWidthsPrct.length), () => MAXIMAL_COLUMN_WIDTH_PX);
 
-    console.timeEnd("computeGridWidths");
-    console.debug('computeGridWidths: %o', gridWidthsPrct);
-    console.debug('computeGridMinWidths: %o', gridMinWidthsPX);
-    console.debug('computeGridMaxWidths: %o', gridMaxWidthsPX);
+    //console.timeEnd("computeGridWidths");
+    //console.debug('computeGridWidths: %o', gridWidthsPrct);
+    //console.debug('computeGridMinWidths: %o', gridMinWidthsPX);
+    //console.debug('computeGridMaxWidths: %o', gridMaxWidthsPX);
     return [gridWidthsPrct, gridMinWidthsPX, gridMaxWidthsPX];
   }
 

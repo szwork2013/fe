@@ -198,8 +198,8 @@ const NumberInput = React.createClass({
   componentWillReceiveProps(nextProps) {
     let newState = {};
 
-    if (!this.state.isFocused && 'value' in props) {
-      const value = parseNumber(props.value)
+    if (!this.state.isFocused && 'value' in this.props) {
+      const value = parseNumber(this.props.value);
       newState.value = isNumber(value) ? value : '';
     }
 
