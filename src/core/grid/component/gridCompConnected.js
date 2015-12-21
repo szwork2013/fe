@@ -55,6 +55,10 @@ export default class GridCompConnected extends React.Component {
     this.context.router.replaceWith(routeName, params, query);
   };
 
+  updateGrid = (grid) => {
+    this.props.updateGridAction(grid);
+  };
+
 
   componentWillMount() {
     console.debug('componentWillMount, props: %o', this.props);
@@ -72,11 +76,24 @@ export default class GridCompConnected extends React.Component {
     updateGridAction(grid);
   }
 
+  componentDidMount() {
+    this.refs.gridComp.search();
+  }
+
+  componentWillUnmount() {
+    const {grid, updateGridAction} = this.props;
+    grid.reset();
+    updateGridAction(grid);
+  }
+
+
+
+
 
   render() {
     console.debug('GridCompConnected#render, props: %o', this.props);
     return (
-      <GridComp grid={this.props.grid} uiLocation="page" onGridChange={this.onGridChange}>
+      <GridComp ref="gridComp" grid={this.props.grid} uiLocation="page" onGridChange={this.onGridChange} updateGrid={this.updateGrid}>
         {this.props.children}
       </GridComp>
     );

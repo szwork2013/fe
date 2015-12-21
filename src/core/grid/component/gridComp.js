@@ -9,8 +9,6 @@ import {Navbar, Nav, NavItem, NavDropdown, MenuItem, CollapsibleNav, Input} from
 import {Checkbox, IconButton, FontIcon, Styles} from 'material-ui';
 
 import Axios from 'core/common/config/axios-config';
-import {store} from 'core/common/redux/store';
-import {updateGridAction} from 'core/grid/gridActions';
 import GridService from 'core/grid/gridService';
 
 import VirtualList from 'core/components/virtualList/virtualList';
@@ -36,8 +34,9 @@ export default class GridComp extends React.Component {
     uiLocation: React.PropTypes.string.isRequired,
 
     // from store
-    grid: React.PropTypes.instanceOf(Grid),
-    onGridChange: React.PropTypes.func
+    grid: React.PropTypes.instanceOf(Grid).isRequired,
+    onGridChange: React.PropTypes.func,
+    updateGrid: React.PropTypes.func.isRequired
   };
 
 
@@ -66,18 +65,10 @@ export default class GridComp extends React.Component {
   componentDidMount() {
     console.debug('gridComp#componentDidMount()');
     window.addEventListener('resize', this.onResizeDebounced);
-    this.search();
   }
 
   componentWillUnmount() {
     window.removeEventListener('resize', this.onResizeDebounced);
-    let grid = this.props.grid;
-
-    console.debug('componentWillUnmount grid ' + grid.gridLocation);
-
-
-    grid.reset();
-    store.dispatch(updateGridAction(grid));
   }
 
 
@@ -97,7 +88,7 @@ export default class GridComp extends React.Component {
     grid.loading = true;
     grid.selectedAllRows = false;
 
-    store.dispatch(updateGridAction(grid));
+    this.props.updateGrid(grid);
 
 
     //  this.dispatch(grid); // this dispatches the action
@@ -114,25 +105,25 @@ export default class GridComp extends React.Component {
           this.refs.VirtualList.scrollTop();
         }
         grid.headerPaddingRight = this._computeNewHPR();
-
-        store.dispatch(updateGridAction(grid));
+        this.props.updateGrid(grid);
       }, (err) => {
         grid.loading = false;
-        store.dispatch(updateGridAction(grid));
+        this.props.updateGrid(grid);
       });
   }
 
   _computeNewHPR() {
     let _cont = this.refs.rowContainer;
+    if (!_cont) return null;
     return (_cont.scrollHeight > _cont.clientHeight) ? 15 : 0;
   }
 
   onResize = () => {
     let grid = this.props.grid;
     let newHPR = this._computeNewHPR();
-    if (grid.headerPaddingRight !== newHPR) {
+    if (newHPR !== null && grid.headerPaddingRight !== newHPR) {
       grid.headerPaddingRight = newHPR;
-      store.dispatch(updateGridAction(grid));
+      this.props.updateGrid(grid);
     }
   };
 
@@ -178,7 +169,7 @@ export default class GridComp extends React.Component {
       grid.selectedRows = clonedMap;
       grid.selectedAllRows = (clonedMap.size ===  this.props.grid.data.totalCount);
       grid.lastClickedRow = clickedRowId;
-      store.dispatch(updateGridAction(grid));
+      this.props.updateGrid(grid);
     }
   };
 
@@ -211,7 +202,7 @@ export default class GridComp extends React.Component {
   onSearchTermChange = evt => {
     let grid = this.props.grid;
     grid.searchTerm = evt.target.value;
-    store.dispatch(updateGridAction(grid));
+    this.props.updateGrid(grid);
   };
 
   onSearchTermSubmit = evt => {
@@ -282,7 +273,7 @@ export default class GridComp extends React.Component {
     grid.selectedAllRows = false;
     grid.showSelection = !grid.showSelection;
 
-    store.dispatch(updateGridAction(grid));
+    this.props.updateGrid(grid);
 
     if (this.refs.VirtualList) {
       this.refs.VirtualList.forceUpdate();
@@ -316,7 +307,7 @@ export default class GridComp extends React.Component {
       grid.selectedAllRows = false;
     }
 
-    store.dispatch(updateGridAction(grid));
+    this.props.updateGrid(grid);
 
     if (this.refs.VirtualList) {
       this.refs.VirtualList.forceUpdate();

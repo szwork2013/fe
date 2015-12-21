@@ -12,6 +12,7 @@ import MdEntityService from 'core/metamodel/mdEntityService';
 import PartyService from 'party/partyService';
 import {setPartyAction} from 'party/partyActions';
 import {customizeTheme}  from 'core/common/config/mui-theme';
+import {screenLg} from 'core/common/config/variables';
 
 import PartyFoForm from 'party/component/partyFoForm';
 import PartyPoForm from 'party/component/partyPoForm';
@@ -20,8 +21,9 @@ import PartyRoleList from 'party/component/partyRoleList';
 import PartyAddressList from 'party/component/partyAddressList';
 
 import GridService from 'core/grid/gridService';
+import Grid from 'core/grid/domain/grid';
 import GridComp from 'core/grid/component/gridComp';
-import {updateGridAction} from 'core/grid/gridActions';
+import {updateGridAction} from 'party/partyActions';
 
 const Colors = Styles.Colors;
 const Typography = Styles.Typography;
@@ -32,12 +34,19 @@ const partyRelGridLocation = 'partyRelList';
 
 
 function mapStateToProps(state) {
+  let partyObject = state.getIn(['party', 'partyObject']);
+  let $grids = partyObject.$grids;
+
+  function select(gridLocation) {
+    return ($grids[gridLocation]) ? $grids[gridLocation] : Grid.clone(state.getIn(['grid', 'grids', gridLocation]));
+  }
+
   return {
-    partyObject: state.getIn(['party', 'partyObject']),
+    partyObject,
     entities: state.getIn(['metamodel', 'entities']),
-    vehicleGrid: state.getIn(['grid', 'grids', vehicleGridLocation]),
-    invoiceGrid: state.getIn(['grid', 'grids', invoiceGridLocation]),
-    partyRelGrid: state.getIn(['grid', 'grids', partyRelGridLocation])
+    vehicleGrid: select(vehicleGridLocation),
+    invoiceGrid: select(invoiceGridLocation),
+    partyRelGrid: select(partyRelGridLocation)
   };
 }
 
@@ -74,17 +83,8 @@ export default class PartyDetail extends React.Component {
   static icon = 'user';
 
   static willTransitionTo = PageAncestor.willTransitionTo;
+  static willTransitionFrom = PageAncestor.willTransitionFrom;
 
-  static willTransitionFrom(transition, component) {
-    PageAncestor.willTransitionFrom(transition, component);
-    //
-    //let {vehicleGrid, invoiceGrid, partyRelGrid} = component.props;
-    //console.log("partyDetail#willTransitionFrom() - resetting grids");
-    //vehicleGrid.reset();
-    //invoiceGrid.reset();
-    //partyRelGrid.reset();
-    //
-  }
 
 
   static contextTypes = {
@@ -102,7 +102,10 @@ export default class PartyDetail extends React.Component {
       addresses: [],
       roles: []
     }, query)) : PartyService.readParty(routerParams.id))
-      .then(partyObject => store.dispatch(setPartyAction(partyObject)));
+      .then(partyObject => {
+        partyObject.$grids = {};
+        return store.dispatch(setPartyAction(partyObject))
+      });
 
     let gridPromise = GridService.fetchGrids(vehicleGridLocation, invoiceGridLocation, partyRelGridLocation);
 
@@ -110,6 +113,19 @@ export default class PartyDetail extends React.Component {
   }
 
 
+  mediaQueryListener = (changed) => {
+    console.log('mediaQueryListener islarge = ' + changed.matches);
+    if (!this.initPartyGrids()) {
+      this.forceUpdate();
+    }
+    setTimeout( () => {
+      this.searchPartyGrids();
+    }, 0);
+  };
+
+  /**
+   *
+   */
   componentWillMount() {
     console.debug('partyDetail#componentWillMount, props: %o', this.props);
 
@@ -125,36 +141,79 @@ export default class PartyDetail extends React.Component {
       }
     });
 
-    const {partyObject, vehicleGrid} = this.props;
-    partyObject.$openedTabs = {};
+    this.mediaQuery = window.matchMedia('only screen and (min-width: ' + screenLg + 'px)');
+    this.mediaQuery.addListener(this.mediaQueryListener);
 
-    vehicleGrid.activeGridConfig = vehicleGrid.getActiveGridConfig();
-    vehicleGrid.masterId = partyObject.partyId;
-    partyObject.$openedTabs[vehicleGridLocation] = true;
+    this.initPartyGrids();
   }
 
-  componentWillReceiveProps(nextProps) {
-    let {partyObject, vehicleGrid, invoiceGrid, partyRelGrid, updateGridAction} = this.props;
-    if (nextProps.partyObject.partyId && nextProps.partyObject.partyId !== partyObject.partyId) {
+
+  /**
+   * tohle je tady kvuli prechodu na jiny detail party (z relationship vazeb), kdy react-router neudela reload
+   * @param prevProps
+   */
+  componentDidUpdate(prevProps) {
+    if (this.props.partyObject.partyId && this.props.partyObject.partyId !== prevProps.partyObject.partyId) {
       console.log("partyDetail#componentWillReceiveProps() - change of party, resetting grids");
-      nextProps.partyObject.$openedTabs = {};
-      nextProps.partyObject.$openedTabs[partyRelGridLocation] = true;
-      partyRelGrid.masterId = nextProps.partyObject.partyId;
-      this.refs[partyRelGridLocation].search(true);
+      const {vehicleGrid, partyRelGrid} = this.props;
+      this.activateTab(partyRelGrid);
+      if(this.mediaQuery.matches) this.activateTab(vehicleGrid);
     }
   }
 
+  componentDidMount() {
+    this.searchPartyGrids();
+  }
 
-  onActiveTab(grid) {
-    console.log('onActiveTab: gridLocation = %s', grid.gridLocation);
-    let {partyObject, setPartyAction, updateGridAction} = this.props;
+  componentWillUnmount() {
+    this.mediaQuery.removeListener(this.mediaQueryListener);
+    this.props.setPartyAction(null);
+  }
 
-    grid.activeGridConfig = grid.getActiveGridConfig();
-    grid.masterId = partyObject.partyId;
-    partyObject.$openedTabs[grid.gridLocation] = true;
-    setPartyAction(partyObject);
-    updateGridAction(grid);
-  };
+  initPartyGrids() {
+    const {vehicleGrid, invoiceGrid} = this.props;
+
+    let updated = this.initGrid(vehicleGrid);
+    if(this.mediaQuery.matches) {
+      updated = updated | this.initGrid(invoiceGrid);  // pozor bitwise, nechci shortcutting
+    }
+    return !!updated;
+  }
+
+  searchPartyGrids() {
+    const {vehicleGrid, invoiceGrid} = this.props;
+    if (!vehicleGrid.data) this.refs[vehicleGridLocation].search();
+    if(this.mediaQuery.matches && !invoiceGrid.data) {
+      this.refs[invoiceGridLocation].search();
+    }
+  }
+
+  initGrid(grid) {
+    console.log('initGrid %s', grid.gridLocation);
+    const {partyObject, updateGridAction} = this.props;
+
+    let doUpdate = false;
+    if (!grid.activeGridConfig) {
+      grid.activeGridConfig = grid.getActiveGridConfig();
+      doUpdate = true;
+    }
+    if (grid.masterId !== partyObject.partyId) {
+      grid.masterId = partyObject.partyId;
+      doUpdate = true;
+    }
+    if (doUpdate) updateGridAction(grid);
+    return doUpdate;
+  }
+
+  activateTab(grid) {
+    this.initGrid(grid);
+    if (!grid.data) {
+      setTimeout( () => {
+        this.refs[grid.gridLocation].search();
+      }, 0);
+    }
+  }
+
 
 
   onSave = (evt) => {
@@ -168,6 +227,9 @@ export default class PartyDetail extends React.Component {
     this.context.router.goBack();
   };
 
+  updateGrid = (grid) => {
+    this.props.updateGridAction(grid);
+  };
 
 
 
@@ -194,63 +256,74 @@ export default class PartyDetail extends React.Component {
     };
 
 
-
-
-
-    return (
-
-      <main className="main-content" style={{display: 'flex', flexDirection: 'column', height: '100%'}} >
-        {this._createToolMenu(partyObject)}
-        <form style={{marginTop: 10}}>
-          <div className="row">
-            <div className="col-xs-12 col-lg-6">
-              <div className="row">
-                <div className="col-xs-12 col-sm-8">
-                  { this._mainForm(partyObject, propsForCreateForm) }
-                  <PartyAddressList partyObject={partyObject} entities={entities} setPartyAction={setPartyAction}/>
-                </div>
-                <div className="col-xs-12 col-sm-4">
-                  <PartyContactList partyObject={partyObject} entities={entities} setPartyAction={setPartyAction}/>
-                  <PartyRoleList partyObject={partyObject} entities={entities} setPartyAction={setPartyAction}/>
-                </div>
-              </div>
-            </div>
+    const mainForm = (
+      <form style={{marginTop: 10}}>
+        <div className="row">
+          <div className="col-xs-12 col-sm-8">
+            { this._mainForm(partyObject, propsForCreateForm) }
+            <PartyAddressList partyObject={partyObject} entities={entities} setPartyAction={setPartyAction}/>
           </div>
-        </form>
-
-
-        <Tabs  className="detail-grid" tabTemplate={TabTemplate} tabItemContainerStyle={{height:tabHeight}} contentContainerStyle={{width: '100%', flexGrow: 1, display: 'flex', minHeight: 0}} >
-          <Tab label="Vehicles" style={{height:tabHeight}} onActive={this.onActiveTab.bind(this, vehicleGrid)}>
-            {(partyObject.$openedTabs[vehicleGridLocation]) ?
-             <GridComp grid={vehicleGrid} uiLocation="tab"/>
-              : ''}
-          </Tab>
-          <Tab label="Invoices" style={{height:tabHeight}} onActive={this.onActiveTab.bind(this, invoiceGrid)}>
-            {(partyObject.$openedTabs[invoiceGridLocation]) ?
-              <GridComp grid={invoiceGrid} uiLocation="tab" />
-            : ''}
-          </Tab>
-          <Tab label="Relationships" style={{height:tabHeight}} onActive={this.onActiveTab.bind(this, partyRelGrid)}>
-            {(partyObject.$openedTabs[partyRelGridLocation]) ?
-              <GridComp ref={partyRelGridLocation} grid={partyRelGrid} uiLocation="tab" />
-              : ''}
-          </Tab>
-        </Tabs>
-
-
-
-
-
-
-
-
-      </main>
-
+          <div className="col-xs-12 col-sm-4">
+            <PartyContactList partyObject={partyObject} entities={entities} setPartyAction={setPartyAction}/>
+            <PartyRoleList partyObject={partyObject} entities={entities} setPartyAction={setPartyAction}/>
+          </div>
+        </div>
+      </form>
     );
+
+    const tabArray = [
+      <Tab label="Vehicles" style={{height:tabHeight}} onActive={this.activateTab.bind(this, vehicleGrid)} key={vehicleGridLocation}>
+        {(partyObject.$grids[vehicleGridLocation]) ?
+          <GridComp ref={vehicleGridLocation} grid={vehicleGrid} uiLocation="tab" updateGrid={this.updateGrid}/>
+          : ''}
+      </Tab>,
+      <Tab label="Invoices" style={{height:tabHeight}} onActive={this.activateTab.bind(this, invoiceGrid)} key={invoiceGridLocation}>
+        {(partyObject.$grids[invoiceGridLocation]) ?
+          <GridComp ref={invoiceGridLocation} grid={invoiceGrid} uiLocation="tab" updateGrid={this.updateGrid}/>
+          : ''}
+      </Tab>,
+      <Tab label="Relationships" style={{height:tabHeight}} onActive={this.activateTab.bind(this, partyRelGrid)} key={partyRelGridLocation}>
+        {(partyObject.$grids[partyRelGridLocation]) ?
+          <GridComp ref={partyRelGridLocation} grid={partyRelGrid} uiLocation="tab" updateGrid={this.updateGrid}/>
+          : ''}
+      </Tab>
+    ];
+
+    if (this.mediaQuery.matches) {
+      tabArray.shift();
+    }
+
+    const tabs = (
+      <Tabs  className="detail-grid" tabTemplate={TabTemplate} tabItemContainerStyle={{height:tabHeight}} contentContainerStyle={{width: '100%', flexGrow: 1, display: 'flex', minHeight: 0}} >
+        {tabArray.map(t => t)}
+      </Tabs>
+    );
+
+    if (this.mediaQuery.matches) {
+      return (
+        <main className="main-content" style={{display: 'flex', flexDirection: 'row', height: '100%'}} >
+          <div style={{display: 'flex', flexDirection: 'column', height: '100%', flexBasis: '50%', flexShrink: 0}}>
+            {this._createToolMenu(partyObject)}
+            {mainForm}
+            {tabs}
+          </div>
+          <GridComp ref={vehicleGridLocation} grid={vehicleGrid} uiLocation="main" updateGrid={this.updateGrid}/>
+        </main>
+      );
+    } else {
+      return (
+        <main className="main-content" style={{display: 'flex', flexDirection: 'column', height: '100%'}} >
+          {this._createToolMenu(partyObject)}
+          {mainForm}
+          {tabs}
+        </main>
+      );
+    }
   }
 
-  _mainForm = (partyObject, propsForCreateForm) => {
 
+
+  _mainForm = (partyObject, propsForCreateForm) => {
     switch (partyObject.partyCategory) {
       case 'PO':
         return <PartyPoForm {...propsForCreateForm} />;

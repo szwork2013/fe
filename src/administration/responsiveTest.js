@@ -28,9 +28,7 @@ export default class ResponsiveTest extends React.Component {
     this.setState(this._createSizeObject());
   };
 
-  componentDidMount() {
-    window.addEventListener('resize', this.onResize);
-
+  componentWillMount() {
 
     this.mq = window.matchMedia('only screen and (min-width: ' + screenLg + 'px)');
     if(this.mq.matches) {
@@ -46,6 +44,12 @@ export default class ResponsiveTest extends React.Component {
         console.log('the width of browser is less then ' + screenLg);
       }
     });
+  }
+
+  componentDidMount() {
+    window.addEventListener('resize', this.onResize);
+
+
 
   }
 
