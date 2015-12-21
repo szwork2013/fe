@@ -79,6 +79,11 @@ export default class GridComp extends React.Component {
       return;
     }
 
+    if (grid.masterFields && grid.masterFields.length > 0 && !grid.masterId) {
+      console.debug('GridComp#search(): masterId is not set, ending for grid ' + grid.gridLocation);
+      return;
+    }
+
     console.debug("%c running search with gridLocation = %s, gridId = %s, searchTerm = %s, masterId = %s", "background-color: green", grid.gridLocation, grid.activeGridConfig.gridId, grid.searchTerm, grid.masterId);
 
     grid.selectedRows = new Map();

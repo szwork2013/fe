@@ -100,7 +100,8 @@ export default class PartyDetail extends React.Component {
     let partyPromise = ((routerParams.id === 'new') ? When(Object.assign({
       contacts: [],
       addresses: [],
-      roles: []
+      roles: [],
+      $open: true
     }, query)) : PartyService.readParty(routerParams.id))
       .then(partyObject => {
         partyObject.$grids = {};

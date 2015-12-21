@@ -32,6 +32,7 @@ export default function createForm(definition, FormComponent) {
         const fieldObject = {
           fullWidth: true,
           floatingLabelText: mdField.label,
+          textLabel: mdField.label,
           errorText: null,
           name: field.name,
           onChange: (evt) => {

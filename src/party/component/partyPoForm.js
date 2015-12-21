@@ -6,7 +6,7 @@ import {TextField, RaisedButton, SelectField} from 'material-ui';
 import { Alert } from 'react-bootstrap';
 
 import createForm from 'core/form/createForm';
-import {showForTenant} from 'core/form/formUtils';
+import {showForTenant, FieldText} from 'core/form/formUtils';
 import StyledSelect from 'core/components/styledSelect/styledSelect';
 import BlockComp from 'core/components/blockComp/blockComp';
 import ActiveItem from 'core/components/blockComp/activeItem';
@@ -88,16 +88,21 @@ class PartyPoForm extends React.Component {
 
         <h5 style={{marginTop: 0, fontSize: '18px', fontWeight: 'bold'}}>{dataObject.fullName}</h5>
 
-        <div>
-          <span className="zz-grey-text">IČ: </span> <span className="zz-ml-2 zz-mr-10">{dataObject.ico}</span>
-          <span className="zz-grey-text">DIČ: </span> <span className="zz-ml-2 zz-mr-10">{dataObject.dic}</span>
-          {showForTenant(<div><span className="zz-grey-text">IČ DPH: </span> <span className="zz-ml-2">{dataObject.icoDph}</span></div>, 2)}
+        <div className="form-text-row">
+          <FieldText label={ico.textLabel} value={dataObject.ico}/>
+          <FieldText label={dic.textLabel} value={dataObject.dic}/>
+          {showForTenant(<FieldText label={icoDph.textLabel} value={dataObject.icoDph}/>, 2)}
         </div>
 
-        <div>
-          <span className="zz-grey-text">Default Currency: </span> <span className="zz-ml-2 zz-mr-10">{dataObject.defaultCurrency}</span>
-          <span className="zz-grey-text">Default Language: </span> <span className="zz-ml-2 zz-mr-10">{enhancedParty.defaultLanguageLabel}</span>
-          <span className="zz-grey-text">Default payment conditions: </span> <span className="zz-ml-2">{enhancedParty.defaultPaymentCondLabel}</span>
+        <div className="form-text-row">
+          <FieldText label={defaultCurrency.textLabel} value={dataObject.defaultCurrency}/>
+          <FieldText label={defaultLanguage.textLabel} value={dataObject.defaultLanguageLabel}/>
+          <FieldText label={defaultPaymentCond.textLabel} value={dataObject.defaultPaymentCondLabel}/>
+          <FieldText label={legalForm.textLabel} value={dataObject.legalFormLabel}/>
+          <FieldText label={naceCode.textLabel} value={dataObject.naceCodeLabel}/>
+          <FieldText label={marketingSource.textLabel} value={dataObject.marketingSourceLabel}/>
+          <FieldText label={nationality.textLabel} value={dataObject.nationalityLabel}/>
+          <FieldText label={taxDomicile.textLabel} value={dataObject.taxDomicileLabel}/>
         </div>
 
 

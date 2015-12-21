@@ -14,6 +14,7 @@ export default class Grid {
     this.gridLocation = gridLocationDto.gridLocation;
     this.entityName = gridLocationDto.entityName;
     this.implicitConditions = gridLocationDto.implicitConditions;
+    this.masterFields = gridLocationDto.masterFields;
 
     // array of GridConfig
     this.gridConfigs = gridLocationDto.gridConfigs;
