@@ -18,6 +18,10 @@ export default class MdEntity {
     return this.lovItems.find(lov => lov.value === id);
   }
 
+  getLovItemLabel(id) {
+    let lov = this.getLovItem(id);
+    return (lov) ? lov.label : undefined;
+  }
 
 
   getField(fieldName) {

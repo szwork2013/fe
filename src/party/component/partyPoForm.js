@@ -1,5 +1,6 @@
 import React from 'react';
 import {Record, List} from 'immutable';
+import {get} from 'lodash';
 import PureRenderMixin from 'react-addons-pure-render-mixin';
 import {TextField, RaisedButton, SelectField} from 'material-ui';
 import { Alert } from 'react-bootstrap';
@@ -8,22 +9,24 @@ import createForm from 'core/form/createForm';
 import {showForTenant} from 'core/form/formUtils';
 import StyledSelect from 'core/components/styledSelect/styledSelect';
 import BlockComp from 'core/components/blockComp/blockComp';
+import ActiveItem from 'core/components/blockComp/activeItem';
+import {composedParty} from 'party/partyUtils';
 
 class PartyPoForm extends React.Component {
   shouldComponentUpdate = PureRenderMixin.shouldComponentUpdate.bind(this);
 
   render() {
 
-    const {fields: {
+
+
+    let {dataObject, rootObject, lastValue,  entities, fields: {
       fullName, ico, dic, icoDph, defaultCurrency, defaultLanguage, defaultPaymentCond, legalForm, naceCode, marketingSource, nationality, taxDomicile
-      }
-      } = this.props;
+      }} = this.props;
 
+    let enhancedParty = composedParty(dataObject, entities);
 
-    return (
-
-      <BlockComp>
-
+    let openContent = (
+      <div>
 
         {/*  1. row  */}
         <div className="row">
@@ -76,9 +79,36 @@ class PartyPoForm extends React.Component {
           </div>
         </div>
 
+      </div>
+    );
 
+
+    let closedContent = (
+      <div style={{display: 'flex', flexDirection: 'column', cursor: 'pointer'}}>
+
+        <h5 style={{marginTop: 0, fontSize: '18px', fontWeight: 'bold'}}>{dataObject.fullName}</h5>
+
+        <div>
+          <span className="zz-grey-text">IČ: </span> <span className="zz-ml-2 zz-mr-10">{dataObject.ico}</span>
+          <span className="zz-grey-text">DIČ: </span> <span className="zz-ml-2 zz-mr-10">{dataObject.dic}</span>
+          {showForTenant(<div><span className="zz-grey-text">IČ DPH: </span> <span className="zz-ml-2">{dataObject.icoDph}</span></div>, 2)}
+        </div>
+
+        <div>
+          <span className="zz-grey-text">Default Currency: </span> <span className="zz-ml-2 zz-mr-10">{dataObject.defaultCurrency}</span>
+          <span className="zz-grey-text">Default Language: </span> <span className="zz-ml-2 zz-mr-10">{enhancedParty.defaultLanguageLabel}</span>
+          <span className="zz-grey-text">Default payment conditions: </span> <span className="zz-ml-2">{enhancedParty.defaultPaymentCondLabel}</span>
+        </div>
+
+
+      </div>
+    );
+
+
+    return (
+      <BlockComp>
+        <ActiveItem openContent={openContent} closedContent={closedContent} lastValue={true} tabIndex={0} {...this.props} />
       </BlockComp>
-
     );
   }
 }

@@ -48,9 +48,6 @@ export default class GridComp extends React.Component {
 
   }
 
-  componentWillReceiveProps(nextProps) {
-    console.debug('GridComp#componentWillReceiveProps, dataCount = ' +  nextProps.grid.getTotalCount());
-  }
 
   componentWillMount() {
     customizeTheme(this.context.muiTheme, {

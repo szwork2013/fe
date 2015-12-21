@@ -155,7 +155,7 @@ export default class PartyDetail extends React.Component {
   componentDidUpdate(prevProps) {
     if (this.props.partyObject.partyId && this.props.partyObject.partyId !== prevProps.partyObject.partyId) {
       console.log("partyDetail#componentWillReceiveProps() - change of party, resetting grids");
-      const {vehicleGrid, partyRelGrid} = this.props;
+      let {vehicleGrid, partyRelGrid} = this.props;
       this.activateTab(partyRelGrid);
       if(this.mediaQuery.matches) this.activateTab(vehicleGrid);
     }
@@ -171,7 +171,7 @@ export default class PartyDetail extends React.Component {
   }
 
   initPartyGrids() {
-    const {vehicleGrid, invoiceGrid} = this.props;
+    let {vehicleGrid, invoiceGrid} = this.props;
 
     let updated = this.initGrid(vehicleGrid);
     if(this.mediaQuery.matches) {
@@ -181,7 +181,7 @@ export default class PartyDetail extends React.Component {
   }
 
   searchPartyGrids() {
-    const {vehicleGrid, invoiceGrid} = this.props;
+    let {vehicleGrid, invoiceGrid} = this.props;
     if (!vehicleGrid.data) this.refs[vehicleGridLocation].search();
     if(this.mediaQuery.matches && !invoiceGrid.data) {
       this.refs[invoiceGridLocation].search();
@@ -190,7 +190,7 @@ export default class PartyDetail extends React.Component {
 
   initGrid(grid) {
     console.log('initGrid %s', grid.gridLocation);
-    const {partyObject, updateGridAction} = this.props;
+    let {partyObject, updateGridAction} = this.props;
 
     let doUpdate = false;
     if (!grid.activeGridConfig) {
@@ -234,11 +234,11 @@ export default class PartyDetail extends React.Component {
 
 
   render() {
-    console.debug('%c partyDetail render', 'background-color: yellow');
+
 
     const tabHeight = 36;
 
-    const {
+    let {
       partyObject,
       entities,
       setPartyAction,
@@ -247,7 +247,7 @@ export default class PartyDetail extends React.Component {
       partyRelGrid
       } = this.props;
 
-    const propsForCreateForm = {
+    let propsForCreateForm = {
       dataObject: partyObject,
       rootObject: partyObject,
       entity: entities.get('Party'),
@@ -255,6 +255,7 @@ export default class PartyDetail extends React.Component {
       setDataAction: setPartyAction
     };
 
+    console.debug('%c partyDetail render $open = %s', 'background-color: yellow', partyObject.$open);
 
     const mainForm = (
       <form style={{marginTop: 10}}>

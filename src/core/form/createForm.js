@@ -23,13 +23,12 @@ export default function createForm(definition, FormComponent) {
 
     constructor(props) {
       super(props);
-      const {dataObject, rootObject, entity, entities, setDataAction} = props;
 
       console.log('createForm props: %o', props);
 
       this.fields = definition.fields.reduce((fields, field) => {
         //console.debug('createForm: field: %o on entity %o', field, entity);
-        const mdField = entity.fields[field.name];
+        const mdField = props.entity.fields[field.name];
         const fieldObject = {
           fullWidth: true,
           floatingLabelText: mdField.label,
@@ -37,15 +36,15 @@ export default function createForm(definition, FormComponent) {
           name: field.name,
           onChange: (evt) => {
             let value = (typeof evt === 'object' && evt.target) ? evt.target.value : evt;
-            //console.log('Form ' + definition.form + " onChange event on " + field.name + ", value = " + value);
-            dataObject[field.name] = value;
-            setDataAction(rootObject);
+            //console.log('Form ' + definition.form + " onChange event on " + field.name + ", value = " + value + ", $open = " + this.props.rootObject.$open);
+            this.props.dataObject[field.name] = value;
+            this.props.setDataAction(this.props.rootObject);
           },
           style: Object.assign({}, defaultStyle, field.style)
         };
 
         if (mdField.hasLocalValueSource()) {
-          let valueSourceEntity =  entities.get(mdField.valueSource);
+          let valueSourceEntity =  props.entities.get(mdField.valueSource);
           if (valueSourceEntity) {
             fieldObject.options = [{value: '', label: '---'}, ...valueSourceEntity.lovItems];
           }

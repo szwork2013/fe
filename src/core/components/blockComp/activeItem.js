@@ -22,16 +22,22 @@ export default class ActiveItem extends React.Component {
 
 
   onClick = (evt) => {
-    this.props.dataObject.$open = true;
-    this.props.setDataAction(this.props.rootObject);
-    console.log('onClick %o', this.props.dataObject);
+    let {dataObject, setDataAction, rootObject} = this.props;
+
+    if (!dataObject.$open) {
+      dataObject.$open = true;
+      setDataAction(rootObject);
+      console.log('onClick %o', dataObject);
+    }
   };
 
   onCommit = (evt) => {
     evt.stopPropagation();
-    Object.assign(this.props.dataObject, {$open: false, $focused: false, $hovered: false});
-    this.props.setDataAction(this.props.rootObject);
-    console.log('onCommit %o', this.props.dataObject);
+    let {dataObject, setDataAction, rootObject} = this.props;
+
+    dataObject.$open = false;
+    setDataAction(rootObject);
+    console.log('onCommit %o', dataObject);
   };
 
 
@@ -63,8 +69,7 @@ export default class ActiveItem extends React.Component {
     ) : (
       <div className={classNames('active-item--closed', {'active-item--not-last': !lastValue})} {...finalProps}>
         {closedContent}
-        <span className="active-item--delete fa fa-times"  onClick={onDelete}></span>
-
+        { (onDelete) ?  (<span className="active-item--delete fa fa-times"  onClick={onDelete}></span>) : ''}
       </div>
     );
 
