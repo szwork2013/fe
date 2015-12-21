@@ -144,41 +144,16 @@ export default class PartyDetail extends React.Component {
     }
   }
 
-  onActiveVehicle = (tab) => {
-    let {vehicleGrid, partyObject, setPartyAction, updateGridAction} = this.props;
 
-    vehicleGrid.activeGridConfig = vehicleGrid.getActiveGridConfig();
-    vehicleGrid.masterId = partyObject.partyId;
-    partyObject.$openedTabs[vehicleGridLocation] = true;
+  onActiveTab(grid) {
+    console.log('onActiveTab: gridLocation = %s', grid.gridLocation);
+    let {partyObject, setPartyAction, updateGridAction} = this.props;
 
-    console.log('onActiveVehicle vehicleGrid = ', vehicleGrid);
+    grid.activeGridConfig = grid.getActiveGridConfig();
+    grid.masterId = partyObject.partyId;
+    partyObject.$openedTabs[grid.gridLocation] = true;
     setPartyAction(partyObject);
-    updateGridAction(vehicleGrid);
-  };
-
-  onActiveInvoice = (tab) => {
-    let {invoiceGrid, partyObject, setPartyAction, updateGridAction} = this.props;
-
-    invoiceGrid.activeGridConfig = invoiceGrid.getActiveGridConfig();
-    invoiceGrid.masterId = partyObject.partyId;
-    partyObject.$openedTabs[invoiceGridLocation] = true;
-
-    console.log('onActiveInvoice invoiceGrid = ', invoiceGrid);
-    setPartyAction(partyObject);
-    updateGridAction(invoiceGrid);
-  };
-
-  onActivePartyRel = (tab) => {
-    let {partyRelGrid, partyObject, setPartyAction, updateGridAction} = this.props;
-
-    partyRelGrid.activeGridConfig = partyRelGrid.getActiveGridConfig();
-    partyRelGrid.masterId = this.props.partyObject.partyId;
-
-    partyObject.$openedTabs[partyRelGridLocation] = true;
-
-    console.log('onActivePartyRel partyRelGrid = ', partyRelGrid);
-    setPartyAction(partyObject);
-    updateGridAction(partyRelGrid);
+    updateGridAction(grid);
   };
 
 
@@ -245,17 +220,17 @@ export default class PartyDetail extends React.Component {
 
 
         <Tabs  className="detail-grid" tabTemplate={TabTemplate} tabItemContainerStyle={{height:tabHeight}} contentContainerStyle={{width: '100%', flexGrow: 1, display: 'flex', minHeight: 0}} >
-          <Tab label="Vehicles" style={{height:tabHeight}} onActive={this.onActiveVehicle}>
+          <Tab label="Vehicles" style={{height:tabHeight}} onActive={this.onActiveTab.bind(this, vehicleGrid)}>
             {(partyObject.$openedTabs[vehicleGridLocation]) ?
              <GridComp grid={vehicleGrid} uiLocation="tab"/>
               : ''}
           </Tab>
-          <Tab label="Invoices" style={{height:tabHeight}} onActive={this.onActiveInvoice}>
+          <Tab label="Invoices" style={{height:tabHeight}} onActive={this.onActiveTab.bind(this, invoiceGrid)}>
             {(partyObject.$openedTabs[invoiceGridLocation]) ?
               <GridComp grid={invoiceGrid} uiLocation="tab" />
             : ''}
           </Tab>
-          <Tab label="Relationships" style={{height:tabHeight}} onActive={this.onActivePartyRel}>
+          <Tab label="Relationships" style={{height:tabHeight}} onActive={this.onActiveTab.bind(this, partyRelGrid)}>
             {(partyObject.$openedTabs[partyRelGridLocation]) ?
               <GridComp ref={partyRelGridLocation} grid={partyRelGrid} uiLocation="tab" />
               : ''}
