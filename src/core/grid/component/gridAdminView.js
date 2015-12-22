@@ -197,7 +197,7 @@ export default class GridAdminView extends React.Component {
     console.log('onClickBack');
     let ok = this.context.router.goBack();
     if (!ok) {
-      this.context.router.transitionTo(GridService.defaultRoutes[this.props.params.gridLocation]);
+      this.context.router.transitionTo(this.props.params.gridLocation);
     }
   };
 

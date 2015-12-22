@@ -1,10 +1,17 @@
-let Colors = require('material-ui/lib/styles/colors');
-let ColorManipulator = require('material-ui/lib/utils/color-manipulator');
-let Spacing = require('material-ui/lib/styles/spacing');
+import React from 'react';
+import {partial} from 'lodash';
+
+const Colors = require('material-ui/lib/styles/colors');
+const Typography = require('material-ui/lib/styles/typography');
+const ColorManipulator = require('material-ui/lib/utils/color-manipulator');
+const Spacing = require('material-ui/lib/styles/spacing');
+const zIndex = require('material-ui/lib/styles/zIndex');
+
 
 export const muiRawTheme = {
   spacing: Spacing,
   fontFamily: 'Roboto+Condensed, sans-serif',
+  zIndex: zIndex,
   palette: {
 
     primary1Color: Colors.indigo500,
@@ -52,7 +59,7 @@ export const muiThemeCustomization = {
 };
 
 export function customizeTheme(muiTheme, muiThemeCustomization) {
-  for(let componentKey in muiThemeCustomization) {
+  for (let componentKey in muiThemeCustomization) {
     if (muiTheme[componentKey]) {
       Object.assign(muiTheme[componentKey], muiThemeCustomization[componentKey]);
     } else {
@@ -60,3 +67,42 @@ export function customizeTheme(muiTheme, muiThemeCustomization) {
     }
   }
 }
+
+export function customizeThemeForDetail(muiTheme) {
+  customizeTheme(muiTheme, {
+    floatingActionButton: {
+      /*  buttonSize: 56, */
+      miniSize: 30
+    },
+    tabs: {
+      backgroundColor: 'white',
+      textColor: Typography.textLightBlack,
+      selectedTextColor: Typography.textDarkBlack
+    }
+  })
+}
+
+
+export const TabTemplate = React.createClass({
+
+  render() {
+    let styles = {
+      'width': '100%',
+      minHeight: 0,
+      flexGrow: 1
+    };
+
+    if (this.props.selected) {
+      styles.display = 'flex';
+    } else {
+      styles.display = 'none';
+    }
+
+    return (
+      <div style={styles}>
+        {this.props.children}
+      </div>
+    );
+  }
+});
+

@@ -43,6 +43,12 @@ class SecurityService  {
     }).then(response => response.data);
   }
 
+  readUser(username) {
+    return Axios.get('/core/security/user/' + username)
+      .then(response => response.data);
+  }
+
+
 }
 
 export default new SecurityService();

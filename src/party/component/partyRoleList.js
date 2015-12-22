@@ -15,31 +15,32 @@ export default class PartyRoleList extends React.Component {
 
   static propTypes = {
     partyObject: React.PropTypes.object.isRequired,
+    rootObject: React.PropTypes.object.isRequired,
     entities: React.PropTypes.object.isRequired,
-    setPartyAction: React.PropTypes.func.isRequired
+    setDataAction: React.PropTypes.func.isRequired
   };
 
   addRole = () => {
     console.debug('addRole');
-    const {partyObject, setPartyAction} = this.props;
+    const {partyObject, setDataAction, rootObject} = this.props;
     let newRole = {$open: true};
     partyObject.roles.push(newRole);
-    setPartyAction(partyObject);
+    setDataAction(rootObject);
   };
 
 
 
   render() {
 
-    const {partyObject, entities, setPartyAction} = this.props;
+    const {partyObject, rootObject, entities, setDataAction} = this.props;
 
     return (
       <BlockComp header="Roles" style={{display: 'flex', flexDirection: 'column'}}>
 
         {
-          partyObject.roles.map((role, index, array) => <PartyRoleForm dataObject={role} rootObject={partyObject} key={index}
+          partyObject.roles.map((role, index, array) => <PartyRoleForm dataObject={role} containerObject={partyObject} rootObject={rootObject} key={index}
                                                                          entities={entities} entity={entities.get('PartyRole')}
-                                                                         setDataAction={setPartyAction} lastValue={(array.length === index + 1)} index={index} /> )
+                                                                         setDataAction={setDataAction} lastValue={(array.length === index + 1)} index={index} /> )
         }
 
         <div style={{display: 'flex', justifyContent: 'flex-end'}}>
@@ -58,7 +59,7 @@ class PartyRoleForm extends React.Component {
   onDelete = (evt) => {
     evt.stopPropagation();
     console.log('onDelete %o', this.props.dataObject);
-    pull(this.props.rootObject.roles, this.props.dataObject);
+    pull(this.props.containerObject.roles, this.props.dataObject);
     this.props.setDataAction(this.props.rootObject);
   };
 
@@ -67,7 +68,7 @@ class PartyRoleForm extends React.Component {
 
 
 
-    const {dataObject, rootObject, lastValue, index, entities, fields: {
+    const {dataObject, rootObject, containerObject, lastValue, index, entities, fields: {
       roleType
       }} = this.props;
 
@@ -75,7 +76,7 @@ class PartyRoleForm extends React.Component {
     let typeLov = PartyRoleType.getLovItem(dataObject.roleType);
 
     // vyhazu ze option selectu role ktere uz na customerovi existuji, krome te me co zrovna edituji
-    let roleTypeArray = rootObject.roles.map(role => role.roleType);
+    let roleTypeArray = containerObject.roles.map(role => role.roleType);
     roleType.options = roleType.options.filter(lov => !includes(roleTypeArray, lov.value) || roleType.value === lov.value );
 
     const openContent = (

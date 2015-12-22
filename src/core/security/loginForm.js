@@ -9,12 +9,12 @@ import { Alert } from 'react-bootstrap';
 export class LoginFormRecord extends Record({
   username: new FieldRecord(),
   password: new FieldRecord(),
-  tenantId: new FieldRecord({lovItems: []}),
+  tenant: new FieldRecord({lovItems: []}),
   errorMessage: null
 }) {
 
-  isTenantIdDisabled() {
-    return (this.tenantId.lovItems.length <= 1);
+  isTenantDisabled() {
+    return (this.tenant.lovItems.length <= 1);
   }
 
   validate() {
@@ -30,8 +30,8 @@ export class LoginFormRecord extends Record({
       isError = true;
     }
 
-    if (form.tenantId.value == null) {
-      form = form.setFieldErrorText('tenantId', "This Field is required.");
+    if (form.tenant.value == null) {
+      form = form.setFieldErrorText('tenant', "This Field is required.");
       isError = true;
     }
 
@@ -87,11 +87,11 @@ export class LoginForm extends React.Component {
                          autoFocus fullWidth autoComplete="off" tabIndex="1" style={{maxWidth:200}}/>
               <SelectField
                 style={{marginLeft:15, maxWidth:200}}
-                value={loginFormData.tenantId.value}
-                onChange={(e) => {setLoginFormDataAction(loginFormData.setFieldValue('tenantId', e.target.value, true));}}
-                disabled={loginFormData.isTenantIdDisabled()}
-                hintText="Client" fullWidth errorText={loginFormData.tenantId.errorText}
-                menuItems={loginFormData.tenantId.lovItems} displayMember="label" valueMember="id" autoComplete="off"/>
+                value={loginFormData.tenant.value}
+                onChange={(e) => {setLoginFormDataAction(loginFormData.setFieldValue('tenant', e.target.value, true));}}
+                disabled={loginFormData.isTenantDisabled()}
+                hintText="Client" fullWidth errorText={loginFormData.tenant.errorText}
+                menuItems={loginFormData.tenant.lovItems} displayMember="label" valueMember="value" autoComplete="off"/>
             </div>
           </div>
           <div className="row">

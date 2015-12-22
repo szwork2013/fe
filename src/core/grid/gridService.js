@@ -18,13 +18,6 @@ import Utils from 'core/common/utils/utils';
 
 class GridService {
 
-  defaultRoutes = {
-    partyCustomers: 'partyList',
-    partyContacts: 'contactPersonList',
-    partySalesReps: 'salesRepList'
-
-  };
-
 
   /**
    * vlozi do GridStore objekty Grid pro gridLocations ktere tam dosud nebyly

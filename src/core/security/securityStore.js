@@ -3,7 +3,7 @@ import { combineReducers } from 'redux-immutablejs';
 
 import { LoginFormRecord } from 'core/security/loginForm';
 
-import {setCurrentUserAction, redirectAfterLoginAction, setLoginFormDataAction, setLoginFormUsernameAction} from 'core/security/securityActions';
+import {setCurrentUserAction, redirectAfterLoginAction, setLoginFormDataAction, setLoginFormUsernameAction, setUserAction} from 'core/security/securityActions';
 
 
 function currentUser(state = null, action) {
@@ -33,18 +33,31 @@ function loginFormData(state = new LoginFormRecord(), action) {
       return state.setFieldValue('username', action.payload, true);
     case setLoginFormUsernameAction.success:
       let tenants = action.payload;
-      return state.setFieldValue('tenantId', (tenants.length > 0) ? tenants[0].id : null, true)
-      .setFieldLovItems('tenantId', tenants);
+      return state.setFieldValue('tenant', (tenants.length > 0) ? tenants[0].value : null, true)
+      .setFieldLovItems('tenant', tenants);
     default:
       return state
   }
 }
 
 
+function userObject(state = null, action) {
+  switch (action.type) {
+    case setUserAction.type:
+      console.log('setUserAction = ', action);
+      return Object.assign({},action.payload);
+    default:
+      return state;
+  }
+}
+
+
+
 
 export const security = combineReducers({
   currentUser,
   redirectAfterLogin,
-  loginFormData
+  loginFormData,
+  userObject
 });
 

@@ -3,7 +3,7 @@ import PureRenderMixin from 'react-addons-pure-render-mixin';
 import {} from 'react-addons-pure-render-mixin';
 import {Styles, IconButton, FontIcon} from 'material-ui';
 import {customizeTheme}  from 'core/common/config/mui-theme';
-import styles from 'core/components/toolmenu/toolmenu.less';
+import css from 'core/components/toolmenu/toolmenu.less';
 
 
 const Colors = Styles.Colors;

@@ -385,6 +385,7 @@ export default class GridComp extends React.Component {
           <Nav navbar>
             {gridConfigMenu}
           </Nav>
+
           <ZzIconButton tooltip="Show selection" fontIcon={classNames('fa', {'fa-check-square': grid.showSelection, 'fa-check-square-o': !grid.showSelection})}
                         onClick={this.onClickCheck} />
           <ZzIconButton tooltip="Refresh" fontIcon="fa fa-refresh" onClick={this.onClickRefresh} />

@@ -108,9 +108,9 @@ export default class MainMenu extends React.Component {
       <Nav navbar eventKey={11}>
         <NavDropdown id="party_menu_dropdown" title='Party' onSelect={this.onSelectWithTransition}>
 
-          { this._menuItem("partyList") }
-          { this._menuItem("contactPersonList") }
-          { this._menuItem("salesRepList") }
+          { this._menuItem("partyCustomers") }
+          { this._menuItem("partyContacts") }
+          { this._menuItem("partySalesReps") }
 
 
           <MenuItem divider/>
@@ -136,7 +136,7 @@ export default class MainMenu extends React.Component {
           <MenuItem eventKey='3'>Administration</MenuItem>
         </NavDropdown>
 
-        <NavDropdown id="administration_dropdown"  title='Administration'>
+        <NavDropdown id="administration_dropdown"  title='Administration' onSelect={this.onSelectWithTransition}>
           { this._menuItem("userList") }
           <MenuItem eventKey='3' onSelect={this.printAppState}>Print App state</MenuItem>
         </NavDropdown>

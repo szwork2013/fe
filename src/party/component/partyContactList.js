@@ -15,31 +15,32 @@ export default class PartyContactList extends React.Component {
 
   static propTypes = {
     partyObject: React.PropTypes.object.isRequired,
+    rootObject: React.PropTypes.object.isRequired,
     entities: React.PropTypes.object.isRequired,
-    setPartyAction: React.PropTypes.func.isRequired
+    setDataAction: React.PropTypes.func.isRequired
   };
 
   addContact = () => {
     console.debug('addContact');
-    const {partyObject, setPartyAction} = this.props;
+    const {partyObject, setDataAction, rootObject} = this.props;
     let newContact = {$open: true};
     partyObject.contacts.push(newContact);
-    setPartyAction(partyObject);
+    setDataAction(rootObject);
   };
 
 
 
   render() {
 
-    const {partyObject, entities, setPartyAction} = this.props;
+    const {partyObject, entities, setDataAction, rootObject} = this.props;
 
     return (
       <BlockComp header="Contacts" style={{display: 'flex', flexDirection: 'column'}}>
 
         {
-          partyObject.contacts.map((contact, index, array) => <PartyContactForm dataObject={contact} rootObject={partyObject} key={index}
+          partyObject.contacts.map((contact, index, array) => <PartyContactForm dataObject={contact} containerObject={partyObject} rootObject={rootObject} key={index}
                                                                          entities={entities} entity={entities.get('PartyContact')}
-                                                                         setDataAction={setPartyAction} lastValue={(array.length === index + 1)} index={index} /> )
+                                                                         setDataAction={setDataAction} lastValue={(array.length === index + 1)} index={index} /> )
         }
 
         <div style={{display: 'flex', justifyContent: 'flex-end'}}>
@@ -58,7 +59,7 @@ class PartyContactForm extends React.Component {
   onDelete = (evt) => {
     evt.stopPropagation();
     console.log('onDelete %o', this.props.dataObject);
-    pull(this.props.rootObject.contacts, this.props.dataObject);
+    pull(this.props.containerObject.contacts, this.props.dataObject);
     this.props.setDataAction(this.props.rootObject);
   };
 

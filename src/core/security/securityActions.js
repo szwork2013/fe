@@ -14,3 +14,4 @@ export const setLoginFormUsernameAction = createPromiseAction('CORE_SECURITY_SET
 });
 
 
+export const setUserAction = createAction('CORE_SECURITY_SET_USER');

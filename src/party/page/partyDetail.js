@@ -12,8 +12,8 @@ import {store} from 'core/common/redux/store';
 import MdEntityService from 'core/metamodel/mdEntityService';
 import PartyService from 'party/partyService';
 import {setPartyAction} from 'party/partyActions';
-import {customizeTheme}  from 'core/common/config/mui-theme';
-import {screenLg} from 'core/common/config/variables';
+import {customizeThemeForDetail, TabTemplate}  from 'core/common/config/mui-theme';
+import {screenLg, tabStyle} from 'core/common/config/variables';
 
 import PartyFoForm from 'party/component/partyFoForm';
 import PartyPoForm from 'party/component/partyPoForm';
@@ -26,8 +26,6 @@ import Grid from 'core/grid/domain/grid';
 import GridComp from 'core/grid/component/gridComp';
 import {updateGridAction} from 'party/partyActions';
 
-const Colors = Styles.Colors;
-const Typography = Styles.Typography;
 
 const vehicleGridLocation = 'partyVehicleList';
 const invoiceGridLocation = 'partyInvoiceList';
@@ -52,28 +50,6 @@ function mapStateToProps(state) {
 }
 
 
-const TabTemplate = React.createClass({
-
-  render() {
-    let styles = {
-      'width': '100%',
-      minHeight: 0,
-      flexGrow: 1
-    };
-
-    if (this.props.selected) {
-      styles.display = 'flex';
-    } else {
-      styles.display = 'none';
-    }
-
-    return (
-      <div style={styles}>
-        {this.props.children}
-      </div>
-    );
-  },
-});
 
 
 @connect(mapStateToProps, {setPartyAction, updateGridAction})
@@ -131,17 +107,7 @@ export default class PartyDetail extends React.Component {
   componentWillMount() {
     console.debug('partyDetail#componentWillMount, props: %o', this.props);
 
-    customizeTheme(this.context.muiTheme, {
-      floatingActionButton: {
-        /*  buttonSize: 56, */
-        miniSize: 30
-      },
-      tabs: {
-        backgroundColor: 'white',
-        textColor: Typography.textLightBlack,
-        selectedTextColor: Typography.textDarkBlack
-      }
-    });
+    customizeThemeForDetail(this.context.muiTheme);
 
     this.mediaQuery = window.matchMedia('only screen and (min-width: ' + screenLg + 'px)');
     this.mediaQuery.addListener(this.mediaQueryListener);
@@ -237,9 +203,6 @@ export default class PartyDetail extends React.Component {
 
   render() {
 
-
-    const tabHeight = 36;
-
     let {
       partyObject,
       entities,
@@ -267,25 +230,25 @@ export default class PartyDetail extends React.Component {
             <PartyAddressList partyObject={partyObject} entities={entities} setPartyAction={setPartyAction}/>
           </div>
           <div className="col-xs-12 col-sm-4">
-            <PartyContactList partyObject={partyObject} entities={entities} setPartyAction={setPartyAction}/>
-            <PartyRoleList partyObject={partyObject} entities={entities} setPartyAction={setPartyAction}/>
+            <PartyContactList partyObject={partyObject} rootObject={partyObject} entities={entities} setDataAction={setPartyAction}/>
+            <PartyRoleList partyObject={partyObject} rootObject={partyObject} entities={entities} setDataAction={setPartyAction}/>
           </div>
         </div>
       </form>
     );
 
     const tabArray = [
-      <Tab label="Vehicles" style={{height:tabHeight}} onActive={this.activateTab.bind(this, vehicleGrid)} key={vehicleGridLocation}>
+      <Tab label="Vehicles" style={tabStyle} onActive={this.activateTab.bind(this, vehicleGrid)} key={vehicleGridLocation}>
         {(partyObject.$grids[vehicleGridLocation]) ?
           <GridComp ref={vehicleGridLocation} grid={vehicleGrid} uiLocation="tab" updateGrid={this.updateGrid}/>
           : ''}
       </Tab>,
-      <Tab label="Invoices" style={{height:tabHeight}} onActive={this.activateTab.bind(this, invoiceGrid)} key={invoiceGridLocation}>
+      <Tab label="Invoices" style={tabStyle} onActive={this.activateTab.bind(this, invoiceGrid)} key={invoiceGridLocation}>
         {(partyObject.$grids[invoiceGridLocation]) ?
           <GridComp ref={invoiceGridLocation} grid={invoiceGrid} uiLocation="tab" updateGrid={this.updateGrid}/>
           : ''}
       </Tab>,
-      <Tab label="Relationships" style={{height:tabHeight}} onActive={this.activateTab.bind(this, partyRelGrid)} key={partyRelGridLocation}>
+      <Tab label="Relationships" style={tabStyle} onActive={this.activateTab.bind(this, partyRelGrid)} key={partyRelGridLocation}>
         {(partyObject.$grids[partyRelGridLocation]) ?
           <GridComp ref={partyRelGridLocation} grid={partyRelGrid} uiLocation="tab" updateGrid={this.updateGrid}/>
           : ''}
@@ -297,7 +260,7 @@ export default class PartyDetail extends React.Component {
     }
 
     const tabs = (
-      <Tabs  className="detail-grid" tabTemplate={TabTemplate} tabItemContainerStyle={{height:tabHeight}} contentContainerStyle={{width: '100%', flexGrow: 1, display: 'flex', minHeight: 0}} >
+      <Tabs  className="detail-grid" tabTemplate={TabTemplate} tabItemContainerStyle={tabStyle} contentContainerStyle={{width: '100%', flexGrow: 1, display: 'flex', minHeight: 0}} >
         {tabArray.map(t => t)}
       </Tabs>
     );

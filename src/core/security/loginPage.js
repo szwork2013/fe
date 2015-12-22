@@ -45,7 +45,7 @@ export default class LoginPage extends React.Component {
     try {
       loginFormData.validate();
 
-      return SecurityService.login(loginFormData.username.value, loginFormData.password.value, loginFormData.tenantId.value)
+      return SecurityService.login(loginFormData.username.value, loginFormData.password.value, loginFormData.tenant.value)
         .then((response) => {
           setCurrentUserAction(response.data);
           this.context.router.transitionTo((redirectAfterLogin && redirectAfterLogin !== '/') ? redirectAfterLogin : 'home');

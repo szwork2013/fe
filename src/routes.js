@@ -17,6 +17,7 @@ import VehicleDetail from 'product/page/vehicleDetail';
 import ProductList from 'product/page/productList';
 import ProductDetail from 'product/page/productDetail';
 import UserList from 'core/security/userList';
+import UserDetail from 'core/security/userDetail';
 
 import LoginPage from 'core/security/loginPage';
 
@@ -32,9 +33,9 @@ const routes = (
 
     <Route name="loginPage" path="login" handler={LoginPage}/>
 
-    <Route name="partyList" path="party/grid/customer/:gridId?" handler={PartyList}/>
-    <Route name="contactPersonList" path="party/grid/contact-person/:gridId?" handler={ContactPersonList}/>
-    <Route name="salesRepList" path="party/grid/sales-rep/:gridId?" handler={SalesRepList}/>
+    <Route name="partyCustomers" path="party/grid/customer/:gridId?" handler={PartyList}/>
+    <Route name="partyContacts" path="party/grid/contact-person/:gridId?" handler={ContactPersonList}/>
+    <Route name="partySalesReps" path="party/grid/sales-rep/:gridId?" handler={SalesRepList}/>
     <Route name="partyDetail" path="party/detail/:id" handler={PartyDetail}/>
 
 
@@ -48,6 +49,7 @@ const routes = (
     <Route name="productDetail" path="product/detail/:id" handler={ProductDetail}/>
 
     <Route name="userList" path="user/grid/:gridId?" handler={UserList}/>
+    <Route name="userDetail" path="user/detail/:id" handler={UserDetail}/>
 
     <Route name="gridAdmin" path="core/grid/admin/:gridLocation" handler={GridAdminView}/>
 

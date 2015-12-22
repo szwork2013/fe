@@ -1,5 +1,6 @@
 import React from 'react';
 import PureRenderMixin from 'react-addons-pure-render-mixin';
+import {get, set} from 'lodash';
 
 
 export default function createForm(definition, FormComponent) {
@@ -31,14 +32,23 @@ export default function createForm(definition, FormComponent) {
         const mdField = props.entity.fields[field.name];
         const fieldObject = {
           fullWidth: true,
-          floatingLabelText: mdField.label,
           textLabel: mdField.label,
           errorText: null,
           name: field.name,
+          fieldPath: field.fieldPath,
           onChange: (evt) => {
             let value = (typeof evt === 'object' && evt.target) ? evt.target.value : evt;
             //console.log('Form ' + definition.form + " onChange event on " + field.name + ", value = " + value + ", $open = " + this.props.rootObject.$open);
-            this.props.dataObject[field.name] = value;
+
+            // uprava pro boolean
+            //let value = (mdField.dataType === 'BOOLEAN' && typeof value === 'string') ? JSON.parse(value) : value;
+
+            if (field.fieldPath) {
+              set(this.props.dataObject, field.fieldPath, value);
+            } else {
+              this.props.dataObject[field.name] = value;
+            }
+
             this.props.setDataAction(this.props.rootObject);
           },
           style: Object.assign({}, defaultStyle, field.style)
@@ -62,6 +72,15 @@ export default function createForm(definition, FormComponent) {
           fieldObject.inputStyle = {marginTop: 0, paddingTop: 6};
         }
 
+        // checkbox ma label, ostatni asi floatingLabelText
+        if (mdField.dataType === 'BOOLEAN') {
+          fieldObject.label = mdField.label;
+          //fieldObject.defaultChecked =
+        } else {
+          fieldObject.floatingLabelText = mdField.label;
+        }
+
+
 
         fields[field.name] = fieldObject;
         return fields;
@@ -73,10 +92,17 @@ export default function createForm(definition, FormComponent) {
     //}
     render() {
 
+      let dataObject = this.props.dataObject;
+
       // nastaveni value
-      for(let fieldName in this.fields) {
-        this.fields[fieldName].value = this.props.dataObject[fieldName];
+      for(let field of Object.values(this.fields)) {
+        if (field.fieldPath) {
+          field.value = get(dataObject, field.fieldPath);
+        } else {
+          field.value = dataObject[field.name];
+        }
       }
+
 
       return <FormComponent fields={this.fields} {...this.props} />;
     }
