@@ -16,8 +16,7 @@ import {setUserAction} from 'core/security/securityActions';
 import {customizeThemeForDetail, TabTemplate}  from 'core/common/config/mui-theme';
 import {screenLg} from 'core/common/config/variables';
 
-import PartyContactList from 'party/component/partyContactList';
-import PartyRoleList from 'party/component/partyRoleList';
+import PartyFoForm from 'party/component/partyFoForm';
 import UserForm from 'core/security/userForm';
 
 import GridService from 'core/grid/gridService';
@@ -60,20 +59,20 @@ export default class UserDetail extends React.Component {
   static fetchData(routerParams, query) {
     console.log("UserDetail#fetchData()");
 
-    let metadataPromise = MdEntityService.fetchEntityMetadata(['User', 'Tenant', 'Party', 'PartyContact', 'PartyRole'], ['PARTYCONTACTCATEGORY']);
+    let metadataPromise = MdEntityService.fetchEntityMetadata(['User', 'Tenant', 'Party']);
 
     let userObjectVar;
     let userPromise = ((routerParams.id === 'new') ? When(Object.assign({
-      partyObject: {},
       gridConfigs: [],
       tenants: [],
       defaultGridConfig: {},
-      $open: true
+      $open: true,
+      enabled: true
     }, query)) : SecurityService.readUser(routerParams.id))
       .then(userObject => {
         userObject.$grids = {};
         userObjectVar = userObject;
-        return PartyService.readParty(userObject.party)
+        return (userObject.party) ? PartyService.readParty(userObject.party) : When(null)
       })
       .then(partyObject => {
         userObjectVar.partyObject = partyObject;
@@ -188,6 +187,15 @@ export default class UserDetail extends React.Component {
       setDataAction: setUserAction
     };
 
+    let propsForCreatePartyForm = {
+      dataObject: userObject.partyObject,
+      rootObject: userObject,
+      entity: entities.get('Party'),
+      entities,
+      setDataAction: setUserAction
+    };
+
+
     console.debug('%c userDetail render $open = %s', 'background-color: yellow', userObject.$open);
 
 
@@ -197,15 +205,17 @@ export default class UserDetail extends React.Component {
 
         <form style={{marginTop: 10}}>
           <div className="row">
-            <div className="col-xs-12 col-sm-8">
-              <UserForm {...propsForCreateForm} />;
+            <div className="col-xs-12">
+              <UserForm {...propsForCreateForm} />
             </div>
-            <div className="col-xs-12 col-sm-4">
-              <PartyContactList partyObject={userObject.partyObject} rootObject={userObject} entities={entities} setDataAction={setUserAction}/>
-              <PartyRoleList partyObject={userObject.partyObject} rootObject={userObject} entities={entities} setDataAction={setUserAction}/>
+          </div>
+          <div className="row">
+            <div className="col-xs-12">
+              <PartyFoForm {...propsForCreatePartyForm} />
             </div>
           </div>
         </form>
+
 
       </main>
     );

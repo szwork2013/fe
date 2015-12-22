@@ -6,27 +6,25 @@ export function composedParty(partyObject, entities) {
     partyObject,
     {
       get defaultLanguageLabel() {
-        const Language = entities.get('Language');
-        return Language.getLovItemLabel(partyObject.defaultLanguage);
+        return entities.get('Language').getLovItemLabel(partyObject.defaultLanguage);
       },
       get defaultPaymentCondLabel() {
-        const PaymentCond = entities.get('PaymentCond');
-        return PaymentCond.getLovItemLabel(partyObject.defaultPaymentCond);
+        return entities.get('PaymentCond').getLovItemLabel(partyObject.defaultPaymentCond);
       },
       get legalFormLabel() {
-        entities.get('LegalForm').getLovItemLabel(partyObject.legalForm);
+        return entities.get('LegalForm').getLovItemLabel(partyObject.legalForm);
       },
       get marketingSourceLabel() {
-        entities.get('MarketingSource').getLovItemLabel(partyObject.marketingSource);
+        return entities.get('MarketingSource').getLovItemLabel(partyObject.marketingSource);
       },
       get naceCodeLabel() {
-        entities.get('NaceCode').getLovItemLabel(partyObject.naceCode);
+        return entities.get('NaceCode').getLovItemLabel(partyObject.naceCode);
       },
       get nationalityLabel() {
-        entities.get('Country').getLovItemLabel(partyObject.nationality);
+        return entities.get('Country').getLovItemLabel(partyObject.nationality);
       },
       get taxDomicileLabel() {
-        entities.get('Country').getLovItemLabel(partyObject.taxDomicile);
+        return entities.get('Country').getLovItemLabel(partyObject.taxDomicile);
       }
     }
   );

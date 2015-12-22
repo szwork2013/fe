@@ -1,5 +1,5 @@
 import React from 'react';
-import {TextField} from 'material-ui';
+import {TextField, Checkbox} from 'material-ui';
 
 import StyledDatePicker from 'core/components/styledDatePicker/styledDatePicker';
 import NumberInput from 'core/components/numberInput/numberInput';
@@ -18,7 +18,8 @@ export default class ResponsiveTest extends React.Component {
       screenWidth: window.screen.width,
       viewportWidth: window.innerWidth,
       bodyClientWidth: document.body.clientWidth,
-      documentClientWidth: document.documentElement.clientWidth
+      documentClientWidth: document.documentElement.clientWidth,
+      checkboxValue: true
     };
     console.log('widths: ', widths);
     return widths;
@@ -58,8 +59,14 @@ export default class ResponsiveTest extends React.Component {
     this.mq.removeListener();
   }
 
+  onChecked = (e) => {
+    console.log('onChecked ', e.target.value, e.target.checked);
+    this.setState({checkboxValue: e.target.checked});
+  };
+
 
   render() {
+
 
     const {screenWidth, viewportWidth, bodyClientWidth, documentClientWidth} = this.state;
 
@@ -160,9 +167,15 @@ export default class ResponsiveTest extends React.Component {
             </div>
 
 
-          <StyledDatePicker defaultValue={new Date()} culture='en' style={{marginRight: '20px'}} />
-          <TextField defaultValue={'1000'} />
+          <StyledDatePicker defaultValue={new Date()} culture='en' style={{marginRight: '20px'}} placeholder="Datum narozeni" />
+          <StyledDatePicker defaultValue={new Date()} culture='en' style={{marginRight: '20px'}} floatingLabelText="Datum narozeni" />
+
+          <TextField defaultValue={'1000'}  />
           <NumberInput />
+
+          <Checkbox  name="checkboxName"
+                     checked={this.state.checkboxValue}
+                     label="went for a run today" onCheck={this.onChecked}/>
 
 
         </form>

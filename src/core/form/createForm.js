@@ -22,6 +22,22 @@ export default function createForm(definition, FormComponent) {
       setDataAction: React.PropTypes.func.isRequired
     };
 
+    setValue(dataObject, field, value) {
+      if (field.fieldPath) {
+        set(dataObject, field.fieldPath, value);
+      } else {
+        dataObject[field.name] = value;
+      }
+    }
+
+    getValue(dataObject, field) {
+      if (field.fieldPath) {
+        return get(dataObject, field.fieldPath);
+      } else {
+        return dataObject[field.name];
+      }
+    }
+
     constructor(props) {
       super(props);
 
@@ -36,19 +52,11 @@ export default function createForm(definition, FormComponent) {
           errorText: null,
           name: field.name,
           fieldPath: field.fieldPath,
-          onChange: (evt) => {
-            let value = (typeof evt === 'object' && evt.target) ? evt.target.value : evt;
+          mdField: mdField,
+          [(mdField.dataType === 'BOOLEAN') ? 'onCheck' : 'onChange']: (evt) => {
+            let value = (typeof evt === 'object' && evt.target) ?  ( (mdField.dataType === 'BOOLEAN') ? evt.target.checked : evt.target.value) : evt;
             //console.log('Form ' + definition.form + " onChange event on " + field.name + ", value = " + value + ", $open = " + this.props.rootObject.$open);
-
-            // uprava pro boolean
-            //let value = (mdField.dataType === 'BOOLEAN' && typeof value === 'string') ? JSON.parse(value) : value;
-
-            if (field.fieldPath) {
-              set(this.props.dataObject, field.fieldPath, value);
-            } else {
-              this.props.dataObject[field.name] = value;
-            }
-
+            this.setValue(this.props.dataObject, field, value);
             this.props.setDataAction(this.props.rootObject);
           },
           style: Object.assign({}, defaultStyle, field.style)
@@ -75,7 +83,6 @@ export default function createForm(definition, FormComponent) {
         // checkbox ma label, ostatni asi floatingLabelText
         if (mdField.dataType === 'BOOLEAN') {
           fieldObject.label = mdField.label;
-          //fieldObject.defaultChecked =
         } else {
           fieldObject.floatingLabelText = mdField.label;
         }
@@ -96,11 +103,7 @@ export default function createForm(definition, FormComponent) {
 
       // nastaveni value
       for(let field of Object.values(this.fields)) {
-        if (field.fieldPath) {
-          field.value = get(dataObject, field.fieldPath);
-        } else {
-          field.value = dataObject[field.name];
-        }
+        field[(field.mdField.dataType === 'BOOLEAN') ? 'checked' : 'value'] = this.getValue(dataObject, field);
       }
 
 

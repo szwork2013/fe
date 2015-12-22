@@ -20,7 +20,7 @@ class UserForm extends React.Component {
 
 
     let {dataObject, rootObject, lastValue,  entities, fields: {
-      username, firstName, lastName, enabled, locked, expired
+      username, enabled, locked, expired
       }} = this.props;
 
     //let enhancedParty = composedParty(dataObject, entities);
@@ -32,12 +32,6 @@ class UserForm extends React.Component {
         <div className="row">
           <div className="col-xs-6 col-sm-4">
             <TextField {...username} />
-          </div>
-          <div className="col-xs-6 col-sm-4">
-            <TextField {...firstName} />
-          </div>
-          <div className="col-xs-6 col-sm-4">
-            <TextField {...lastName} />
           </div>
         </div>
 
@@ -62,7 +56,11 @@ class UserForm extends React.Component {
       <div style={{display: 'flex', flexDirection: 'column', cursor: 'pointer'}}>
 
         <h5 style={{marginTop: 0, fontSize: '18px', fontWeight: 'bold'}}>{dataObject.username}</h5>
-
+        <div className="form-text-row">
+          <FieldText value={ (dataObject.enabled) ? 'Enabled' : 'Disabled' }/>
+          <FieldText value={ (dataObject.locked) ? 'Locked' : '' }/>
+          <FieldText value={ (dataObject.expired) ? 'Expired' : '' }/>
+        </div>
 
       </div>
     );
@@ -81,12 +79,6 @@ const definition = {
   fields: [{
     name: 'username',
     validators: ['required']
-  },{
-    name: 'firstName',
-    fieldPath: 'partyObject.firstName'
-  },{
-    name: 'lastName',
-    fieldPath: 'partyObject.lastName'
   },{
     name: 'enabled'
   }, {

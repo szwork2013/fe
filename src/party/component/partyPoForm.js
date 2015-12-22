@@ -1,9 +1,6 @@
 import React from 'react';
-import {Record, List} from 'immutable';
-import {get} from 'lodash';
 import PureRenderMixin from 'react-addons-pure-render-mixin';
-import {TextField, RaisedButton, SelectField} from 'material-ui';
-import { Alert } from 'react-bootstrap';
+import {TextField} from 'material-ui';
 
 import createForm from 'core/form/createForm';
 import {showForTenant, FieldText} from 'core/form/formUtils';
@@ -23,7 +20,7 @@ class PartyPoForm extends React.Component {
       fullName, ico, dic, icoDph, defaultCurrency, defaultLanguage, defaultPaymentCond, legalForm, naceCode, marketingSource, nationality, taxDomicile
       }} = this.props;
 
-    let enhancedParty = composedParty(dataObject, entities);
+    dataObject = composedParty(dataObject, entities);
 
     let openContent = (
       <div>
@@ -98,6 +95,8 @@ class PartyPoForm extends React.Component {
           <FieldText label={defaultCurrency.textLabel} value={dataObject.defaultCurrency}/>
           <FieldText label={defaultLanguage.textLabel} value={dataObject.defaultLanguageLabel}/>
           <FieldText label={defaultPaymentCond.textLabel} value={dataObject.defaultPaymentCondLabel}/>
+        </div>
+        <div className="form-text-row">
           <FieldText label={legalForm.textLabel} value={dataObject.legalFormLabel}/>
           <FieldText label={naceCode.textLabel} value={dataObject.naceCodeLabel}/>
           <FieldText label={marketingSource.textLabel} value={dataObject.marketingSourceLabel}/>

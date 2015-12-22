@@ -16,7 +16,8 @@ export default class ActiveItem extends React.Component {
     entities: React.PropTypes.object.isRequired,
     setDataAction: React.PropTypes.func.isRequired,
     lastValue: React.PropTypes.bool,
-    index: React.PropTypes.number
+    index: React.PropTypes.number,
+    onCommit: React.PropTypes.func
   };
 
 
@@ -33,8 +34,9 @@ export default class ActiveItem extends React.Component {
 
   onCommit = (evt) => {
     evt.stopPropagation();
-    let {dataObject, setDataAction, rootObject} = this.props;
+    let {dataObject, setDataAction, rootObject, onCommit} = this.props;
 
+    if (onCommit) onCommit(dataObject);
     dataObject.$open = false;
     setDataAction(rootObject);
     console.log('onCommit %o', dataObject);
