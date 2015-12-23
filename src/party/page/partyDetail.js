@@ -1,7 +1,7 @@
 import React from 'react';
 import PureRenderMixin from 'react-addons-pure-render-mixin';
 import History from 'react-router/lib/History';
-import {uniq, values} from 'lodash';
+import {uniq, values, first, last} from 'lodash';
 import When from 'when';
 import { connect } from 'react-redux';
 import { FlatButton, Styles, Tabs, Tab} from 'material-ui';
@@ -15,6 +15,7 @@ import {setPartyAction} from 'party/partyActions';
 import {customizeThemeForDetail, TabTemplate}  from 'core/common/config/mui-theme';
 import {screenLg, tabStyle} from 'core/common/config/variables';
 
+import {composedParty, CUSTOMER_ROLE} from 'party/partyUtils';
 import PartyFoForm from 'party/component/partyFoForm';
 import PartyPoForm from 'party/component/partyPoForm';
 import PartyContactList from 'party/component/partyContactList';
@@ -32,6 +33,8 @@ const invoiceGridLocation = 'partyInvoiceList';
 const partyRelGridLocation = 'partyRelList';
 
 
+
+
 function mapStateToProps(state) {
   let partyObject = state.getIn(['party', 'partyObject']);
   let $grids = partyObject.$grids;
@@ -40,12 +43,16 @@ function mapStateToProps(state) {
     return ($grids[gridLocation]) ? $grids[gridLocation] : Grid.clone(state.getIn(['grid', 'grids', gridLocation]));
   }
 
+  let grids = [select(partyRelGridLocation)];
+  if (partyObject.hasRole(CUSTOMER_ROLE)) {
+    grids.unshift(select(invoiceGridLocation));
+    grids.unshift(select(vehicleGridLocation));
+  }
+
   return {
     partyObject,
     entities: state.getIn(['metamodel', 'entities']),
-    vehicleGrid: select(vehicleGridLocation),
-    invoiceGrid: select(invoiceGridLocation),
-    partyRelGrid: select(partyRelGridLocation)
+    grids
   };
 }
 
@@ -79,16 +86,19 @@ export default class PartyDetail extends React.Component {
       addresses: [],
       roles: [],
       $open: true
-    }, query)) : PartyService.readParty(routerParams.id))
-      .then(partyObject => {
-        partyObject.$grids = {};
-        return store.dispatch(setPartyAction(partyObject))
-      });
+    }, query)) : PartyService.readParty(routerParams.id));
 
     let gridPromise = GridService.fetchGrids(vehicleGridLocation, invoiceGridLocation, partyRelGridLocation);
 
-    return When.all([metadataPromise, partyPromise, gridPromise]);
+    return When.all([metadataPromise, partyPromise, gridPromise])
+      .then( ([entityMap, partyObject, gridMap]) => {
+        partyObject.$grids = {};
+        partyObject = composedParty(partyObject, entityMap);
+        return store.dispatch(setPartyAction(partyObject))
+    });
   }
+
+  state = {};
 
 
   mediaQueryListener = (changed) => {
@@ -123,9 +133,18 @@ export default class PartyDetail extends React.Component {
   componentDidUpdate(prevProps) {
     if (this.props.partyObject.partyId && this.props.partyObject.partyId !== prevProps.partyObject.partyId) {
       console.log("partyDetail#componentWillReceiveProps() - change of party, resetting grids");
-      let {vehicleGrid, partyRelGrid} = this.props;
-      this.activateTab(partyRelGrid);
-      if(this.mediaQuery.matches) this.activateTab(vehicleGrid);
+
+      let {grids} = this.props;
+      let selectedTab = (this.mediaQuery.matches && grids.length > 1) ? grids[1].gridLocation :  grids[0].gridLocation;
+
+      this.setState({selectedTab});
+
+      this.activateTab(first(grids));
+      if(this.mediaQuery.matches && grids.length > 1) this.activateTab(grids[1]);
+
+      //this.setState({selectedTab});
+      setTimeout(() => {this.setState({selectedTab: undefined});});
+
     }
   }
 
@@ -139,20 +158,22 @@ export default class PartyDetail extends React.Component {
   }
 
   initPartyGrids() {
-    let {vehicleGrid, invoiceGrid} = this.props;
+    let {grids} = this.props;
 
-    let updated = this.initGrid(vehicleGrid);
-    if(this.mediaQuery.matches) {
-      updated = updated | this.initGrid(invoiceGrid);  // pozor bitwise, nechci shortcutting
+    let updated = this.initGrid(first(grids));
+    if(this.mediaQuery.matches && grids.length > 1) {
+      updated = updated | this.initGrid(grids[1]);  // pozor bitwise, nechci shortcutting
     }
     return !!updated;
   }
 
   searchPartyGrids() {
-    let {vehicleGrid, invoiceGrid} = this.props;
-    if (!vehicleGrid.data) this.refs[vehicleGridLocation].search();
-    if(this.mediaQuery.matches && !invoiceGrid.data) {
-      this.refs[invoiceGridLocation].search();
+    let {grids} = this.props;
+    let firstGrid = first(grids);
+
+    if (!firstGrid.data) this.refs[firstGrid.gridLocation].search();
+    if(this.mediaQuery.matches && grids.length > 1 &&  !grids[1].data) {
+      this.refs[grids[1].gridLocation].search();
     }
   }
 
@@ -173,6 +194,10 @@ export default class PartyDetail extends React.Component {
     return doUpdate;
   }
 
+  /**
+   * Grid k aktivaci (init + search v timeoutu)
+   * @param grid
+   */
   activateTab(grid) {
     this.initGrid(grid);
     if (!grid.data) {
@@ -207,9 +232,7 @@ export default class PartyDetail extends React.Component {
       partyObject,
       entities,
       setPartyAction,
-      vehicleGrid,
-      invoiceGrid,
-      partyRelGrid
+      grids
       } = this.props;
 
     let propsForCreateForm = {
@@ -237,33 +260,21 @@ export default class PartyDetail extends React.Component {
       </form>
     );
 
-    const tabArray = [
-      <Tab label="Vehicles" style={tabStyle} onActive={this.activateTab.bind(this, vehicleGrid)} key={vehicleGridLocation}>
-        {(partyObject.$grids[vehicleGridLocation]) ?
-          <GridComp ref={vehicleGridLocation} grid={vehicleGrid} uiLocation="tab" updateGrid={this.updateGrid}/>
-          : ''}
-      </Tab>,
-      <Tab label="Invoices" style={tabStyle} onActive={this.activateTab.bind(this, invoiceGrid)} key={invoiceGridLocation}>
-        {(partyObject.$grids[invoiceGridLocation]) ?
-          <GridComp ref={invoiceGridLocation} grid={invoiceGrid} uiLocation="tab" updateGrid={this.updateGrid}/>
-          : ''}
-      </Tab>,
-      <Tab label="Relationships" style={tabStyle} onActive={this.activateTab.bind(this, partyRelGrid)} key={partyRelGridLocation}>
-        {(partyObject.$grids[partyRelGridLocation]) ?
-          <GridComp ref={partyRelGridLocation} grid={partyRelGrid} uiLocation="tab" updateGrid={this.updateGrid}/>
+
+    const tabArray = grids.slice( (this.mediaQuery.matches) ? 1 : 0 ).map(grid => (
+      <Tab label={grid.label} style={tabStyle} onActive={this.activateTab.bind(this, grid)} key={grid.gridLocation}  value={grid.gridLocation}>
+        {(partyObject.$grids[grid.gridLocation]) ?
+          <GridComp ref={grid.gridLocation} grid={grid} uiLocation="tab" updateGrid={this.updateGrid}/>
           : ''}
       </Tab>
-    ];
+    ));
 
-    if (this.mediaQuery.matches) {
-      tabArray.shift();
-    }
 
-    const tabs = (
-      <Tabs  className="detail-grid" tabTemplate={TabTemplate} tabItemContainerStyle={tabStyle} contentContainerStyle={{width: '100%', flexGrow: 1, display: 'flex', minHeight: 0}} >
+    const tabs = (tabArray.length) ? (
+      <Tabs value={this.state.selectedTab} className="detail-grid" tabTemplate={TabTemplate} tabItemContainerStyle={tabStyle} contentContainerStyle={{width: '100%', flexGrow: 1, display: 'flex', minHeight: 0}} >
         {tabArray.map(t => t)}
       </Tabs>
-    );
+    ) : '';
 
     if (this.mediaQuery.matches) {
       return (
@@ -273,7 +284,7 @@ export default class PartyDetail extends React.Component {
             {mainForm}
             {tabs}
           </div>
-          <GridComp ref={vehicleGridLocation} grid={vehicleGrid} uiLocation="main" updateGrid={this.updateGrid}/>
+          <GridComp ref={grids[0].gridLocation} grid={grids[0]} uiLocation="main" updateGrid={this.updateGrid}/>
         </main>
       );
     } else {
@@ -319,5 +330,4 @@ export default class PartyDetail extends React.Component {
 
 
 }
-
 

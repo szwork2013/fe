@@ -10,7 +10,6 @@ import {FieldText} from 'core/form/formUtils';
 import StyledSelect from 'core/components/styledSelect/styledSelect';
 
 import ActiveItem from 'core/components/blockComp/activeItem';
-import {composedParty} from 'party/partyUtils';
 
 class UserForm extends React.Component {
   shouldComponentUpdate = PureRenderMixin.shouldComponentUpdate.bind(this);
@@ -23,7 +22,6 @@ class UserForm extends React.Component {
       username, enabled, locked, expired
       }} = this.props;
 
-    //let enhancedParty = composedParty(dataObject, entities);
 
     let openContent = (
       <div>

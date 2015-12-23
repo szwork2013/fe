@@ -22,7 +22,7 @@ class GridService {
   /**
    * vlozi do GridStore objekty Grid pro gridLocations ktere tam dosud nebyly
    * @param jedno nebo vice gridLocation
-   * @returns {*}
+   * @returns gridMap
    */
   fetchGrids(...gridLocations) {
     const gridMap = store.getState().getIn(['grid', 'grids']);

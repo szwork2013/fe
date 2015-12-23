@@ -7,7 +7,6 @@ import {showForTenant, FieldText} from 'core/form/formUtils';
 import StyledSelect from 'core/components/styledSelect/styledSelect';
 import BlockComp from 'core/components/blockComp/blockComp';
 import ActiveItem from 'core/components/blockComp/activeItem';
-import {composedParty} from 'party/partyUtils';
 
 class PartyPoForm extends React.Component {
   shouldComponentUpdate = PureRenderMixin.shouldComponentUpdate.bind(this);
@@ -20,7 +19,6 @@ class PartyPoForm extends React.Component {
       fullName, ico, dic, icoDph, defaultCurrency, defaultLanguage, defaultPaymentCond, legalForm, naceCode, marketingSource, nationality, taxDomicile
       }} = this.props;
 
-    dataObject = composedParty(dataObject, entities);
 
     let openContent = (
       <div>

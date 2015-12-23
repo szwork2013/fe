@@ -8,7 +8,7 @@ import StyledSelect from 'core/components/styledSelect/styledSelect';
 import StyledDatePicker from 'core/components/styledDatePicker/styledDatePicker';
 import BlockComp from 'core/components/blockComp/blockComp';
 import ActiveItem from 'core/components/blockComp/activeItem';
-import {composedParty} from 'party/partyUtils';
+
 
 class PartyFoForm extends React.Component {
   shouldComponentUpdate = PureRenderMixin.shouldComponentUpdate.bind(this);
@@ -26,7 +26,6 @@ class PartyFoForm extends React.Component {
       firstName, lastName, titleBefore, dateOfBirth, birthNumber, birthLastName, salutation, placeOfBirth, nationality, taxDomicile, gender
       }} = this.props;
 
-    dataObject = composedParty(dataObject, entities);
 
     let openContent = (
       <div>
