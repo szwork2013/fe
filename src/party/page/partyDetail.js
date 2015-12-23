@@ -142,9 +142,7 @@ export default class PartyDetail extends React.Component {
       this.activateTab(first(grids));
       if(this.mediaQuery.matches && grids.length > 1) this.activateTab(grids[1]);
 
-      //this.setState({selectedTab});
       setTimeout(() => {this.setState({selectedTab: undefined});});
-
     }
   }
 

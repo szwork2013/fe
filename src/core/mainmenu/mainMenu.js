@@ -60,9 +60,6 @@ export default class MainMenu extends React.Component {
     window.location.reload();
   };
 
-  printAppState = (e) => {
-    console.debug(alt.takeSnapshot());
-  }
 
   onHome = (event) => {
     event.preventDefault();
@@ -138,7 +135,6 @@ export default class MainMenu extends React.Component {
 
         <NavDropdown id="administration_dropdown"  title='Administration' onSelect={this.onSelectWithTransition}>
           { this._menuItem("userList") }
-          <MenuItem eventKey='3' onSelect={this.printAppState}>Print App state</MenuItem>
         </NavDropdown>
 
 

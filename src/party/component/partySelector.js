@@ -55,11 +55,11 @@ export default class PartySelector extends React.Component {
       <form onSubmit={this.onSearch}>
         <TextField hintText="Search party..."/>
         <FlatButton type="submit" secondary={true} label="Search" labelPosition="after" labelStyle={{paddingLeft: 8}}
-                    style={{paddingLeft: 10}}>
+                    style={{paddingLeft: 10, marginLeft: 5}}>
           <FontIcon className="fa fa-search" style={{fontSize:14, color: Colors.indigo500}}/>
         </FlatButton>
         <FlatButton onClick={this.onNew} secondary={true} label="New" labelPosition="after"
-                    labelStyle={{paddingLeft: 8}} style={{paddingLeft: 10}}>
+                    labelStyle={{paddingLeft: 8}} style={{paddingLeft: 5}}>
           <FontIcon className="fa fa-file-o" style={{fontSize:14, color: Colors.indigo500}}/>
         </FlatButton>
 
