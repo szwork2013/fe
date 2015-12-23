@@ -15,14 +15,14 @@ import PartyService from 'party/partyService';
 import {setUserAction} from 'core/security/securityActions';
 import {customizeThemeForDetail, TabTemplate}  from 'core/common/config/mui-theme';
 import {screenLg} from 'core/common/config/variables';
+import BlockComp from 'core/components/blockComp/blockComp';
 
-import PartyFoForm from 'party/component/partyFoForm';
 import UserForm from 'core/security/userForm';
+import PartySelector from 'party/component/partySelector';
 
 import GridService from 'core/grid/gridService';
 import Grid from 'core/grid/domain/grid';
 import GridComp from 'core/grid/component/gridComp';
-//import {updateGridAction} from 'party/partyActions';
 
 const Colors = Styles.Colors;
 const Typography = Styles.Typography;
@@ -38,7 +38,6 @@ function mapStateToProps(state) {
 }
 
 
-
 @connect(mapStateToProps, {setUserAction})
 export default class UserDetail extends React.Component {
   shouldComponentUpdate = PureRenderMixin.shouldComponentUpdate.bind(this);
@@ -48,7 +47,6 @@ export default class UserDetail extends React.Component {
 
   static willTransitionTo = PageAncestor.willTransitionTo;
   static willTransitionFrom = PageAncestor.willTransitionFrom;
-
 
 
   static contextTypes = {
@@ -61,7 +59,6 @@ export default class UserDetail extends React.Component {
 
     let metadataPromise = MdEntityService.fetchEntityMetadata(['User', 'Tenant', 'Party']);
 
-    let userObjectVar;
     let userPromise = ((routerParams.id === 'new') ? When(Object.assign({
       gridConfigs: [],
       tenants: [],
@@ -71,12 +68,7 @@ export default class UserDetail extends React.Component {
     }, query)) : SecurityService.readUser(routerParams.id))
       .then(userObject => {
         userObject.$grids = {};
-        userObjectVar = userObject;
-        return (userObject.party) ? PartyService.readParty(userObject.party) : When(null)
-      })
-      .then(partyObject => {
-        userObjectVar.partyObject = partyObject;
-        return store.dispatch(setUserAction(userObjectVar))
+        return store.dispatch(setUserAction(userObject));
       });
 
     //let gridPromise = GridService.fetchGrids(vehicleGridLocation, invoiceGridLocation, partyRelGridLocation);
@@ -95,7 +87,6 @@ export default class UserDetail extends React.Component {
 
     //this.initPartyGrids();
   }
-
 
 
   componentDidMount() {
@@ -152,7 +143,6 @@ export default class UserDetail extends React.Component {
   //}
 
 
-
   onSave = (evt) => {
     console.log('onSave');
   };
@@ -168,7 +158,12 @@ export default class UserDetail extends React.Component {
   //  this.props.updateGridAction(grid);
   //};
 
-
+  onDisconnect = (e) => {
+    console.log('onDisconnect');
+    let {userObject, setUserAction} = this.props;
+    userObject.party = null;
+    setUserAction(userObject);
+  };
 
   render() {
 
@@ -187,14 +182,6 @@ export default class UserDetail extends React.Component {
       setDataAction: setUserAction
     };
 
-    let propsForCreatePartyForm = {
-      dataObject: userObject.partyObject,
-      rootObject: userObject,
-      entity: entities.get('Party'),
-      entities,
-      setDataAction: setUserAction
-    };
-
 
     console.debug('%c userDetail render $open = %s', 'background-color: yellow', userObject.$open);
 
@@ -203,19 +190,15 @@ export default class UserDetail extends React.Component {
       <main className="main-content container">
         {this._createToolMenu(userObject)}
 
-        <form style={{marginTop: 10}}>
-          <div className="row">
-            <div className="col-xs-12">
-              <UserForm {...propsForCreateForm} />
-            </div>
-          </div>
-          <div className="row">
-            <div className="col-xs-12">
-              <PartyFoForm {...propsForCreatePartyForm} />
-            </div>
-          </div>
-        </form>
-
+        <BlockComp style={{marginTop: 10}} header="User">
+          <form >
+            <UserForm {...propsForCreateForm} />
+          </form>
+        </BlockComp>
+        <BlockComp header="Connected Party">
+          <PartySelector partyObject={userObject.party} partyEntity={entities.get('Party')}
+                         onDisconnect={this.onDisconnect}/>
+        </BlockComp>
 
       </main>
     );

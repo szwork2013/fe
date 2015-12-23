@@ -8,7 +8,7 @@ import { Alert } from 'react-bootstrap';
 import createForm from 'core/form/createForm';
 import {FieldText} from 'core/form/formUtils';
 import StyledSelect from 'core/components/styledSelect/styledSelect';
-import BlockComp from 'core/components/blockComp/blockComp';
+
 import ActiveItem from 'core/components/blockComp/activeItem';
 import {composedParty} from 'party/partyUtils';
 
@@ -67,9 +67,7 @@ class UserForm extends React.Component {
 
 
     return (
-      <BlockComp>
         <ActiveItem openContent={openContent} closedContent={closedContent} lastValue={true} tabIndex={0} {...this.props} />
-      </BlockComp>
     );
   }
 }

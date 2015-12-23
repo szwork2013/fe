@@ -20,7 +20,7 @@ export default class BlockComp extends React.Component {
 
 
   static defaultProps = {
-    zDepth: 1
+    zDepth: 0
   };
 
   componentWillMount() {

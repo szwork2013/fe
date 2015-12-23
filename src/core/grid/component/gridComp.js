@@ -18,8 +18,9 @@ import GridHeader from 'core/grid/component/gridHeader';
 import {ZzIconButton} from 'core/components/toolmenu/toolmenu';
 
 
-import styles from 'core/grid/component/gridComp.less';
+import css from 'core/grid/component/gridComp.less';
 
+const Colors = Styles.Colors;
 
 export default class GridComp extends React.Component {
   shouldComponentUpdate = PureRenderMixin.shouldComponentUpdate.bind(this);
@@ -50,12 +51,6 @@ export default class GridComp extends React.Component {
 
 
   componentWillMount() {
-    customizeTheme(this.context.muiTheme, {
-      flatButton: {
-        color: Styles.Colors.blueGrey50
-      }
-    });
-
     this.onResizeDebounced = _.debounce(this.onResize, 100);
   }
 
@@ -397,6 +392,7 @@ export default class GridComp extends React.Component {
           <form className="navbar-form navbar-right" role="search" onSubmit={this.onSearchTermSubmit}>
             <Input type="text"  placeholder='Search' onChange={this.onSearchTermChange} value={grid.searchTerm}
                    bsSize="small"/>
+            <span className="fa fa-search" style={{position: 'absolute', bottom: 15, right: 15, pointerEvents: 'none', color: Colors.grey400}}></span>
           </form>
         </Navbar>
 

@@ -17,13 +17,6 @@ export default class Toolmenu extends React.Component {
   };
 
 
-  componentWillMount() {
-    customizeTheme(this.context.muiTheme, {
-      flatButton: {
-        color: Colors.blueGrey50
-      }
-    });
-  }
 
   render() {
 
