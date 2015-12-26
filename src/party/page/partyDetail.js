@@ -15,7 +15,7 @@ import {setPartyAction} from 'party/partyActions';
 import {customizeThemeForDetail, TabTemplate}  from 'core/common/config/mui-theme';
 import {screenLg, tabStyle} from 'core/common/config/variables';
 
-import {composedParty, CUSTOMER_ROLE} from 'party/partyUtils';
+import {enhanceParty, CUSTOMER_ROLE} from 'party/partyUtils';
 import PartyFoForm from 'party/component/partyFoForm';
 import PartyPoForm from 'party/component/partyPoForm';
 import PartyContactList from 'party/component/partyContactList';
@@ -36,7 +36,8 @@ const partyRelGridLocation = 'partyRelList';
 
 
 function mapStateToProps(state) {
-  let partyObject = state.getIn(['party', 'partyObject']);
+  let entities = state.getIn(['metamodel', 'entities']);
+  let partyObject = enhanceParty(state.getIn(['party', 'partyObject']), entities);
   let $grids = partyObject.$grids;
 
   function select(gridLocation) {
@@ -51,7 +52,7 @@ function mapStateToProps(state) {
 
   return {
     partyObject,
-    entities: state.getIn(['metamodel', 'entities']),
+    entities,
     grids
   };
 }
@@ -93,7 +94,6 @@ export default class PartyDetail extends React.Component {
     return When.all([metadataPromise, partyPromise, gridPromise])
       .then( ([entityMap, partyObject, gridMap]) => {
         partyObject.$grids = {};
-        partyObject = composedParty(partyObject, entityMap);
         return store.dispatch(setPartyAction(partyObject))
     });
   }

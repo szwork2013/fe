@@ -33,9 +33,6 @@ export default class GridConfig {
     // array of GridConfigCondition
     this.conditions = [];
 
-    // entity key
-    this.entity = null;
-
     this.gridId = null;
 
     this.gridLocation = null;

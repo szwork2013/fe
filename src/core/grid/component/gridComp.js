@@ -96,24 +96,15 @@ export default class GridComp extends React.Component {
 
 
     //  this.dispatch(grid); // this dispatches the action
-    Axios.get('/core/grid/' + grid.activeGridConfig.gridId, {params: Object.assign({searchTerm: grid.searchTerm, sort: grid.sort, masterId: grid.masterId}, grid.getConditionQueryObject())})
-      .then((response) => {
-        grid.data = response.data;
-        grid.loading = false;
-        console.debug('data received count = ' + grid.data.totalCount);
-
-        grid.gridWidths = GridService.computeGridWidths(grid.data, grid.activeGridConfig);
-
-
-        if (scrollToTop && this.refs.VirtualList) {
-          this.refs.VirtualList.scrollTop();
-        }
-        grid.headerPaddingRight = this._computeNewHPR();
-        this.props.updateGrid(grid);
-      }, (err) => {
-        grid.loading = false;
-        this.props.updateGrid(grid);
-      });
+    GridService.search(grid)
+    .then(grid => {
+      if (scrollToTop && this.refs.VirtualList) {
+        this.refs.VirtualList.scrollTop();
+      }
+      this.props.updateGrid(grid);
+    }, (err) => {
+      this.props.updateGrid(grid);
+    });
   }
 
   _computeNewHPR() {

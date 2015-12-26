@@ -35,6 +35,7 @@ export default class PartySelector extends React.Component {
   onSearch = (e) => {
     e.preventDefault();
     console.log('onSearch');
+
   };
 
   onNew = (e) => {

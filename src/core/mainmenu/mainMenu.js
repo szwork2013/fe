@@ -135,6 +135,8 @@ export default class MainMenu extends React.Component {
 
         <NavDropdown id="administration_dropdown"  title='Administration' onSelect={this.onSelectWithTransition}>
           { this._menuItem("userList") }
+          { this._menuItem("entityList") }
+          { this._menuItem("gridLocationList") }
         </NavDropdown>
 
 

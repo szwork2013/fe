@@ -261,12 +261,12 @@ export default class GridAdminView extends React.Component {
   };
 
   onAddColumn = (fieldNames) => {
-    console.log('onAddColumn FieldNames: ' + fieldNames);
+    console.log('onAddColumn FieldNames: %O', fieldNames);
     let grid = this.props.grid;
     let editedGridConfig = this.state.editedGridConfig;
 
     fieldNames.forEach(v => {
-      editedGridConfig.columns.push(Utils.formatId(editedGridConfig.entity, v));
+      editedGridConfig.columns.push(Utils.formatId(grid.entityName, v));
     });
     editedGridConfig.syncColumnRefs(grid.$entityRef);
 
@@ -279,7 +279,7 @@ export default class GridAdminView extends React.Component {
     let editedGridConfig = this.state.editedGridConfig;
 
     fieldNames.forEach(v => {
-      let fieldKey = Utils.formatId(editedGridConfig.entity, v);
+      let fieldKey = Utils.formatId(grid.entityName, v);
       _.remove(editedGridConfig.columns, c => c == fieldKey);
     });
 
@@ -294,7 +294,7 @@ export default class GridAdminView extends React.Component {
     let editedGridConfig = this.state.editedGridConfig;
 
     for(let v of fieldNames) {
-      let fieldKey = Utils.formatId(editedGridConfig.entity, v);
+      let fieldKey = Utils.formatId(grid.entityName, v);
       let index = editedGridConfig.columns.indexOf(fieldKey);
       if (index < 1) {
         return;
@@ -315,7 +315,7 @@ export default class GridAdminView extends React.Component {
     let iLen = fieldNames.length;
     for (let i=iLen-1; i>=0; i--) {
       let v = fieldNames[i];
-      let fieldKey = Utils.formatId(editedGridConfig.entity, v);
+      let fieldKey = Utils.formatId(grid.entityName, v);
       let index = editedGridConfig.columns.indexOf(fieldKey);
       if (index >= editedGridConfig.columns.length - 1) {
         return;

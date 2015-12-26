@@ -173,6 +173,21 @@ class GridService {
     return true;
   }
 
+  search(grid) {
+    return Axios.get('/core/grid/' + grid.activeGridConfig.gridId, {params: Object.assign({searchTerm: grid.searchTerm, sort: grid.sort, masterId: grid.masterId}, grid.getConditionQueryObject())})
+      .then((response) => {
+        grid.data = response.data;
+        grid.loading = false;
+        console.debug('data received count = ' + grid.data.totalCount);
+        grid.gridWidths = GridService.computeGridWidths(grid.data, grid.activeGridConfig);
+        grid.headerPaddingRight = this._computeNewHPR();
+        return grid;
+      }, (err) => {
+        grid.loading = false;
+        throw err;
+      });
+  }
+
 
 }
 

@@ -162,7 +162,7 @@ export default class Grid {
         let gcc = new GridConfigCondition(this.activeGridConfig);
         let operFrags = oper.split('_');
         let fieldName = operFrags[0];
-        gcc.column = this.activeGridConfig.entity + "_" + fieldName;
+        gcc.column = this.entityName + "_" + fieldName;
         gcc.operator = operFrags[1];
         gcc.values = query[fieldName];
 

@@ -85,6 +85,7 @@ class PartyFoForm extends React.Component {
         <div className="form-text-row">
           <FieldText label={dateOfBirth.textLabel} value={dataObject.dateOfBirth} mdField={dateOfBirth.mdField} />
           <FieldText label={birthNumber.textLabel} value={dataObject.birthNumber}/>
+          <FieldText label={gender.textLabel} value={dataObject.genderLabel}/>
           <FieldText label={birthLastName.textLabel} value={dataObject.birthLastName}/>
           <FieldText label={salutation.textLabel} value={dataObject.salutation}/>
           <FieldText label={placeOfBirth.textLabel} value={dataObject.placeOfBirth}/>
