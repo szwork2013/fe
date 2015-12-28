@@ -2,7 +2,7 @@ import {Map} from 'immutable';
 import { combineReducers } from 'redux-immutablejs';
 
 import Grid from 'core/grid/domain/grid';
-import {updateGridAction, updateGridsAction, updateGridLocationAction} from 'core/grid/gridActions';
+import {updateGridAction, updateGridsAction, updateGridObjectAction, updateGridObjectGridAction} from 'core/grid/gridActions';
 
 
 // [gridLocation] -> Grid
@@ -19,11 +19,15 @@ function grids(state = new Map(), action) {
 }
 
 // gridLocation (admin)
-function gridLocation(state = null, action) {
+function gridObject(state = null, action) {
   switch (action.type) {
-    case updateGridLocationAction.type:
-      console.log('updateGridLocationAction = ', action);
+    case updateGridObjectAction.type:
+      console.log('updateGridObjectAction = %O', action.payload);
       return Grid.clone(action.payload);
+    case updateGridObjectGridAction.type:
+      console.log('updateGridObjectGridAction %s : %O', action.type, action.payload);
+      state.$grids[action.payload.gridLocation] = Grid.clone(action.payload);
+      return Object.assign({},state);
     default:
       return state;
   }
@@ -34,6 +38,6 @@ function gridLocation(state = null, action) {
 
 export const grid = combineReducers({
   grids,
-  gridLocation
+  gridObject
 });
 

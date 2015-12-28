@@ -22,7 +22,7 @@ class GridService {
   /**
    * vlozi do GridStore objekty Grid pro gridLocations ktere tam dosud nebyly
    * @param jedno nebo vice gridLocation
-   * @returns gridMap
+   * @returns - Immutablejs gridMap
    */
   fetchGrids(...gridLocations) {
     const gridMap = store.getState().getIn(['grid', 'grids']);
@@ -37,17 +37,16 @@ class GridService {
 
     var gridArray;
     return Axios.get('/core/grid-config', {params: {gridLocation: unresolvedGridLocations}})
-      .then( response => response.data.map(g => new Grid(g)) )
-      .then( _gridArray => {
+      .then(response => response.data.map(g => new Grid(g)))
+      .then(_gridArray => {
         gridArray = _gridArray;
         return MdEntityService.fetchEntities(uniq(gridArray.map(g => g.entityName)))
       })
-      .then( entityMap => {
-        let gridObject = gridArray.reduce( (acc, grid) => {
+      .then(entityMap => {
+        let gridObject = gridArray.reduce((acc, grid) => {
           grid.$entityRef = entityMap.get(grid.entityName);
-          // doplnime gridConfig.$columnRefs: MdField[]
 
-          for(let gridConfig of grid.gridConfigs) {
+          for (let gridConfig of grid.gridConfigs) {
             GridConfig.clasifyJson(gridConfig, grid);
           }
 
@@ -59,6 +58,29 @@ class GridService {
         store.dispatch(updateGridsAction(Map(gridObject)));
 
         return gridMap.merge(gridObject);
+      });
+  }
+
+  /**
+   * urceno pouze pro admin editaci gridLocation
+   * @param gridLocation
+   * @returns {*}
+   */
+  readGridLocation(gridLocation) {
+    const entityMap = store.getState().getIn(['metamodel', 'entities']);
+
+    var grid;
+    return Axios.get('/core/grid-location/' + gridLocation)
+      .then((response) => {
+        grid = new Grid(response.data);
+        return MdEntityService.fetchEntities(['GridLocation', grid.entityName]);
+      }).then(entityMap => {
+        grid.$entityRef = entityMap.get(grid.entityName);
+
+        for (let gridConfig of grid.gridConfigs) {
+          GridConfig.clasifyJson(gridConfig, grid);
+        }
+        return grid;
       });
   }
 
@@ -79,7 +101,7 @@ class GridService {
     var CELL_PADDING_PX = 5;
 
     let matrix = [];
-    let headers = gridConfig.$columnRefs.map( (mdField) => {
+    let headers = gridConfig.$columnRefs.map((mdField) => {
       let v = mdField.gridHeaderLabelActive;
       return ((v) ? ( (typeof v == 'string') ? v.trim() : v.toString().trim() ) : "") + HEADER_ADDITIONAL_STRING;
     });
@@ -88,7 +110,7 @@ class GridService {
     //console.log("Array: %o", matrix);
 
     if (gridData) {
-      for(let row of gridData.rows) {
+      for (let row of gridData.rows) {
         for (let i = 0; i < row.cells.length; i++) {
           let str = (row.cells[i].value) ? ( (typeof row.cells[i].value == 'string') ? row.cells[i].value.trim() : row.cells[i].value.toString().trim() ) : "";
           if (matrix[i].length < str.length) {
@@ -122,7 +144,7 @@ class GridService {
     // udelame sumu minWidths
     let sumGridMinWidths = sum(gridMinWidthsPX);
     // spocitame width pro sloupce tak, aby odpovidaly pomerum min-width
-    let gridWidthsPrct = gridMinWidthsPX.map(v => ((100*v)/sumGridMinWidths));
+    let gridWidthsPrct = gridMinWidthsPX.map(v => ((100 * v) / sumGridMinWidths));
 
     // spocitame maxWidths (jen vytvorime array)
     let gridMaxWidthsPX = Array.from(new Array(gridWidthsPrct.length), () => MAXIMAL_COLUMN_WIDTH_PX);
@@ -135,22 +157,21 @@ class GridService {
   }
 
 
-
   validateCondition(condition, errorMessages, index, allOperators) {
     if (!condition.column || !condition.operator) {
-      errorMessages.push( (index+1) + ". výběrový filtr musí mít vyplněn sloupec a operátor");
+      errorMessages.push((index + 1) + ". výběrový filtr musí mít vyplněn sloupec a operátor");
       return false;
     }
     let operatorLov = allOperators.find(li => li.value === condition.operator);
     let cardinality = operatorLov.params[0];
     if (cardinality == 1 || cardinality == "N") {
       if (isEmpty(condition.values) || !condition.values[0]) {
-        errorMessages.push( (index+1) + ". výběrový filtr musí mít vyplněnou hodnotu");
+        errorMessages.push((index + 1) + ". výběrový filtr musí mít vyplněnou hodnotu");
         return false;
       }
-    }  else if (cardinality == 2) {
+    } else if (cardinality == 2) {
       if (isEmpty(condition.values) || condition.values.length < 2 || !condition.values[0] || !condition.values[1]) {
-        errorMessages.push( (index+1) + ". výběrový filtr musí mít vyplněné obě hodnoty");
+        errorMessages.push((index + 1) + ". výběrový filtr musí mít vyplněné obě hodnoty");
         return false;
       }
     }
@@ -159,12 +180,12 @@ class GridService {
 
   validateSortColumn(sortColumns, sortColumn, errorMessages, index) {
     if (!sortColumn.field || !sortColumn.sortOrder) {
-      errorMessages.push( (index+1) + ". řazení v sestavě musí mít vyplněno sloupec a volbu řazení");
+      errorMessages.push((index + 1) + ". řazení v sestavě musí mít vyplněno sloupec a volbu řazení");
       return false;
     }
 
     if (sortColumn.fixed) {
-      if (sortColumns.filter( (v,i) =>  ( !v.fixed && i < index ) ).length > 0) {
+      if (sortColumns.filter((v, i) => ( !v.fixed && i < index )).length > 0) {
         errorMessages.push("Uzamknutá řazení musí být na začátku seznamu řazení (tj. nemůže být například první řazení odemčené a druhé zamčené.")
         return false;
       }
@@ -174,13 +195,20 @@ class GridService {
   }
 
   search(grid) {
-    return Axios.get('/core/grid/' + grid.activeGridConfig.gridId, {params: Object.assign({searchTerm: grid.searchTerm, sort: grid.sort, masterId: grid.masterId}, grid.getConditionQueryObject())})
+    console.debug("%c running search with gridLocation = %s, gridId = %s, searchTerm = %s, masterId = %s", "background-color: green", grid.gridLocation, grid.activeGridConfig.gridId, grid.searchTerm, grid.masterId);
+
+    return Axios.get('/core/grid/' + grid.activeGridConfig.gridId, {
+        params: Object.assign({
+          searchTerm: grid.searchTerm,
+          sort: grid.sort,
+          masterId: grid.masterId
+        }, grid.getConditionQueryObject())
+      })
       .then((response) => {
         grid.data = response.data;
         grid.loading = false;
         console.debug('data received count = ' + grid.data.totalCount);
-        grid.gridWidths = GridService.computeGridWidths(grid.data, grid.activeGridConfig);
-        grid.headerPaddingRight = this._computeNewHPR();
+        grid.gridWidths = this.computeGridWidths(grid.data, grid.activeGridConfig);
         return grid;
       }, (err) => {
         grid.loading = false;

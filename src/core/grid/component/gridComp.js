@@ -37,7 +37,8 @@ export default class GridComp extends React.Component {
     // from store
     grid: React.PropTypes.instanceOf(Grid).isRequired,
     onGridChange: React.PropTypes.func,
-    updateGrid: React.PropTypes.func.isRequired
+    updateGrid: React.PropTypes.func.isRequired,
+    gridClassName: React.PropTypes.string
   };
 
 
@@ -86,7 +87,6 @@ export default class GridComp extends React.Component {
       return;
     }
 
-    console.debug("%c running search with gridLocation = %s, gridId = %s, searchTerm = %s, masterId = %s", "background-color: green", grid.gridLocation, grid.activeGridConfig.gridId, grid.searchTerm, grid.masterId);
 
     grid.selectedRows = new Map();
     grid.loading = true;
@@ -98,6 +98,7 @@ export default class GridComp extends React.Component {
     //  this.dispatch(grid); // this dispatches the action
     GridService.search(grid)
     .then(grid => {
+      grid.headerPaddingRight = this._computeNewHPR();
       if (scrollToTop && this.refs.VirtualList) {
         this.refs.VirtualList.scrollTop();
       }
@@ -316,7 +317,8 @@ export default class GridComp extends React.Component {
     let {
       grid,
       children,
-      uiLocation
+      uiLocation,
+      gridClassName
       } = this.props;
 
     console.debug("gridComp rendering: dataCount = " + grid.getTotalCount());
@@ -324,10 +326,11 @@ export default class GridComp extends React.Component {
 
     let dropdownId = grid.gridLocation + "_dropdown";
 
+    const gridClassNames = classNames('md-grid', 'md-grid--' + uiLocation, gridClassName);
 
     if (!grid.activeGridConfig) {
       return (
-        <div className={classNames('md-grid', 'md-grid--' + uiLocation)} className="md-grid">
+        <div className={gridClassNames}>
           <Navbar fluid style={{marginBottom: 10, minHeight: 'initial', fontSize: 14}}>
             <Nav>
               <NavItem eventKey={3} href={this.context.router.makeHref('gridAdmin', {gridLocation: grid.gridLocation})} onClick={this.onSelectGridManage}>Create Grid</NavItem>
@@ -365,7 +368,7 @@ export default class GridComp extends React.Component {
     return (
 
 
-      <div className={classNames('md-grid', 'md-grid--' + uiLocation)}>
+      <div className={gridClassNames}>
 
         <Navbar fluid  style={{marginBottom: 10, minHeight: 'initial', fontSize: 14}}>
           <Nav navbar>

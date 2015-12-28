@@ -48,16 +48,20 @@ export default class PartySelector extends React.Component {
       gridPromise = When(dataObject.$partySelector.grid);
     } else {
       gridPromise = GridService.fetchGrids(partySearchGridLocation)
-      .then(grid => Grid.clone(grid));
+        .then(gridMap => Grid.clone(gridMap.get(partySearchGridLocation)));
     }
 
-    gridPromise.then(grid => {
+    gridPromise
+      .then(grid => {
+        console.log('onSearch %O', grid);
+        grid.activeGridConfig = grid.getActiveGridConfig();
         grid.searchTerm = dataObject.$partySelector.searchTerm;
-        GridService.search(grid)
-          .then(grid => {
-            setDataAction(dataObject);
-          })
-      });
+        return GridService.search(grid);
+      })
+      .then(grid => {
+        setDataAction(dataObject);
+      })
+
 
   };
 

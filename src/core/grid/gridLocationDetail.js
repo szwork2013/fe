@@ -13,8 +13,9 @@ import MdEntityService from 'core/metamodel/mdEntityService';
 import {customizeThemeForDetail, TabTemplate}  from 'core/common/config/mui-theme';
 import {screenLg} from 'core/common/config/variables';
 import BlockComp from 'core/components/blockComp/blockComp';
+import {selectGrid} from 'core/form/formUtils';
 
-import {updateGridLocationAction} from 'core/grid/gridActions';
+import {updateGridObjectAction, updateGridObjectGridAction} from 'core/grid/gridActions';
 import GridService from 'core/grid/gridService';
 import Grid from 'core/grid/domain/grid';
 import GridComp from 'core/grid/component/gridComp';
@@ -22,18 +23,20 @@ import GridComp from 'core/grid/component/gridComp';
 const Colors = Styles.Colors;
 const Typography = Styles.Typography;
 
+const gridConfigGridLocation = 'gridConfigList';
 
 function mapStateToProps(state) {
-  let userObject = state.getIn(['security', 'userObject']);
+  let gridObject = state.getIn(['grid', 'gridObject']);
 
   return {
-    userObject,
+    gridObject,
+    gridConfigGrid: selectGrid(state, gridObject, gridConfigGridLocation),
     entities: state.getIn(['metamodel', 'entities'])
   };
 }
 
 
-@connect(mapStateToProps, {updateGridLocationAction})
+@connect(mapStateToProps, {updateGridObjectAction, updateGridObjectGridAction})
 export default class GridLocationDetail extends React.Component {
   shouldComponentUpdate = PureRenderMixin.shouldComponentUpdate.bind(this);
 
@@ -50,18 +53,25 @@ export default class GridLocationDetail extends React.Component {
   };
 
   static fetchData(routerParams, query) {
-    console.log("UserDetail#fetchData()");
+    console.log("GridLocationDetail#fetchData()");
 
-    let metadataPromise = MdEntityService.fetchEntities(['GridLocation']);
-
-    let gridPromise = GridService.fetchGrids(routerParams.id)
-      .then(grid => {
-        return store.dispatch(updateGridLocationAction(grid));
+    let gridObjectPromise = MdEntityService.fetchEntities(['GridLocation', 'GridConfig'])
+      .then(() => {
+        return GridService.readGridLocation(routerParams.id);
+      })
+      .then((gridObject) => {
+        gridObject.$grids = {};
+        return store.dispatch(updateGridObjectAction(gridObject));
       });
 
-    //let gridPromise = GridService.fetchGrids(vehicleGridLocation, invoiceGridLocation, partyRelGridLocation);
+    //let gridPromise = GridService.fetchGrids(routerParams.id)
+    //  .then(grid => {
+    //    return store.dispatch(updateGridLocationAction(grid));
+    //  });
 
-    return When.all([metadataPromise, gridPromise]);
+    let gridPromise = GridService.fetchGrids(gridConfigGridLocation);
+
+    return When.all([gridObjectPromise, gridPromise]);
   }
 
 
@@ -69,66 +79,29 @@ export default class GridLocationDetail extends React.Component {
    *
    */
   componentWillMount() {
-    console.debug('UserDetail#componentWillMount, props: %o', this.props);
+    console.debug('GridLocationDetail#componentWillMount, props: %o', this.props);
 
     customizeThemeForDetail(this.context.muiTheme);
 
-    //this.initPartyGrids();
+    let {gridObject,gridConfigGrid,updateGridObjectGridAction} = this.props;
+
+
+    gridConfigGrid.activeGridConfig = gridConfigGrid.getActiveGridConfig();
+    gridConfigGrid.masterId = gridObject.gridLocation;
+    updateGridObjectGridAction(gridConfigGrid);
   }
 
 
   componentDidMount() {
     //this.searchUserGrids();
+    this.refs[this.props.gridConfigGrid.gridLocation].search();
   }
 
   componentWillUnmount() {
-    //this.mediaQuery.removeListener(this.mediaQueryListener);
-    this.props.updateGridLocationAction(null);
+    this.props.updateGridObjectAction(null);
   }
 
-  //initUserGrids() {
-  //  let {vehicleGrid, invoiceGrid} = this.props;
-  //
-  //  let updated = this.initGrid(vehicleGrid);
-  //  if(this.mediaQuery.matches) {
-  //    updated = updated | this.initGrid(invoiceGrid);  // pozor bitwise, nechci shortcutting
-  //  }
-  //  return !!updated;
-  //}
 
-  //searchUserGrids() {
-  //  let {vehicleGrid, invoiceGrid} = this.props;
-  //  if (!vehicleGrid.data) this.refs[vehicleGridLocation].search();
-  //  if(this.mediaQuery.matches && !invoiceGrid.data) {
-  //    this.refs[invoiceGridLocation].search();
-  //  }
-  //}
-
-  //initGrid(grid) {
-  //  console.log('initGrid %s', grid.gridLocation);
-  //  let {partyObject, updateGridAction} = this.props;
-  //
-  //  let doUpdate = false;
-  //  if (!grid.activeGridConfig) {
-  //    grid.activeGridConfig = grid.getActiveGridConfig();
-  //    doUpdate = true;
-  //  }
-  //  if (grid.masterId !== partyObject.partyId) {
-  //    grid.masterId = partyObject.partyId;
-  //    doUpdate = true;
-  //  }
-  //  if (doUpdate) updateGridAction(grid);
-  //  return doUpdate;
-  //}
-
-  //activateTab(grid) {
-  //  this.initGrid(grid);
-  //  if (!grid.data) {
-  //    setTimeout( () => {
-  //      this.refs[grid.gridLocation].search();
-  //    }, 0);
-  //  }
-  //}
 
 
   onSave = (evt) => {
@@ -147,24 +120,29 @@ export default class GridLocationDetail extends React.Component {
 
 
     let {
-      userObject,
+      gridObject,
+      gridConfigGrid,
       entities,
-      setUserAction
+      updateGridObjectAction
       } = this.props;
 
 
-    console.debug('%c GridLocationDetail render $open = %s', 'background-color: yellow', userObject.$open);
+    console.debug('%c GridLocationDetail render $open = %s', 'background-color: yellow', gridObject.$open);
 
 
     return (
-      <main className="main-content container">
+      <main className="main-content container" style={{display: 'flex', flexDirection: 'column', height: '100%'}}>
         {this._createToolMenu()}
 
         <BlockComp style={{marginTop: 10}} header="Grid">
           <form >
-            HA
+            {gridObject.label} ({gridObject.gridLocation}) for entity {gridObject.entityName}
+            <br/>
+            TODO: label edit
           </form>
         </BlockComp>
+
+        <GridComp ref={gridConfigGrid.gridLocation} grid={gridConfigGrid} uiLocation="main" updateGrid={this.props.updateGridObjectGridAction} gridClassName="detail-grid"/>
 
       </main>
     );

@@ -14,6 +14,7 @@ import PartyService from 'party/partyService';
 import {setPartyAction} from 'party/partyActions';
 import {customizeThemeForDetail, TabTemplate}  from 'core/common/config/mui-theme';
 import {screenLg, tabStyle} from 'core/common/config/variables';
+import {selectGrid} from 'core/form/formUtils';
 
 import {enhanceParty, CUSTOMER_ROLE} from 'party/partyUtils';
 import PartyFoForm from 'party/component/partyFoForm';
@@ -38,16 +39,12 @@ const partyRelGridLocation = 'partyRelList';
 function mapStateToProps(state) {
   let entities = state.getIn(['metamodel', 'entities']);
   let partyObject = enhanceParty(state.getIn(['party', 'partyObject']), entities);
-  let $grids = partyObject.$grids;
 
-  function select(gridLocation) {
-    return ($grids[gridLocation]) ? $grids[gridLocation] : Grid.clone(state.getIn(['grid', 'grids', gridLocation]));
-  }
 
-  let grids = [select(partyRelGridLocation)];
+  let grids = [selectGrid(state, partyObject, partyRelGridLocation)];
   if (partyObject.hasRole(CUSTOMER_ROLE)) {
-    grids.unshift(select(invoiceGridLocation));
-    grids.unshift(select(vehicleGridLocation));
+    grids.unshift(selectGrid(state, partyObject, invoiceGridLocation));
+    grids.unshift(selectGrid(state, partyObject, vehicleGridLocation));
   }
 
   return {
@@ -282,7 +279,7 @@ export default class PartyDetail extends React.Component {
             {mainForm}
             {tabs}
           </div>
-          <GridComp ref={grids[0].gridLocation} grid={grids[0]} uiLocation="main" updateGrid={this.updateGrid}/>
+          <GridComp ref={grids[0].gridLocation} grid={grids[0]} uiLocation="main-right" updateGrid={this.updateGrid}/>
         </main>
       );
     } else {
