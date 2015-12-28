@@ -10,16 +10,11 @@ import PageAncestor from 'core/common/page/pageAncestor';
 import Toolmenu from 'core/components/toolmenu/toolmenu';
 import {store} from 'core/common/redux/store';
 import MdEntityService from 'core/metamodel/mdEntityService';
-import SecurityService from 'core/security/securityService';
-import PartyService from 'party/partyService';
-import {setUserAction} from 'core/security/securityActions';
 import {customizeThemeForDetail, TabTemplate}  from 'core/common/config/mui-theme';
 import {screenLg} from 'core/common/config/variables';
 import BlockComp from 'core/components/blockComp/blockComp';
 
-import UserForm from 'core/security/userForm';
-import PartySelector from 'party/component/partySelector';
-
+import {updateGridLocationAction} from 'core/grid/gridActions';
 import GridService from 'core/grid/gridService';
 import Grid from 'core/grid/domain/grid';
 import GridComp from 'core/grid/component/gridComp';
@@ -38,12 +33,12 @@ function mapStateToProps(state) {
 }
 
 
-@connect(mapStateToProps, {setUserAction})
-export default class UserDetail extends React.Component {
+@connect(mapStateToProps, {updateGridLocationAction})
+export default class GridLocationDetail extends React.Component {
   shouldComponentUpdate = PureRenderMixin.shouldComponentUpdate.bind(this);
 
-  static title = 'User';
-  static icon = 'user';
+  static title = 'Grid';
+  static icon = 'table';
 
   static willTransitionTo = PageAncestor.willTransitionTo;
   static willTransitionFrom = PageAncestor.willTransitionFrom;
@@ -57,24 +52,16 @@ export default class UserDetail extends React.Component {
   static fetchData(routerParams, query) {
     console.log("UserDetail#fetchData()");
 
-    let metadataPromise = MdEntityService.fetchEntityMetadata(['User', 'Tenant', 'Party']);
+    let metadataPromise = MdEntityService.fetchEntities(['GridLocation']);
 
-    let userPromise = ((routerParams.id === 'new') ? When(Object.assign({
-      gridConfigs: [],
-      tenants: [],
-      defaultGridConfig: {},
-      $open: true,
-      enabled: true
-    }, query)) : SecurityService.readUser(routerParams.id))
-      .then(userObject => {
-        userObject.$grids = {};
-        userObject.$partySelector = {};
-        return store.dispatch(setUserAction(userObject));
+    let gridPromise = GridService.fetchGrids(routerParams.id)
+      .then(grid => {
+        return store.dispatch(updateGridLocationAction(grid));
       });
 
     //let gridPromise = GridService.fetchGrids(vehicleGridLocation, invoiceGridLocation, partyRelGridLocation);
 
-    return When.all([metadataPromise, userPromise]);
+    return When.all([metadataPromise, gridPromise]);
   }
 
 
@@ -96,7 +83,7 @@ export default class UserDetail extends React.Component {
 
   componentWillUnmount() {
     //this.mediaQuery.removeListener(this.mediaQueryListener);
-    this.props.setUserAction(null);
+    this.props.updateGridLocationAction(null);
   }
 
   //initUserGrids() {
@@ -155,16 +142,6 @@ export default class UserDetail extends React.Component {
     this.context.router.goBack();
   };
 
-  //updateGrid = (grid) => {
-  //  this.props.updateGridAction(grid);
-  //};
-
-  onDisconnect = (e) => {
-    console.log('onDisconnect');
-    let {userObject, setUserAction} = this.props;
-    userObject.party = null;
-    setUserAction(userObject);
-  };
 
   render() {
 
@@ -175,30 +152,18 @@ export default class UserDetail extends React.Component {
       setUserAction
       } = this.props;
 
-    let propsForCreateForm = {
-      dataObject: userObject,
-      rootObject: userObject,
-      entity: entities.get('User'),
-      entities,
-      setDataAction: setUserAction
-    };
 
-
-    console.debug('%c userDetail render $open = %s', 'background-color: yellow', userObject.$open);
+    console.debug('%c GridLocationDetail render $open = %s', 'background-color: yellow', userObject.$open);
 
 
     return (
       <main className="main-content container">
-        {this._createToolMenu(userObject)}
+        {this._createToolMenu()}
 
-        <BlockComp style={{marginTop: 10}} header="User">
+        <BlockComp style={{marginTop: 10}} header="Grid">
           <form >
-            <UserForm {...propsForCreateForm} />
+            HA
           </form>
-        </BlockComp>
-        <BlockComp header="Connected Party">
-          <PartySelector partyObject={userObject.party} dataObject={userObject} partyEntity={entities.get('Party')}
-                         onDisconnect={this.onDisconnect}  setDataAction={setUserAction}/>
         </BlockComp>
 
       </main>
@@ -208,17 +173,12 @@ export default class UserDetail extends React.Component {
   }
 
 
-  _createToolMenu(userObject) {
+  _createToolMenu() {
     return (
       <Toolmenu>
         <FlatButton onClick={this.onSave}>
-          <span className="fa fa-save"/><span> Save User</span>
+          <span className="fa fa-save"/><span> Save Grid</span>
         </FlatButton>
-        { (userObject.party > 0) ? (
-          <FlatButton onClick={this.onDelete}>
-            <span className="fa fa-trash"/><span> Delete User</span>
-          </FlatButton>
-        ) : <div/>}
         <FlatButton onClick={this.onBack} disabled={History.length <= 1}>
           <span className="fa fa-chevron-left"/><span> Back</span>
         </FlatButton>

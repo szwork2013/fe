@@ -1,5 +1,6 @@
 import {expect} from 'chai';
 import {List, Map, fromJS} from 'immutable';
+import {transform} from 'lodash';
 
 describe('immutability', () => {
 
@@ -84,6 +85,32 @@ describe('immutability', () => {
       for (let item of entityMap.entries()) {
         console.log(item); // 1, 2, 3
       }
+
+
+    });
+
+  });
+
+  describe('Test Merge in', () => {
+
+    it('dobre merguje', () => {
+
+      let entityMap = Map();
+      entityMap = entityMap.set('Party', {id: 'PartyId'});
+      entityMap = entityMap.set('Address', {id: 'AddressId'});
+      entityMap = entityMap.set('Country', {id: 'countryId'});
+
+      let lovObject = {Party: [1,2], Address: [1,2,3]};
+
+
+
+      entityMap = entityMap.mergeDeep(transform(lovObject, function(result, v, k) {result[k] = {lovItems: v};}));
+
+      console.log('\n');
+      for (let item of entityMap.entries()) {
+        console.log(item); // 1, 2, 3
+      }
+
 
 
     });

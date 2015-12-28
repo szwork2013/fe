@@ -1,7 +1,7 @@
 import React, { PropTypes } from 'react';
 import {Record, List} from 'immutable';
 import PureRenderMixin from 'react-addons-pure-render-mixin';
-import {TextField, RaisedButton, SelectField} from 'material-ui';
+import {TextField, RaisedButton, SelectField, MenuItem} from 'material-ui';
 import {FieldRecord, enhanceFormRecord} from 'core/form/fieldRecord';
 import { Alert } from 'react-bootstrap';
 
@@ -66,6 +66,8 @@ export class LoginForm extends React.Component {
       </div>
     );
 
+    const tenantItems = loginFormData.tenant.lovItems.map( (li,i) => <MenuItem value={li.value} key={i} primaryText={li.label}/>);
+
 
     return (
       <form onSubmit={ e => onSubmit(e, this.refs.usernameField)} >
@@ -90,8 +92,9 @@ export class LoginForm extends React.Component {
                 value={loginFormData.tenant.value}
                 onChange={(e) => {setLoginFormDataAction(loginFormData.setFieldValue('tenant', e.target.value, true));}}
                 disabled={loginFormData.isTenantDisabled()}
-                hintText="Client" fullWidth errorText={loginFormData.tenant.errorText}
-                menuItems={loginFormData.tenant.lovItems} displayMember="label" valueMember="value" autoComplete="off"/>
+                hintText="Client" fullWidth errorText={loginFormData.tenant.errorText} autoComplete="off">
+                {tenantItems}
+                </SelectField>
             </div>
           </div>
           <div className="row">

@@ -21,7 +21,8 @@ import UserDetail from 'core/security/userDetail';
 
 import LoginPage from 'core/security/loginPage';
 import EntityList from 'core/metamodel/entityList';
-import GridLocationList from 'core/metamodel/gridLocationList';
+import GridLocationList from 'core/grid/gridLocationList';
+import GridLocationDetail from 'core/grid/gridLocationDetail';
 
 import GridAdminView from 'core/grid/component/gridAdminView';
 import ResponsiveTest from 'administration/responsiveTest';
@@ -36,6 +37,7 @@ const routes = (
     <Route name="loginPage" path="login" handler={LoginPage}/>
     <Route name="entityList" path="core/entity/:gridId?" handler={EntityList}/>
     <Route name="gridLocationList" path="core/grid-location/:gridId?" handler={GridLocationList}/>
+    <Route name="gridLocationDetail" path="core/grid-location/detail/:id?" handler={GridLocationDetail}/>
 
 
 

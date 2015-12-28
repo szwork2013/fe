@@ -1,6 +1,6 @@
 import Axios from 'core/common/config/axios-config';
 import When from 'when';
-import {uniq, values, flatten} from 'lodash';
+import {flatten} from 'lodash';
 
 import {updateEntitiesAction} from 'core/metamodel/metamodelActions';
 import {store} from 'core/common/redux/store';
@@ -17,50 +17,38 @@ class MdEntityService {
    * Pokud je zadane pole withLovs, tak k nim jeste dotahne lovItems, pokud nejsou jeste dotazene (lovitems === undefined)
    * Pokud se neco dotahovalo aktualizuje metamodel/entities
    *  Vrati promise resolvovany do (doplneneho) entityObject
-   * @param entityNames - pole [Party, ...]
-   * @param withLovs - pole [true, false..] o stejne delce jako entityNames, kde pokud je true tak se dotahnou i lov do mdEntity.lovItems
+   * @param entityNamesOrSpecs - pole jmen entit [Party, ...] (potom se predpoklada, ze je to without lov) nebo pole objektu [{entity: 'Country', lov: true}, ...]
    * @returns Promise<entityObject>
      */
-  fetchEntities(entityNames, withLovs) {
+  fetchEntities(entityNamesOrSpecs) {
 
     const entityMap = store.getState().getIn(['metamodel', 'entities']);
 
-    let unresolvedEntityNames = entityNames.filter(v => !entityMap.has(v));
+    let entitySpecs = entityNamesOrSpecs.map(v => (typeof v === 'string') ? {entity: v} : v);
 
-    var promise;
-    var asyncFetch = false;
-    if (unresolvedEntityNames.length > 0) {
-      asyncFetch = true;
-      promise = this.fetchMissingEntities(unresolvedEntityNames, entityMap);
-    } else {
-      promise = When(entityMap);
-    }
+    let unresolvedEntitySpecs = entitySpecs.filter(v => !entityMap.has(v.entity));
 
-    var finalPromise = promise.then((entityMap) => {
-      if (withLovs && withLovs.length === entityNames.length) {
-        var keyWithLovs = entityNames.filter( (k,i) => withLovs[i]);
-        let unresolvedLovs = keyWithLovs.filter(k => entityMap.get(k).lovItems === undefined);
+    let unresolvedLovNames = entitySpecs.filter(v => v.lov).filter(v => {
+      let entityObject = entityMap.get(v.entity);
+      return (!entityObject || entityObject.lovItems === undefined);
+    }).map(v => v.entity);
 
-        var promiseLov;
-        if (unresolvedLovs.length > 0) {
-          asyncFetch = true;
-          promiseLov = this.fetchMissingEntityLovs(unresolvedLovs, entityMap);
-        } else {
-          promiseLov = When(entityMap);
+
+    var promiseArray = [(unresolvedEntitySpecs.length) ? this.fetchMissingEntities(unresolvedEntitySpecs.map(s => s.entity), entityMap) : entityMap,
+      (unresolvedLovNames.length) ? this.fetchMissingEntityLovs(unresolvedLovNames) : {}];
+
+    return When.all(promiseArray)
+      .then( ([entityMap, lovObject]) => {
+        for(let entityName in lovObject) {
+          let entityObject = entityMap.get(entityName);
+          entityObject.lovItems = lovObject[entityName];
+          entityMap = entityMap.set(entityName, entityObject);
         }
-        return promiseLov;
-      } else {
+        if ( unresolvedEntitySpecs.length || unresolvedLovNames.length ) {
+          store.dispatch(updateEntitiesAction(entityMap));
+        }
         return entityMap;
-      }
     });
-
-    return finalPromise.then((entityMap) => {
-      if (asyncFetch) {
-        store.dispatch(updateEntitiesAction(entityMap));
-      }
-      return entityMap;
-    });
-
   }
 
 
@@ -82,42 +70,41 @@ class MdEntityService {
       });
   }
 
-  fetchMissingEntityLovs(entityNames, entityMap) {
+  fetchMissingEntityLovs(entityNames) {
     return Axios.get('/core/metamodel/lovitem', {params: {entityName: entityNames}})
-      .then((response) => {
-        var data = response.data;
-        for(let ek of entityNames) {
-          let entity = entityMap.get(ek);
-          entity.lovItems = data[ek];
-          entityMap = entityMap.set(ek, entity);
-        }
-        return entityMap;
-      });
+      .then((response) => response.data);
   }
 
 
   /**
    *
    * @param mainEntityNames - pole jmen hlavnich entit, ktere dotahneme bez lov a k nim potom dotahneme entity vsech fieldu s localValueSource vcetne lov
-   * @param entityNamesForLov - pole jmen entit ktere dotahneme s lovs
+   * @param entityNamesOrSpecs - pole jmen entit ktere dotahneme bez lovs, nebo pole objektu [{entity: 'Country', lov: true}, ...]
    * @returns {Promise.<entityObject>|Promise|*}
    */
-  fetchEntityMetadata(mainEntityNames, entityNamesForLov) {
+  fetchEntityMetadata(mainEntityNames, entityNamesOrSpecs) {
+
+    entityNamesOrSpecs = (entityNamesOrSpecs) ? entityNamesOrSpecs : [];
+    let entitySpecs = entityNamesOrSpecs.map(v => (typeof v === 'string') ? {entity: v} : v);
+
     return this.fetchEntities(mainEntityNames)
       .then(entityMap => {
 
-        let allFields = flatten(mainEntityNames.map(entityName => values(entityMap.get(entityName).fields)));
-        let allValueSources = allFields.filter(f => f.hasLocalValueSource()).map(f => f.valueSource);
+        let allFields = flatten(mainEntityNames.map(entityName => Object.values(entityMap.get(entityName).fields)));
+        let fieldSpecs = allFields.filter(f => f.hasLocalValueSource()).map(f => ({entity: f.valueSource, lov: true}));
+        let allEntitySpecs = fieldSpecs.concat(entitySpecs);
 
-        if (entityNamesForLov) {
-          for (let e of entityNamesForLov) {
-            allValueSources.push(e);
+        let objectifiedSpecs = allEntitySpecs.reduce( (acc, spec) => {
+          let old = acc[spec.entity];
+          if (old) {
+            old.lov = old.lov || spec.lov;
+          } else {
+            acc[spec.entity] = spec;
           }
-        }
+          return acc;
+        }, {});
 
-        let valuesSources = uniq(allValueSources);
-
-        return this.fetchEntities(valuesSources, valuesSources.map(v => true));
+        return this.fetchEntities(Object.values(objectifiedSpecs));
       })
   }
 

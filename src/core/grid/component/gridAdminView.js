@@ -1,6 +1,6 @@
 import React from 'react';
 import {Alert} from 'react-bootstrap';
-import { FlatButton, SelectField, TextField, RaisedButton, Checkbox } from 'material-ui';
+import { FlatButton, SelectField, TextField, RaisedButton, Checkbox, MenuItem } from 'material-ui';
 import reactMixin from 'react-mixin';
 import Router from 'react-router';
 import _ from 'lodash';
@@ -56,7 +56,7 @@ export default class GridAdminView extends React.Component {
     console.log("GridAdminView#fetchData(%o)", routerParams);
     return When.join(
       GridService.fetchGrids(routerParams.gridLocation),
-      MdEntityService.fetchEntities(['FILTEROPERATOR'], [true])
+      MdEntityService.fetchEntities([{entity: 'FILTEROPERATOR', lov: true}])
     );
   }
 
@@ -80,8 +80,7 @@ export default class GridAdminView extends React.Component {
 
   /* ****************   EVENT HENDLERS ************************************************************ */
 
-  onChangeGridConfig = (evt) => {
-    let gridId = evt.target.value;
+  onChangeGridConfig = (evt, key, gridId) => {
     console.log('onChangeGridConfig gridId = %s', gridId);
     //this.setState({gridId});
     let gridConfig = this.props.grid.getGridConfig(gridId);
@@ -90,9 +89,9 @@ export default class GridAdminView extends React.Component {
     // dotahny vsechny existujici seznamy
     let valueSources = _.uniq(clonedGridConfig.conditions
       .filter(condition => (condition.$columnRef && condition.$columnRef.hasLocalValueSource()) )
-      .map(condition => (condition.$columnRef.valueSource)));
+      .map(condition => ({entity: condition.$columnRef.valueSource, lov: true})));
 
-    MdEntityService.fetchEntities(valueSources, valueSources.map(v => true) )
+    MdEntityService.fetchEntities(valueSources)
     .then(() => {
       this.setState({gridId, editedGridConfig: clonedGridConfig});
     });
@@ -352,10 +351,10 @@ export default class GridAdminView extends React.Component {
   fetchLovItems(conditions) {
     if (_.isEmpty(conditions)) return;
 
-    let valueSources = _.uniq(conditions.filter(c => (c.$columnRef && c.$columnRef.hasLocalValueSource())).map(c => c.$columnRef.valueSource));
+    let valueSources = _.uniq(conditions.filter(c => (c.$columnRef && c.$columnRef.hasLocalValueSource())).map(c => ({entity: c.$columnRef.valueSource, lov: true})));
 
     if (valueSources.length > 0) {
-      MdEntityService.fetchEntities(valueSources, [true]);
+      MdEntityService.fetchEntities(valueSources);
     }
   }
 
@@ -452,6 +451,8 @@ export default class GridAdminView extends React.Component {
 
     let publicGridConfig = new Boolean(editedGridConfig && editedGridConfig.gridUse == 'PUBLIC').toString();
 
+    const gridConfigItems = grid.gridConfigs.map( (li,i) => <MenuItem value={li.gridId} key={i} primaryText={li.label}/>);
+
     return (
       <main className="main-content container">
         {toolMenu}
@@ -464,8 +465,9 @@ export default class GridAdminView extends React.Component {
             style={Object.assign(inputStyle, {marginLeft: 10})}
             menuItemStyle={inputStyle}
             onChange={this.onChangeGridConfig}
-            hintText="Vyber Sestavu"
-            menuItems={grid.gridConfigs} displayMember="label" valueMember="gridId" autoComplete="off"/>
+            hintText="Vyber Sestavu" autoComplete="off">
+            {gridConfigItems}
+          </SelectField>
 
         ) : ''}
 

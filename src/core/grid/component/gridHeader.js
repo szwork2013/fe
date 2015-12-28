@@ -70,10 +70,10 @@ export default class GridHeader extends React.Component {
       conditionObject.setColumnRef(field);
     }
 
-    let entitiesToFetch = ['FILTEROPERATOR'];
-    if (field.hasLocalValueSource()) entitiesToFetch.push(field.valueSource);
+    let entitiesToFetch = [{entity: 'FILTEROPERATOR', lov: true}];
+    if (field.hasLocalValueSource()) entitiesToFetch.push({entity: field.valueSource, lov: true});
 
-    MdEntityService.fetchEntities(entitiesToFetch, _.fill(Array(entitiesToFetch.length), true))
+    MdEntityService.fetchEntities(entitiesToFetch)
     .then(entityMap => {
       let allOperators = entityMap.get('FILTEROPERATOR').lovItems;
       let operatorOptions = allOperators.filter(li => _.includes(conditionObject.$columnRef.availableOperators, li.value));

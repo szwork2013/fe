@@ -80,7 +80,7 @@ export default class PartyDetail extends React.Component {
   static fetchData(routerParams, query) {
     console.log("PartyDetail#fetchData()");
 
-    let metadataPromise = MdEntityService.fetchEntityMetadata(['Party', 'PartyContact', 'PartyRole', 'Address'], ['PARTYCONTACTCATEGORY']);
+    let metadataPromise = MdEntityService.fetchEntityMetadata(['Party', 'PartyContact', 'PartyRole', 'Address'], [{entity: 'PARTYCONTACTCATEGORY', lov: true}]);
 
     let partyPromise = ((routerParams.id === 'new') ? When(Object.assign({
       contacts: [],
