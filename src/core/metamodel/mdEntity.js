@@ -10,6 +10,10 @@ export default class MdEntity {
     // objekt (mapa) (fieldName -> MdField)
     this.fields;
 
+    // objekt (mapa) (actionName -> MdAction)
+    this.actions;
+
+
     // list of lovItems for this entity (e.g. Country has list of countries: [{id:'CZ','Czech Republic'},...]
     this.lovItems;
   }
@@ -28,6 +32,9 @@ export default class MdEntity {
     return this.fields[fieldName];
   }
 
+  getAction(actionName) {
+    return this.actions[actionName];
+  }
 
 }
 

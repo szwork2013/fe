@@ -3,7 +3,7 @@ import { combineReducers } from 'redux-immutablejs';
 
 import Grid from 'core/grid/domain/grid';
 import {updateGridAction, updateGridsAction, updateGridObjectAction, updateGridObjectGridAction} from 'core/grid/gridActions';
-
+import {updateChildGrid} from 'core/form/formUtils';
 
 // [gridLocation] -> Grid
 function grids(state = new Map(), action) {
@@ -25,9 +25,7 @@ function gridObject(state = null, action) {
       console.log('updateGridObjectAction = %O', action.payload);
       return Grid.clone(action.payload);
     case updateGridObjectGridAction.type:
-      console.log('updateGridObjectGridAction %s : %O', action.type, action.payload);
-      state.$grids[action.payload.gridLocation] = Grid.clone(action.payload);
-      return Object.assign({},state);
+      return updateChildGrid(state, action);
     default:
       return state;
   }

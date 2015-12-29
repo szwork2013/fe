@@ -3,7 +3,7 @@ import { combineReducers } from 'redux-immutablejs';
 
 import {setPartyAction, updateGridAction} from 'party/partyActions';
 import Grid from 'core/grid/domain/grid';
-
+import {updateChildGrid} from 'core/form/formUtils';
 
 function partyObject(state = null, action) {
   switch (action.type) {
@@ -11,9 +11,7 @@ function partyObject(state = null, action) {
       console.log('setPartyAction = ', action);
       return Object.assign({},action.payload);
     case updateGridAction.type:
-      console.log('updateGridAction %s : %O', action.type, action.payload);
-      state.$grids[action.payload.gridLocation] = Grid.clone(action.payload);
-      return Object.assign({},state);
+      return updateChildGrid(state, action);
     default:
       return state;
   }

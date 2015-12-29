@@ -159,10 +159,11 @@ export default class UserDetail extends React.Component {
   //  this.props.updateGridAction(grid);
   //};
 
-  onDisconnect = (e) => {
-    console.log('onDisconnect');
+
+  onPartyChange = (partyObject) => {
+    console.log('onPartyChange %O', partyObject);
     let {userObject, setUserAction} = this.props;
-    userObject.party = null;
+    userObject.party = partyObject;
     setUserAction(userObject);
   };
 
@@ -172,7 +173,7 @@ export default class UserDetail extends React.Component {
     let {
       userObject,
       entities,
-      setUserAction
+      setUserAction,
       } = this.props;
 
     let propsForCreateForm = {
@@ -198,7 +199,7 @@ export default class UserDetail extends React.Component {
         </BlockComp>
         <BlockComp header="Connected Party">
           <PartySelector partyObject={userObject.party} dataObject={userObject} partyEntity={entities.get('Party')}
-                         onDisconnect={this.onDisconnect}  setDataAction={setUserAction}/>
+                         onPartyChange={this.onPartyChange}  setDataAction={setUserAction} />
         </BlockComp>
 
       </main>

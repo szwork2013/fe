@@ -1,6 +1,6 @@
 import React from 'react';
 import PureRenderMixin from 'react-addons-pure-render-mixin';
-import {TextField, FlatButton, Styles, FontIcon} from 'material-ui';
+import {TextField, FlatButton, Styles, FontIcon, Dialog} from 'material-ui';
 import When from 'when';
 
 import BlockComp from 'core/components/blockComp/blockComp';
@@ -8,6 +8,7 @@ import {FieldText} from 'core/form/formUtils';
 import {customizeTheme}  from 'core/common/config/mui-theme';
 import GridService from 'core/grid/gridService';
 import Grid from 'core/grid/domain/grid';
+import GridComp from 'core/grid/component/gridComp';
 
 const Colors = Styles.Colors;
 const partySearchGridLocation = 'partySearch';
@@ -23,8 +24,8 @@ export default class PartySelector extends React.Component {
     partyObject: React.PropTypes.object,
     dataObject: React.PropTypes.object,
     partyEntity: React.PropTypes.object.isRequired,
-    onDisconnect: React.PropTypes.func,
-    setDataAction: React.PropTypes.func.isRequired
+    setDataAction: React.PropTypes.func.isRequired,
+    onPartyChange: React.PropTypes.func.isRequired
   };
 
 
@@ -41,7 +42,9 @@ export default class PartySelector extends React.Component {
     e.preventDefault();
     console.log('onSearch');
 
-    let {dataObject, setDataAction} = this.props;
+    let {dataObject, setDataAction, onPartyChange} = this.props;
+
+    dataObject.$partySelector.notFound = undefined;
 
     let gridPromise;
     if (dataObject.$partySelector.grid) {
@@ -62,26 +65,50 @@ export default class PartySelector extends React.Component {
         return GridService.search(grid);
       })
       .then(grid => {
+        let dataLength = grid.data.rows.length;
+        if (dataLength === 0) {
+          dataObject.$partySelector.notFound = 'No party found';
+          setDataAction(dataObject);
+        } else if (dataLength === 1) {
+          onPartyChange(this.createPartyObject(grid, 0));
+        } else {
+          dataObject.$partySelector.dialogOpened = true;
+          setDataAction(dataObject);
+        }
 
-        setDataAction(dataObject);
       })
 
 
   };
 
+  selectParty = (index) => {
+    let {onPartyChange, dataObject} = this.props;
+    dataObject.$partySelector.dialogOpened = false;
+    if (index === -1) {
+      onPartyChange(undefined);
+    } else {
+      onPartyChange(undefined);
+    }
+  };
+
+  updateGrid = (grid) => {
+    let {dataObject, setDataAction} = this.props;
+    dataObject.$partySelector.grid = Grid.clone(grid);
+    //dataObject.$partySelector.searchTerm = grid.searchTerm;
+    setDataAction(dataObject);
+  };
+
+
   onNew = (e) => {
     console.log('onNew');
   };
 
-  //onDisconnect = (e) => {
-  //  console.log('onDisconnect');
-  //};
-
 
   render() {
 
-    let {partyObject, partyEntity, setDataAction, dataObject} = this.props;
+    let {partyObject, partyEntity, setDataAction, dataObject, onPartyChange} = this.props;
 
+    console.log('%c partySelector render: partyObject = %O', 'background-color: yellow', partyObject);
 
     let searchForm = () => (
       <form onSubmit={this.onSearch}>
@@ -95,16 +122,16 @@ export default class PartySelector extends React.Component {
                     labelStyle={{paddingLeft: 8}} style={{paddingLeft: 5}}>
           <FontIcon className="fa fa-file-o" style={{fontSize:14, color: Colors.indigo500}}/>
         </FlatButton>
-
+        { (dataObject.$partySelector.notFound) ? (<div style={{display: 'block', color: Colors.red500}}>{dataObject.$partySelector.notFound}</div>) : ''}
       </form>
     );
 
     let partyText = () => (
       <div style={{display: 'flex', alignItems: 'baseline' }}>
-        <div style={{fontSize: '18px', fontWeight: 'bold'}}>{partyObject.fullName}</div>
+        <div style={{fontSize: '18px', fontWeight: 'bold', marginRight: 8}}>{partyObject.fullName}</div>
         <FieldText label={partyEntity.fields.ico.label} value={partyObject.ico}/>
         <FieldText label={partyEntity.fields.birthNumber.label} value={partyObject.birthNumber}/>
-        <FlatButton onClick={this.props.onDisconnect} secondary={true} label="Disconnect" labelPosition="after"
+        <FlatButton onClick={onPartyChange.bind(this, undefined)} secondary={true} label="Disconnect" labelPosition="after"
                     labelStyle={{paddingLeft: 8}} style={{paddingLeft: 10, marginLeft: 10}}>
           <FontIcon className="fa fa-chain-broken" style={{fontSize:14, color: Colors.indigo500}}/>
         </FlatButton>
@@ -115,7 +142,46 @@ export default class PartySelector extends React.Component {
     return (
       <div>
         {(partyObject) ? partyText() : searchForm() }
+        { (dataObject.$partySelector.dialogOpened) ? (
+          <Dialog
+            title="Found parties" bodyStyle={{display: 'flex', flexDirection: 'column'}}
+            actions={this._dialogActions()}
+            modal={true}
+            open={dataObject.$partySelector.dialogOpened}>
+            <GridComp ref={dataObject.$partySelector.grid.gridLocation} grid={dataObject.$partySelector.grid} uiLocation="dialog" updateGrid={this.updateGrid}/>
+          </Dialog>
+        ) : ''}
       </div>
     );
   }
+
+  createPartyObject(grid, index) {
+    return {
+      partyId: this.getGridFieldValue(grid, index, 'partyId'),
+      fullName: this.getGridFieldValue(grid, index, 'fullName'),
+      ico: this.getGridFieldValue(grid, index, 'ico'),
+      birthNumber: this.getGridFieldValue(grid, index, 'birthNumber')
+    }
+  }
+
+  getGridFieldValue(grid, index, fieldName) {
+    let fieldIndex = grid.activeGridConfig.$columnRefs.findIndex(mdField => mdField.fieldName === fieldName);
+    let rows = grid.data.rows;
+    if (fieldIndex >= 0 && rows.length > index) {
+      return rows[index].cells[fieldIndex].value;
+    } else {
+      return undefined;
+    }
+  }
+
+  _dialogActions() {
+    return [
+      <FlatButton
+        label="Cancel"
+        secondary={true}
+        onClick={this.selectParty.bind(this, -1)} />
+    ];
+  }
+
+
 }

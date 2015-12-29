@@ -29,3 +29,10 @@ export const FieldText = ({label, value, mdField}) => ((value == null) ? <span/>
 export function selectGrid(reduxState, dataObject, gridLocation) {
   return (dataObject.$grids[gridLocation]) ? dataObject.$grids[gridLocation] : Grid.clone(reduxState.getIn(['grid', 'grids', gridLocation]));
 }
+
+export function updateChildGrid(parentObject, action) {
+  console.log('action %s : %O', action.type, action.payload);
+  if (!parentObject.$grids) parentObject.$grids = {};
+  parentObject.$grids[action.payload.gridLocation] = Grid.clone(action.payload);
+  return Object.assign({},parentObject);
+}

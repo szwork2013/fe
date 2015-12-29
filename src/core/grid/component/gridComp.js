@@ -38,7 +38,8 @@ export default class GridComp extends React.Component {
     grid: React.PropTypes.instanceOf(Grid).isRequired,
     onGridChange: React.PropTypes.func,
     updateGrid: React.PropTypes.func.isRequired,
-    gridClassName: React.PropTypes.string
+    gridClassName: React.PropTypes.string,
+    buttons: React.PropTypes.array
   };
 
 
