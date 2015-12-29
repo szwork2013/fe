@@ -25,11 +25,24 @@ export const FieldText = ({label, value, mdField}) => ((value == null) ? <span/>
 ));
 
 
-
+/**
+ * Existuje-li grid gridLocation v dataObject.$grids vrati ho, jinak naklonuje grid z reduxove grid.grids mapy a vrati ho
+ * @param reduxState
+ * @param dataObject
+ * @param gridLocation
+ * @returns {*}
+ */
 export function selectGrid(reduxState, dataObject, gridLocation) {
   return (dataObject.$grids[gridLocation]) ? dataObject.$grids[gridLocation] : Grid.clone(reduxState.getIn(['grid', 'grids', gridLocation]));
 }
 
+/**
+ * vezme grid jako payload action, naklonuje ho a ulozi do parentObject.$grids
+ * parentObject potom vrati jako novy objekt (Object.assign())
+ * @param parentObject
+ * @param action
+ * @returns {*}
+ */
 export function updateChildGrid(parentObject, action) {
   console.log('action %s : %O', action.type, action.payload);
   if (!parentObject.$grids) parentObject.$grids = {};

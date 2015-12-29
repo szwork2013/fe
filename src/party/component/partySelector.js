@@ -63,7 +63,7 @@ export default class PartySelector extends React.Component {
         } else if (dataLength === 1) {
           onPartyChange(this.createPartyObject(grid, 0));
         } else {
-          dataObject.$partySelector.dialogOpened = true;
+          dataObject.$partySelector.searchDialogOpened = true;
           setDataAction(dataObject);
         }
 
@@ -75,7 +75,7 @@ export default class PartySelector extends React.Component {
   selectParty = (partyId, index) => {
     console.log('selectParty %s .. %s', partyId, index);
     let {onPartyChange, dataObject} = this.props;
-    dataObject.$partySelector.dialogOpened = false;
+    dataObject.$partySelector.searchDialogOpened = false;
     if (index === -1) {
       onPartyChange(undefined);
     } else {
@@ -105,7 +105,7 @@ export default class PartySelector extends React.Component {
 
     let searchForm = () => (
       <form onSubmit={this.onSearch}>
-        <TextField hintText="Search party..."
+        <TextField hintText="Search party..." style={{width: 140}}
                    onChange={(e) => {dataObject.$partySelector.searchTerm = e.target.value; setDataAction(dataObject);}}/>
         <FlatButton type="submit" secondary={true} label="Search" labelPosition="after" labelStyle={{paddingLeft: 8}}
                     style={{paddingLeft: 10, marginLeft: 5}}>
@@ -135,14 +135,14 @@ export default class PartySelector extends React.Component {
     return (
       <div>
         {(partyObject) ? partyText() : searchForm() }
-        { (dataObject.$partySelector.dialogOpened) ? (
+        { (dataObject.$partySelector.searchDialogOpened) ? (
           <Dialog
             title="Found parties" bodyStyle={{display: 'flex', flexDirection: 'column'}}
             actions={this._dialogActions()}
             modal={true}
-            open={dataObject.$partySelector.dialogOpened}>
-            <GridComp ref={dataObject.$partySelector.grid.gridLocation} grid={dataObject.$partySelector.grid}
-                      uiLocation="dialog" updateGrid={this.updateGrid} functionMap={{chooseParty: this.selectParty.bind(this)}} />
+            open={dataObject.$partySelector.searchDialogOpened}>
+            <GridComp ref={dataObject.$partySelector.grid.gridLocation} grid={dataObject.$partySelector.grid} multiSelect={false}
+                      uiLocation="dialog" bodyStyle={{paddingBottom: 7}} updateGrid={this.updateGrid} functionMap={{chooseParty: this.selectParty.bind(this)}} />
           </Dialog>
         ) : ''}
       </div>

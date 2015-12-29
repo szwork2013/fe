@@ -2,8 +2,8 @@ import {Map, Record} from 'immutable';
 import { combineReducers } from 'redux-immutablejs';
 
 import { LoginFormRecord } from 'core/security/loginForm';
-
-import {setCurrentUserAction, redirectAfterLoginAction, setLoginFormDataAction, setLoginFormUsernameAction, setUserAction} from 'core/security/securityActions';
+import {updateChildGrid} from 'core/form/formUtils';
+import {setCurrentUserAction, redirectAfterLoginAction, setLoginFormDataAction, setLoginFormUsernameAction, setUserAction, updateGridAction} from 'core/security/securityActions';
 
 
 function currentUser(state = null, action) {
@@ -46,6 +46,8 @@ function userObject(state = null, action) {
     case setUserAction.type:
       console.log('setUserAction = ', action);
       return Object.assign({},action.payload);
+    case updateGridAction.type:
+      return updateChildGrid(state, action);
     default:
       return state;
   }

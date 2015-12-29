@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 import reactMixin from 'react-mixin';
 import {Router,Link} from 'react-router';
 import PureRenderMixin from 'react-addons-pure-render-mixin';
-import _ from 'lodash';
+import {debounce} from 'lodash';
 import classNames from 'classnames';
 import {Navbar, Nav, NavItem, NavDropdown, MenuItem, CollapsibleNav, Input} from 'react-bootstrap';
 import {Checkbox, IconButton, FontIcon, Styles, FlatButton} from 'material-ui';
@@ -33,15 +33,18 @@ export default class GridComp extends React.Component {
 
   static propTypes = {
     uiLocation: React.PropTypes.string.isRequired,
-
-    // from store
     grid: React.PropTypes.instanceOf(Grid).isRequired,
     onGridChange: React.PropTypes.func,
     updateGrid: React.PropTypes.func.isRequired,
     gridClassName: React.PropTypes.string,
-    functionMap: React.PropTypes.object
+    functionMap: React.PropTypes.object,
+    multiSelect: React.PropTypes.bool,
+    bodyStyle: React.PropTypes.object
   };
 
+  static defaultProps = {
+    multiSelect: true
+  };
 
 
   constructor(props) {
@@ -53,7 +56,7 @@ export default class GridComp extends React.Component {
 
 
   componentWillMount() {
-    this.onResizeDebounced = _.debounce(this.onResize, 100);
+    this.onResizeDebounced = debounce(this.onResize, 100);
   }
 
   componentDidMount() {
@@ -98,15 +101,15 @@ export default class GridComp extends React.Component {
 
     //  this.dispatch(grid); // this dispatches the action
     GridService.search(grid)
-    .then(grid => {
-      grid.headerPaddingRight = this._computeNewHPR();
-      if (scrollToTop && this.refs.VirtualList) {
-        this.refs.VirtualList.scrollTop();
-      }
-      this.props.updateGrid(grid);
-    }, (err) => {
-      this.props.updateGrid(grid);
-    });
+      .then(grid => {
+        grid.headerPaddingRight = this._computeNewHPR();
+        if (scrollToTop && this.refs.VirtualList) {
+          this.refs.VirtualList.scrollTop();
+        }
+        this.props.updateGrid(grid);
+      }, (err) => {
+        this.props.updateGrid(grid);
+      });
   }
 
   _computeNewHPR() {
@@ -146,25 +149,25 @@ export default class GridComp extends React.Component {
       // pokud byl pri kliknuti drzen shift a zaroven existoval klik predtim
       // a zaroven se nekliklo na jeden a ten samy radek
       if (e.shiftKey && lastSelected && lastSelected !== clickedRowId) {
-          let startStop = false;
-          // Projedeme vsechny radky
-          this.props.grid.data.rows.every(row => {
-            // pokud jsme nasli zacatek nebo konec oznaceni
-            if (row.rowId === clickedRowId || row.rowId === lastSelected) {
-              // pokud jsme narazili na zacatek oznaceni - nastavime startStop na true
-              // zastaveni cylku pokud jsme na konci oznaceni (startStop == false)
-              return startStop = !startStop;
-            } else if (startStop) {
-              // pokud jsme uprostred oznaceneho bloku - invertujeme oznaceni radku
-              clonedMap.has(row.rowId) ? clonedMap.delete(row.rowId) : clonedMap.set(row.rowId, true);
-            }
-            // true, aby cyklus pokracoval dal
-            return true;
-          });
+        let startStop = false;
+        // Projedeme vsechny radky
+        this.props.grid.data.rows.every(row => {
+          // pokud jsme nasli zacatek nebo konec oznaceni
+          if (row.rowId === clickedRowId || row.rowId === lastSelected) {
+            // pokud jsme narazili na zacatek oznaceni - nastavime startStop na true
+            // zastaveni cylku pokud jsme na konci oznaceni (startStop == false)
+            return startStop = !startStop;
+          } else if (startStop) {
+            // pokud jsme uprostred oznaceneho bloku - invertujeme oznaceni radku
+            clonedMap.has(row.rowId) ? clonedMap.delete(row.rowId) : clonedMap.set(row.rowId, true);
+          }
+          // true, aby cyklus pokracoval dal
+          return true;
+        });
       }
       // nastavime stav
       grid.selectedRows = clonedMap;
-      grid.selectedAllRows = (clonedMap.size ===  this.props.grid.data.totalCount);
+      grid.selectedAllRows = (clonedMap.size === this.props.grid.data.totalCount);
       grid.lastClickedRow = clickedRowId;
       this.props.updateGrid(grid);
     }
@@ -236,7 +239,7 @@ export default class GridComp extends React.Component {
 
     if (!grid.conditionArray) grid.conditionArray = [];
 
-    let oldConditionIndex = _.findIndex(grid.conditionArray, (gcc => gcc.columnName === mdField.fieldName));
+    let oldConditionIndex = grid.conditionArray.findIndex(gcc => gcc.columnName === mdField.fieldName);
 
     if (condition) {
       if (oldConditionIndex >= 0) {
@@ -258,8 +261,6 @@ export default class GridComp extends React.Component {
     this.search(true);
 
   };
-
-
 
 
   onClickCheck = (evt) => {
@@ -311,9 +312,9 @@ export default class GridComp extends React.Component {
     }
   };
 
-  onAction = (functionName, cellId, index) => {
-    console.debug("functionName %s ... %s ... %s", functionName, cellId, index);
-    this.props.functionMap[functionName](cellId, index);
+  onAction = (functionName, cellId, index, evt) => {
+    //console.debug("functionName %s ... %s ... %s ... %s", functionName, cellId, index, evt.target.checked);
+    this.props.functionMap[functionName](cellId, index, evt.target.checked);
   };
 
   /* *******   REACT METHODS ************ */
@@ -324,7 +325,9 @@ export default class GridComp extends React.Component {
       grid,
       children,
       uiLocation,
-      gridClassName
+      gridClassName,
+      multiSelect,
+      bodyStyle
       } = this.props;
 
     console.debug("gridComp rendering: dataCount = " + grid.getTotalCount());
@@ -339,7 +342,8 @@ export default class GridComp extends React.Component {
         <div className={gridClassNames}>
           <Navbar fluid style={{marginBottom: 10, minHeight: 'initial', fontSize: 14}}>
             <Nav>
-              <NavItem eventKey={3} href={this.context.router.makeHref('gridAdmin', {gridLocation: grid.gridLocation})} onClick={this.onSelectGridManage}>Create Grid</NavItem>
+              <NavItem eventKey={3} href={this.context.router.makeHref('gridAdmin', {gridLocation: grid.gridLocation})}
+                       onClick={this.onSelectGridManage}>Create Grid</NavItem>
             </Nav>
           </Navbar>
         </div>
@@ -347,17 +351,18 @@ export default class GridComp extends React.Component {
     }
 
     let gridConfigMenu = (
-          <NavDropdown id={dropdownId} eventKey={3} title={grid.activeGridConfig.label}>
-            {
-              grid.gridConfigs.map((gc) => {
-                return (
-                    <MenuItem eventKey={gc.gridId} key={gc.gridId} onSelect={this.onSelectGridConfig}>{gc.label}</MenuItem>
-                );
-              })
-            }
-            <MenuItem divider/>
-            <MenuItem href={this.context.router.makeHref('gridAdmin', {gridLocation: grid.gridLocation})} onSelect={this.onSelectGridManage}> Manage </MenuItem>
-          </NavDropdown>
+      <NavDropdown id={dropdownId} eventKey={3} title={grid.activeGridConfig.label}>
+        {
+          grid.gridConfigs.map((gc) => {
+            return (
+              <MenuItem eventKey={gc.gridId} key={gc.gridId} onSelect={this.onSelectGridConfig}>{gc.label}</MenuItem>
+            );
+          })
+        }
+        <MenuItem divider/>
+        <MenuItem href={this.context.router.makeHref('gridAdmin', {gridLocation: grid.gridLocation})}
+                  onSelect={this.onSelectGridManage}> Manage </MenuItem>
+      </NavDropdown>
     );
 
     let loadingElement = (
@@ -369,94 +374,106 @@ export default class GridComp extends React.Component {
     this.columnWidths = grid.activeGridWidths;
 
 
-
-
     return (
 
 
       <div className={gridClassNames}>
 
-        <Navbar fluid  style={{marginBottom: 10, minHeight: 'initial', fontSize: 14}}>
+        <Navbar fluid style={{marginBottom: 10, minHeight: 'initial', fontSize: 14}}>
           <Nav navbar>
             {gridConfigMenu}
           </Nav>
 
-          <ZzIconButton tooltip="Show selection" fontIcon={classNames('fa', {'fa-check-square': grid.showSelection, 'fa-check-square-o': !grid.showSelection})}
-                        onClick={this.onClickCheck} />
-          <ZzIconButton tooltip="Refresh" fontIcon="fa fa-refresh" onClick={this.onClickRefresh} />
+          {(multiSelect) ? (
+            <ZzIconButton tooltip="Show selection"
+                          fontIcon={classNames('fa', {'fa-check-square': grid.showSelection, 'fa-check-square-o': !grid.showSelection})}
+                          onClick={this.onClickCheck}/>
+          ) : ''}
+          <ZzIconButton tooltip="Refresh" fontIcon="fa fa-refresh" onClick={this.onClickRefresh}/>
 
           { (grid.data && grid.data.totalCount) ? (grid.data.totalCount + ' rows') : '' }
 
           {children}
 
           <form className="navbar-form navbar-right" role="search" onSubmit={this.onSearchTermSubmit}>
-            <Input type="text"  placeholder='Search' onChange={this.onSearchTermChange} value={grid.searchTerm}
+            <Input type="text" placeholder='Search' onChange={this.onSearchTermChange} value={grid.searchTerm}
                    bsSize="small"/>
-            <span className="fa fa-search" style={{position: 'absolute', bottom: 15, right: 15, pointerEvents: 'none', color: Colors.grey400}}></span>
+            <span className="fa fa-search"
+                  style={{position: 'absolute', bottom: 15, right: 15, pointerEvents: 'none', color: Colors.grey400}}></span>
           </form>
         </Navbar>
 
 
-          <div className="md-grid-header-wrapper" style={{paddingRight: grid.headerPaddingRight}}>
-            <div className="md-grid-header" ref="gridHeader">
+        <div className="md-grid-header-wrapper" style={{paddingRight: grid.headerPaddingRight}}>
+          <div className="md-grid-header" ref="gridHeader">
 
-              {
-                ( (grid.showSelection) ? (
-                  <div className="md-grid-header-cell" style={{float: 'left', minWidth: '28px', width: '28px'}}>
-                    <Checkbox name="selectAllCheckbox"
-                      onCheck={this.onCheckCbxAll}
-                      checked={grid.selectedAllRows}
-                    />
-                  </div>
-                ) : '')
-              }
+            {
+              ( (grid.showSelection) ? (
+                <div className="md-grid-header-cell" style={{float: 'left', minWidth: '28px', width: '28px'}}>
+                  <Checkbox name="selectAllCheckbox"
+                            onCheck={this.onCheckCbxAll}
+                            checked={grid.selectedAllRows}
+                  />
+                </div>
+              ) : '')
+            }
 
-              <div className="md-grid-data-row" style={{marginRight: grid.showSelection?'28px':'0px'}}>
+            <div className="md-grid-data-row" style={{marginRight: grid.showSelection?'28px':'0px'}}>
               {
                 grid.activeGridConfig.$columnRefs.map((mdField, columnIndex) => {
 
-                  let sortObject = _.find(grid.sortArray, so => so.field.fieldName === mdField.fieldName);
-                  let conditionObject = _.find(grid.conditionArray, gcc => gcc.$columnRef.fieldName === mdField.fieldName);
+                  let sortObject = (grid.sortArray) ? grid.sortArray.find(so => so.field.fieldName === mdField.fieldName) : null;
+                  let conditionObject = (grid.conditionArray) ? grid.conditionArray.find(gcc => gcc.$columnRef.fieldName === mdField.fieldName) : null;
 
                   return (
                     <div key={columnIndex} className="md-grid-header-cell"
                          style={{width: this.columnWidths[0][columnIndex]+'%', minWidth: this.columnWidths[1][columnIndex]+'px', maxWidth: this.columnWidths[2][columnIndex]+'px'}}>
-                      <GridHeader field={mdField} sortObject={sortObject} conditionObject={conditionObject} gridConfig={grid.activeGridConfig} onClickLink={this.onClickColumnSort} onConditionSet={this.onClickColumnCondition} />
+                      <GridHeader field={mdField} sortObject={sortObject} conditionObject={conditionObject}
+                                  gridConfig={grid.activeGridConfig} onClickLink={this.onClickColumnSort}
+                                  onConditionSet={this.onClickColumnCondition}/>
                     </div>
                   );
                 })
               }
-              </div>
             </div>
           </div>
+        </div>
 
-          <div ref="rowContainer" className="md-grid-body">
-            { (grid.loading) ? loadingElement : '' }
-            {
-              ( grid.data) ? (( grid.data.totalCount === 0) ? 'No data found'
-                  : ( (grid.data.totalCount > 50) ?
-                  (<VirtualList ref="VirtualList" items={ grid.data.rows} renderItem={this.renderItem}
-                                itemHeight={28}
-                                container={this.refs.rowContainer} scrollDelay={15} resizeDelay={15} header={this.refs.gridHeader} useRAF={true} /> )
-                  : grid.data.rows.map( (row, index) => this.renderItem(row, index)))
-              ) : ''
-            }
-          </div>
+        <div ref="rowContainer" className="md-grid-body" style={bodyStyle}>
+          { (grid.loading) ? loadingElement : '' }
+          {
+            ( grid.data) ? (( grid.data.totalCount === 0) ? 'No data found'
+                : ( (grid.data.totalCount > 50) ?
+                (<VirtualList ref="VirtualList" items={ grid.data.rows} renderItem={this.renderItem}
+                              itemHeight={28}
+                              container={this.refs.rowContainer} scrollDelay={15} resizeDelay={15}
+                              header={this.refs.gridHeader} useRAF={true}/> )
+                : grid.data.rows.map((row, index) => this.renderItem(row, index)))
+            ) : ''
+          }
+        </div>
       </div>
     );
   }
 
 
   renderItem = (item, index) => {
-    let grid = this.props.grid;
+    let {grid, functionMap} = this.props;
+
+
+
     let activeGridConfig = grid.activeGridConfig;
     let rowClass = "md-grid-row";
 
     let selected = grid.selectedRows.has(item.rowId);
-    if (selected) {rowClass += " md-grid-row-selected";}
+    if (selected) {
+      rowClass += " md-grid-row-selected";
+    }
 
     let showRowHover = activeGridConfig.showRowHower;
-    if (showRowHover) {rowClass += " md-grid-row-hover";}
+    if (showRowHover) {
+      rowClass += " md-grid-row-hover";
+    }
 
     return (
       <div key={item.rowId} className={rowClass}>
@@ -464,53 +481,62 @@ export default class GridComp extends React.Component {
           ( (grid.showSelection) ? (
             <div className="md-grid-cell" style={{float: 'left', minWidth: '28px', width: '28px'}}>
               <Checkbox
-                  name="selectRowCheckbox"
-                  checked={selected}
-                  onClick={this.onClickRow.bind(this, item.rowId)}
-                  />
+                name="selectRowCheckbox"
+                checked={selected}
+                onClick={this.onClickRow.bind(this, item.rowId)}
+              />
             </div>
           ) : '')
         }
 
         <div className="md-grid-data-row" style={{marginRight: grid.showSelection?'28px':'0px'}}>
-        {
-          item.cells.map( (gridCell, columnIndex) => {
+          {
+            item.cells.map((gridCell, columnIndex) => {
 
-            let field = activeGridConfig.$columnRefs[columnIndex];
-            let detailRoute = field.detailRoute;
+              let field = activeGridConfig.$columnRefs[columnIndex];
+              let detailRoute = field.detailRoute;
 
-            let formattedValue = field.formatValue(gridCell.value);
+              let formattedValue = field.formatValue(gridCell.value);
 
-            let styleObject = {width: this.columnWidths[0][columnIndex]+'%', minWidth: this.columnWidths[1][columnIndex]+'px', maxWidth: this.columnWidths[2][columnIndex]+'px' };
-            if (field.textAlign) {
-              styleObject.textAlign = field.textAlign;
-            }
-            let cellId = (gridCell.dataId) ? gridCell.dataId : item.rowId;
+              let styleObject = {
+                width: this.columnWidths[0][columnIndex] + '%',
+                minWidth: this.columnWidths[1][columnIndex] + 'px',
+                maxWidth: this.columnWidths[2][columnIndex] + 'px'
+              };
+              if (field.textAlign) {
+                styleObject.textAlign = field.textAlign;
+              }
+              let cellId = (gridCell.dataId) ? gridCell.dataId : item.rowId;
 
-            return (
-              <div key={columnIndex} className="md-grid-cell"
-                style={styleObject} >
-                {
-                  (field.actionType === 'FUNCTION') ?
-                    <FlatButton primary={true} style={{lineHeight: '28px'}} label={gridCell.value} labelPosition="after" onClick={this.onAction.bind(this, field.functionName, cellId, index)} />
-                    :
-                    (
-                      (detailRoute) ?
+              return (
+                <div key={columnIndex} className="md-grid-cell"
+                     style={styleObject}>
+                  {
+                    (field.actionDisplay === 'BUTTON') ?
+                      <FlatButton primary={true} style={{lineHeight: '28px'}} label={gridCell.value}
+                                  labelPosition="after"
+                                  onClick={this.onAction.bind(this, field.functionName, cellId, index)}/>
+                      : ( (field.actionDisplay === 'CHECKBOX') ?
+                        <Checkbox name={field.fieldName} checked={functionMap[field.functionNameGetter()](cellId, index)}
+                                  onCheck={this.onAction.bind(this, field.functionNameSetter(), cellId, index)}/>
+                        :
                         (
-                          <Link to={detailRoute} params={{id: cellId}}> {formattedValue} </Link>
+                          (detailRoute) ?
+                            (
+                              <Link to={detailRoute} params={{id: cellId}}> {formattedValue} </Link>
+                            )
+                            : formattedValue
                         )
-                        : formattedValue
                     )
-                }
-              </div>
-            );
-          })
-        }
+                  }
+                </div>
+              );
+            })
+          }
         </div>
       </div>
     );
   }
-
 
 
 }

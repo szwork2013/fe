@@ -12,10 +12,11 @@ import {store} from 'core/common/redux/store';
 import MdEntityService from 'core/metamodel/mdEntityService';
 import SecurityService from 'core/security/securityService';
 import PartyService from 'party/partyService';
-import {setUserAction} from 'core/security/securityActions';
+import {setUserAction, updateGridAction} from 'core/security/securityActions';
 import {customizeThemeForDetail, TabTemplate}  from 'core/common/config/mui-theme';
 import {screenLg} from 'core/common/config/variables';
 import BlockComp from 'core/components/blockComp/blockComp';
+import {selectGrid} from 'core/form/formUtils';
 
 import UserForm from 'core/security/userForm';
 import PartySelector from 'party/component/partySelector';
@@ -27,18 +28,20 @@ import GridComp from 'core/grid/component/gridComp';
 const Colors = Styles.Colors;
 const Typography = Styles.Typography;
 
+const tenantGridLocation = 'tenantList';
 
 function mapStateToProps(state) {
   let userObject = state.getIn(['security', 'userObject']);
 
   return {
     userObject,
+    tenantGrid: selectGrid(state, userObject, tenantGridLocation),
     entities: state.getIn(['metamodel', 'entities'])
   };
 }
 
 
-@connect(mapStateToProps, {setUserAction})
+@connect(mapStateToProps, {setUserAction, updateGridAction})
 export default class UserDetail extends React.Component {
   shouldComponentUpdate = PureRenderMixin.shouldComponentUpdate.bind(this);
 
@@ -57,7 +60,7 @@ export default class UserDetail extends React.Component {
   static fetchData(routerParams, query) {
     console.log("UserDetail#fetchData()");
 
-    let metadataPromise = MdEntityService.fetchEntityMetadata(['User', 'Tenant', 'Party']);
+    let metadataPromise = MdEntityService.fetchEntityMetadata(['User'], ['Tenant', 'Party']);
 
     let userPromise = ((routerParams.id === 'new') ? When(Object.assign({
       gridConfigs: [],
@@ -72,9 +75,9 @@ export default class UserDetail extends React.Component {
         return store.dispatch(setUserAction(userObject));
       });
 
-    //let gridPromise = GridService.fetchGrids(vehicleGridLocation, invoiceGridLocation, partyRelGridLocation);
+    let gridPromise = GridService.fetchGrids(tenantGridLocation);
 
-    return When.all([metadataPromise, userPromise]);
+    return When.all([metadataPromise, userPromise, gridPromise]);
   }
 
 
@@ -86,62 +89,21 @@ export default class UserDetail extends React.Component {
 
     customizeThemeForDetail(this.context.muiTheme);
 
-    //this.initPartyGrids();
+    let {tenantGrid,updateGridAction} = this.props;
+
+
+    tenantGrid.activeGridConfig = tenantGrid.getActiveGridConfig();
+    updateGridAction(tenantGrid);
   }
 
 
   componentDidMount() {
-    //this.searchUserGrids();
+    this.refs[this.props.tenantGrid.gridLocation].search();
   }
 
   componentWillUnmount() {
-    //this.mediaQuery.removeListener(this.mediaQueryListener);
     this.props.setUserAction(null);
   }
-
-  //initUserGrids() {
-  //  let {vehicleGrid, invoiceGrid} = this.props;
-  //
-  //  let updated = this.initGrid(vehicleGrid);
-  //  if(this.mediaQuery.matches) {
-  //    updated = updated | this.initGrid(invoiceGrid);  // pozor bitwise, nechci shortcutting
-  //  }
-  //  return !!updated;
-  //}
-
-  //searchUserGrids() {
-  //  let {vehicleGrid, invoiceGrid} = this.props;
-  //  if (!vehicleGrid.data) this.refs[vehicleGridLocation].search();
-  //  if(this.mediaQuery.matches && !invoiceGrid.data) {
-  //    this.refs[invoiceGridLocation].search();
-  //  }
-  //}
-
-  //initGrid(grid) {
-  //  console.log('initGrid %s', grid.gridLocation);
-  //  let {partyObject, updateGridAction} = this.props;
-  //
-  //  let doUpdate = false;
-  //  if (!grid.activeGridConfig) {
-  //    grid.activeGridConfig = grid.getActiveGridConfig();
-  //    doUpdate = true;
-  //  }
-  //  if (grid.masterId !== partyObject.partyId) {
-  //    grid.masterId = partyObject.partyId;
-  //    doUpdate = true;
-  //  }
-  //  if (doUpdate) updateGridAction(grid);
-  //  return doUpdate;
-  //}
-
-  //activateTab(grid) {
-  //  this.initGrid(grid);
-  //  if (!grid.data) {
-  //    setTimeout( () => {
-  //      this.refs[grid.gridLocation].search();
-  //    }, 0);
-  //  }
-  //}
 
 
   onSave = (evt) => {
@@ -155,15 +117,29 @@ export default class UserDetail extends React.Component {
     this.context.router.goBack();
   };
 
-  //updateGrid = (grid) => {
-  //  this.props.updateGridAction(grid);
-  //};
-
 
   onPartyChange = (partyObject) => {
     console.log('onPartyChange %O', partyObject);
     let {userObject, setUserAction} = this.props;
     userObject.party = partyObject;
+    setUserAction(userObject);
+  };
+
+
+  getSelectTenant = (tenantId, index) => {
+    //console.log('getSelectTenant %s .. %s', tenantId, index);
+    return this.props.userObject.tenants.includes(tenantId);
+  };
+
+  setSelectTenant = (tenantId, index, checked) => {
+    let {userObject, setUserAction} = this.props;
+    console.log('setSelectTenant %s .. %s...%s', tenantId, index, checked);
+    let ti = userObject.tenants.indexOf(tenantId);
+    if (checked) {
+      if (ti === -1) userObject.tenants.push(tenantId);
+    } else {
+      if (ti >= 0) userObject.tenants.splice(ti, 1);
+    }
     setUserAction(userObject);
   };
 
@@ -174,6 +150,8 @@ export default class UserDetail extends React.Component {
       userObject,
       entities,
       setUserAction,
+      tenantGrid,
+      updateGridAction
       } = this.props;
 
     let propsForCreateForm = {
@@ -197,10 +175,20 @@ export default class UserDetail extends React.Component {
             <UserForm {...propsForCreateForm} />
           </form>
         </BlockComp>
-        <BlockComp header="Connected Party">
-          <PartySelector partyObject={userObject.party} dataObject={userObject} partyEntity={entities.get('Party')}
-                         onPartyChange={this.onPartyChange}  setDataAction={setUserAction} />
-        </BlockComp>
+        <div className="row">
+          <div className="col-xs-12 col-sm-6" style={{display: 'flex', flexDirection: 'column'}}>
+            <BlockComp header="Connected Party" style={{flexGrow: 1}}>
+              <PartySelector partyObject={userObject.party} dataObject={userObject} partyEntity={entities.get('Party')}
+                             onPartyChange={this.onPartyChange}  setDataAction={setUserAction} />
+            </BlockComp>
+          </div>
+          <div className="col-xs-12 col-sm-6">
+            <BlockComp header="Available Tenants">
+              <GridComp ref={tenantGrid.gridLocation} grid={tenantGrid} multiSelect={false} gridClassName="detail-grid" bodyStyle={{paddingBottom: 7}}
+                        uiLocation="main" updateGrid={updateGridAction} functionMap={{getSelectTenant: this.getSelectTenant.bind(this), setSelectTenant: this.setSelectTenant.bind(this)}} />
+            </BlockComp>
+          </div>
+        </div>
 
       </main>
     );

@@ -11,7 +11,7 @@ import Toolmenu from 'core/components/toolmenu/toolmenu';
 import {store} from 'core/common/redux/store';
 import MdEntityService from 'core/metamodel/mdEntityService';
 import PartyService from 'party/partyService';
-import {setPartyAction} from 'party/partyActions';
+import {setPartyAction, updateGridAction} from 'party/partyActions';
 import {customizeThemeForDetail, TabTemplate}  from 'core/common/config/mui-theme';
 import {screenLg, tabStyle} from 'core/common/config/variables';
 import {selectGrid} from 'core/form/formUtils';
@@ -26,7 +26,6 @@ import PartyAddressList from 'party/component/partyAddressList';
 import GridService from 'core/grid/gridService';
 import Grid from 'core/grid/domain/grid';
 import GridComp from 'core/grid/component/gridComp';
-import {updateGridAction} from 'party/partyActions';
 
 
 const vehicleGridLocation = 'partyVehicleList';

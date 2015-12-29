@@ -1,6 +1,8 @@
-import _ from 'lodash';
+import {capitalize} from 'lodash';
 import moment from 'moment';
+
 import {formatNumber} from 'core/components/numberInput/numberInput';
+
 
 export default class MdField {
 
@@ -89,6 +91,15 @@ export default class MdField {
   hasLocalValueSource() {
     return (this.valueSource && this.valueSourceType === 'LOCAL');
   }
+
+  functionNameGetter() {
+    return 'get' + capitalize(this.functionName);
+  }
+
+  functionNameSetter() {
+    return 'set' + capitalize(this.functionName);
+  }
+
 
 }
 
