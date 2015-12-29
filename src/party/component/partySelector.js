@@ -29,15 +29,6 @@ export default class PartySelector extends React.Component {
   };
 
 
-  XcomponentWillMount() {
-    customizeTheme(this.context.muiTheme, {
-      flatButton: {
-        color: Colors.transparent
-      }
-    });
-  }
-
-
   onSearch = (e) => {
     e.preventDefault();
     console.log('onSearch');
@@ -81,13 +72,15 @@ export default class PartySelector extends React.Component {
 
   };
 
-  selectParty = (index) => {
+  selectParty = (partyId, index) => {
+    console.log('selectParty %s .. %s', partyId, index);
     let {onPartyChange, dataObject} = this.props;
     dataObject.$partySelector.dialogOpened = false;
     if (index === -1) {
       onPartyChange(undefined);
     } else {
-      onPartyChange(undefined);
+      let partyObject = this.createPartyObject(dataObject.$partySelector.grid, index);
+      onPartyChange(partyObject);
     }
   };
 
@@ -148,7 +141,8 @@ export default class PartySelector extends React.Component {
             actions={this._dialogActions()}
             modal={true}
             open={dataObject.$partySelector.dialogOpened}>
-            <GridComp ref={dataObject.$partySelector.grid.gridLocation} grid={dataObject.$partySelector.grid} uiLocation="dialog" updateGrid={this.updateGrid}/>
+            <GridComp ref={dataObject.$partySelector.grid.gridLocation} grid={dataObject.$partySelector.grid}
+                      uiLocation="dialog" updateGrid={this.updateGrid} functionMap={{chooseParty: this.selectParty.bind(this)}} />
           </Dialog>
         ) : ''}
       </div>
@@ -179,7 +173,7 @@ export default class PartySelector extends React.Component {
       <FlatButton
         label="Cancel"
         secondary={true}
-        onClick={this.selectParty.bind(this, -1)} />
+        onClick={this.selectParty.bind(this, null, -1)} />
     ];
   }
 

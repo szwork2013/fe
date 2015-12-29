@@ -50,6 +50,15 @@ export default class MdField {
     // left,right,center
     this.textAlign;
 
+    // FUNCTION, URL
+    this.actionType;
+
+    // BUTTON, ICON
+    this.actionDisplay;
+
+    // jmeno funkce pro FUNCTION actionType
+    functionName;
+
   }
 
 

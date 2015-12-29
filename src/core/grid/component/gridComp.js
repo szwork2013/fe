@@ -6,7 +6,7 @@ import PureRenderMixin from 'react-addons-pure-render-mixin';
 import _ from 'lodash';
 import classNames from 'classnames';
 import {Navbar, Nav, NavItem, NavDropdown, MenuItem, CollapsibleNav, Input} from 'react-bootstrap';
-import {Checkbox, IconButton, FontIcon, Styles} from 'material-ui';
+import {Checkbox, IconButton, FontIcon, Styles, FlatButton} from 'material-ui';
 
 import Axios from 'core/common/config/axios-config';
 import GridService from 'core/grid/gridService';
@@ -39,7 +39,7 @@ export default class GridComp extends React.Component {
     onGridChange: React.PropTypes.func,
     updateGrid: React.PropTypes.func.isRequired,
     gridClassName: React.PropTypes.string,
-    buttons: React.PropTypes.array
+    functionMap: React.PropTypes.object
   };
 
 
@@ -311,6 +311,11 @@ export default class GridComp extends React.Component {
     }
   };
 
+  onAction = (functionName, cellId, index) => {
+    console.debug("functionName %s ... %s ... %s", functionName, cellId, index);
+    this.props.functionMap[functionName](cellId, index);
+  };
+
   /* *******   REACT METHODS ************ */
 
 
@@ -433,7 +438,7 @@ export default class GridComp extends React.Component {
                   (<VirtualList ref="VirtualList" items={ grid.data.rows} renderItem={this.renderItem}
                                 itemHeight={28}
                                 container={this.refs.rowContainer} scrollDelay={15} resizeDelay={15} header={this.refs.gridHeader} useRAF={true} /> )
-                  : grid.data.rows.map(row => this.renderItem(row)))
+                  : grid.data.rows.map( (row, index) => this.renderItem(row, index)))
               ) : ''
             }
           </div>
@@ -442,7 +447,7 @@ export default class GridComp extends React.Component {
   }
 
 
-  renderItem = (item) => {
+  renderItem = (item, index) => {
     let grid = this.props.grid;
     let activeGridConfig = grid.activeGridConfig;
     let rowClass = "md-grid-row";
@@ -480,19 +485,23 @@ export default class GridComp extends React.Component {
             if (field.textAlign) {
               styleObject.textAlign = field.textAlign;
             }
+            let cellId = (gridCell.dataId) ? gridCell.dataId : item.rowId;
 
             return (
               <div key={columnIndex} className="md-grid-cell"
                 style={styleObject} >
-
                 {
-                  (detailRoute) ?
+                  (field.actionType === 'FUNCTION') ?
+                    <FlatButton primary={true} style={{lineHeight: '28px'}} label={gridCell.value} labelPosition="after" onClick={this.onAction.bind(this, field.functionName, cellId, index)} />
+                    :
                     (
-                      <Link to={detailRoute} params={{id: (gridCell.dataId) ? gridCell.dataId : item.rowId}}> {formattedValue} </Link>
+                      (detailRoute) ?
+                        (
+                          <Link to={detailRoute} params={{id: cellId}}> {formattedValue} </Link>
+                        )
+                        : formattedValue
                     )
-                    : formattedValue
                 }
-
               </div>
             );
           })

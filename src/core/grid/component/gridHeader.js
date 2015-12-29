@@ -4,7 +4,7 @@ import _ from 'lodash';
 import classNames from 'classnames';
 import PureRenderMixin from 'react-addons-pure-render-mixin';
 
-import {RaisedButton} from 'material-ui';
+import {RaisedButton, Styles} from 'material-ui';
 import {Tooltip, OverlayTrigger, Overlay, Popover} from 'react-bootstrap';
 
 import MdField from 'core/metamodel/mdField';
@@ -14,6 +14,8 @@ import StyledSelect from 'core/components/styledSelect/styledSelect';
 import MdEntityService from 'core/metamodel/mdEntityService';
 import ConditionValue from 'core/grid/component/conditionValue';
 import GridService from 'core/grid/gridService';
+
+const Colors = Styles.Colors;
 
 /**
  *
@@ -151,7 +153,7 @@ export default class GridHeader extends React.Component {
         rootClose={true}
         target={()=> ReactDOM.findDOMNode(this.refs.filterIconRef)}
         placement="bottom">
-        <Popover style={{minWidth: 300}}
+        <Popover style={{minWidth: 300, zIndex: 1600}}
           title={<span><span>Column Filter</span> <span className="fa fa-close" style={{float: 'right', cursor: 'pointer'}} onClick={this.cancelPopover} ></span></span>}
           id={field.fieldName + '_filter'}>
 
@@ -183,12 +185,14 @@ export default class GridHeader extends React.Component {
     );
 
 
-    let anchor = (
+    let anchor = (field.filterable) ? (
       <a onClick={this._onClickLink} onMouseOver={this.onMouseOver} onMouseOut={this.onMouseOut}>
         { (sortObject) ? (
           <span className={classNames('fa', {'fa-long-arrow-up': !desc, 'fa-long-arrow-down': desc})}> </span> ) : '' }
         {field.gridHeaderLabelActive}
       </a>
+    ) : (
+      <span style={{color: Colors.indigo500}}>{field.gridHeaderLabelActive}</span>
     );
 
     let anchorWithTooltip = (
@@ -201,8 +205,8 @@ export default class GridHeader extends React.Component {
 
       <span>
         { (tooltipText) ? anchorWithTooltip : anchor}
-        { filter }
-        { filterPopover }
+        { (field.filterable) ? filter : ''}
+        { (field.filterable) ? filterPopover : ''}
       </span>
 
 

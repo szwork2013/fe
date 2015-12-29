@@ -13,7 +13,6 @@ export default class GridConfig {
     gridConfig.$gridRef = grid;
 
     gridConfig.syncColumnRefs(grid.$entityRef);
-    gridConfig.syncActionRefs(grid.$entityRef);
     gridConfig.gridWidths = GridService.computeGridWidths(null, gridConfig);
 
     // premapujeme na objekt
@@ -30,12 +29,6 @@ export default class GridConfig {
 
     // array of MdField (doplneno pozdeji ve GridService#fetchGrids() )
     this.$columnRefs = [];
-
-    // list of actionKeys
-    this.actions = [];
-
-    // array of MdAction (doplneno pozdeji ve GridService#fetchGrids() )
-    this.$actionRefs = [];
 
     // array of GridConfigCondition
     this.conditions = [];
@@ -78,15 +71,6 @@ export default class GridConfig {
     }
   }
 
-  syncActionRefs(entityRef) {
-    this.$actionRefs = [];
-    for(let actionKey of this.actions) {
-      let ak = Utils.parseId(actionKey);
-      let mdAction = entityRef.getAction(ak[1]);
-      this.$actionRefs.push(mdAction);
-    }
-  }
-
 
   clone() {
     let newGridConfig = new GridConfig(this.$gridRef);
@@ -97,7 +81,6 @@ export default class GridConfig {
     // copy columns
     newGridConfig.columns = this.columns.slice(0);
     newGridConfig.syncColumnRefs(this.$gridRef.$entityRef);
-    newGridConfig.syncActionRefs(this.$gridRef.$entityRef);
 
     // copy conditions
     for(let c of this.conditions) {
