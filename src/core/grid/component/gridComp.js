@@ -39,7 +39,8 @@ export default class GridComp extends React.Component {
     gridClassName: React.PropTypes.string,
     functionMap: React.PropTypes.object,
     multiSelect: React.PropTypes.bool,
-    bodyStyle: React.PropTypes.object
+    bodyStyle: React.PropTypes.object,
+    hideToolbar: React.PropTypes.bool
   };
 
   static defaultProps = {
@@ -327,7 +328,8 @@ export default class GridComp extends React.Component {
       uiLocation,
       gridClassName,
       multiSelect,
-      bodyStyle
+      bodyStyle,
+      hideToolbar
       } = this.props;
 
     console.debug("gridComp rendering: dataCount = " + grid.getTotalCount());
@@ -379,29 +381,31 @@ export default class GridComp extends React.Component {
 
       <div className={gridClassNames}>
 
-        <Navbar fluid style={{marginBottom: 10, minHeight: 'initial', fontSize: 14}}>
-          <Nav navbar>
-            {gridConfigMenu}
-          </Nav>
+        {(hideToolbar) ? '' : (
+          <Navbar fluid style={{marginBottom: 10, minHeight: 'initial', fontSize: 14}}>
+            <Nav navbar>
+              {gridConfigMenu}
+            </Nav>
 
-          {(multiSelect) ? (
-            <ZzIconButton tooltip="Show selection"
-                          fontIcon={classNames('fa', {'fa-check-square': grid.showSelection, 'fa-check-square-o': !grid.showSelection})}
-                          onClick={this.onClickCheck}/>
-          ) : ''}
-          <ZzIconButton tooltip="Refresh" fontIcon="fa fa-refresh" onClick={this.onClickRefresh}/>
+            {(multiSelect) ? (
+              <ZzIconButton tooltip="Show selection"
+                            fontIcon={classNames('fa', {'fa-check-square': grid.showSelection, 'fa-check-square-o': !grid.showSelection})}
+                            onClick={this.onClickCheck}/>
+            ) : ''}
+            <ZzIconButton tooltip="Refresh" fontIcon="fa fa-refresh" onClick={this.onClickRefresh}/>
 
-          { (grid.data && grid.data.totalCount) ? (grid.data.totalCount + ' rows') : '' }
+            { (grid.data && grid.data.totalCount) ? (grid.data.totalCount + ' rows') : '' }
 
-          {children}
+            {children}
 
-          <form className="navbar-form navbar-right" role="search" onSubmit={this.onSearchTermSubmit}>
-            <Input type="text" placeholder='Search' onChange={this.onSearchTermChange} value={grid.searchTerm}
-                   bsSize="small"/>
+            <form className="navbar-form navbar-right" role="search" onSubmit={this.onSearchTermSubmit}>
+              <Input type="text" placeholder='Search' onChange={this.onSearchTermChange} value={grid.searchTerm}
+                     bsSize="small"/>
             <span className="fa fa-search"
                   style={{position: 'absolute', bottom: 15, right: 15, pointerEvents: 'none', color: Colors.grey400}}></span>
-          </form>
-        </Navbar>
+            </form>
+          </Navbar>
+        )}
 
 
         <div className="md-grid-header-wrapper" style={{paddingRight: grid.headerPaddingRight}}>

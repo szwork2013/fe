@@ -9,6 +9,8 @@ import {customizeTheme}  from 'core/common/config/mui-theme';
 import GridService from 'core/grid/gridService';
 import Grid from 'core/grid/domain/grid';
 import GridComp from 'core/grid/component/gridComp';
+import PartyFoForm from 'party/component/partyFoForm';
+import MdEntityService from 'core/metamodel/mdEntityService';
 
 const Colors = Styles.Colors;
 const partySearchGridLocation = 'partySearch';
@@ -21,6 +23,7 @@ export default class PartySelector extends React.Component {
   };
 
   static propTypes = {
+    entities: React.PropTypes.object.isRequired,
     partyObject: React.PropTypes.object,
     dataObject: React.PropTypes.object,
     partyEntity: React.PropTypes.object.isRequired,
@@ -94,12 +97,31 @@ export default class PartySelector extends React.Component {
 
   onNew = (e) => {
     console.log('onNew');
+    let {dataObject, setDataAction, onPartyChange} = this.props;
+
+    MdEntityService.fetchEntityMetadata(['Party'])
+    .then(entityMap => {
+      dataObject.$partySelector.newDialogOpened = true;
+      dataObject.$partySelector.newParty = {$open: true};
+      setDataAction(dataObject);
+    });
+
   };
 
+  cancelNewParty = () => {
+    let {dataObject, setDataAction, onPartyChange} = this.props;
+    dataObject.$partySelector.newDialogOpened = false;
+    setDataAction(dataObject);
+  };
+  saveNewParty = () => {
+    let {dataObject, setDataAction, onPartyChange} = this.props;
+    dataObject.$partySelector.newDialogOpened = false;
+    setDataAction(dataObject);
+  };
 
   render() {
 
-    let {partyObject, partyEntity, setDataAction, dataObject, onPartyChange} = this.props;
+    let {partyObject, partyEntity, setDataAction, dataObject, onPartyChange, entities} = this.props;
 
     console.log('%c partySelector render: partyObject = %O', 'background-color: yellow', partyObject);
 
@@ -138,11 +160,20 @@ export default class PartySelector extends React.Component {
         { (dataObject.$partySelector.searchDialogOpened) ? (
           <Dialog
             title="Found parties" bodyStyle={{display: 'flex', flexDirection: 'column'}}
-            actions={this._dialogActions()}
+            actions={this._searchDialogActions()}
             modal={true}
             open={dataObject.$partySelector.searchDialogOpened}>
             <GridComp ref={dataObject.$partySelector.grid.gridLocation} grid={dataObject.$partySelector.grid} multiSelect={false}
                       uiLocation="dialog" bodyStyle={{paddingBottom: 7}} updateGrid={this.updateGrid} functionMap={{chooseParty: this.selectParty.bind(this)}} />
+          </Dialog>
+        ) : ''}
+        { (dataObject.$partySelector.newDialogOpened) ? (
+          <Dialog
+            title="New party"
+            actions={this._newDialogActions()}
+            modal={true}
+            open={dataObject.$partySelector.newDialogOpened}>
+            <PartyFoForm dataObject={dataObject.$partySelector.newParty} rootObject={dataObject} entity={partyEntity} entities={entities} setDataAction={setDataAction} />;
           </Dialog>
         ) : ''}
       </div>
@@ -168,7 +199,7 @@ export default class PartySelector extends React.Component {
     }
   }
 
-  _dialogActions() {
+  _searchDialogActions() {
     return [
       <FlatButton
         label="Cancel"
@@ -178,4 +209,18 @@ export default class PartySelector extends React.Component {
   }
 
 
+
+  _newDialogActions() {
+    return [
+      <FlatButton
+        label="Cancel"
+        secondary={true}
+        onClick={this.cancelNewParty} />,
+      <FlatButton
+        label="Save"
+        primary={true}
+        keyboardFocused={true}
+        onTouchTap={this.saveNewParty} />
+    ];
+  }
 }

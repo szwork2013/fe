@@ -61,6 +61,8 @@ export default class MdField {
     // jmeno funkce pro FUNCTION actionType
     functionName;
 
+    // format pro optional formatovani cisla
+    numberFormat;
   }
 
 
@@ -80,7 +82,7 @@ export default class MdField {
       case "DATETIME":
         return moment(value).format('L LTS');
       case "NUMBER":
-        return formatNumber(value, '0,0.00');
+        return (this.numberFormat) ? formatNumber(value, '0,0.00') : value;
       case "BOOLEAN":
         return value;
       default:

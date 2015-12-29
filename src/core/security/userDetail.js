@@ -179,12 +179,12 @@ export default class UserDetail extends React.Component {
           <div className="col-xs-12 col-sm-6" style={{display: 'flex', flexDirection: 'column'}}>
             <BlockComp header="Connected Party" style={{flexGrow: 1}}>
               <PartySelector partyObject={userObject.party} dataObject={userObject} partyEntity={entities.get('Party')}
-                             onPartyChange={this.onPartyChange}  setDataAction={setUserAction} />
+                             onPartyChange={this.onPartyChange}  setDataAction={setUserAction} entities={entities} />
             </BlockComp>
           </div>
           <div className="col-xs-12 col-sm-6">
             <BlockComp header="Available Tenants">
-              <GridComp ref={tenantGrid.gridLocation} grid={tenantGrid} multiSelect={false} gridClassName="detail-grid" bodyStyle={{paddingBottom: 7}}
+              <GridComp ref={tenantGrid.gridLocation} grid={tenantGrid} multiSelect={false} hideToolbar={true} gridClassName="detail-grid" bodyStyle={{paddingBottom: 7}}
                         uiLocation="main" updateGrid={updateGridAction} functionMap={{getSelectTenant: this.getSelectTenant.bind(this), setSelectTenant: this.setSelectTenant.bind(this)}} />
             </BlockComp>
           </div>
