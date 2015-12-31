@@ -178,42 +178,50 @@ export default class StyledSelect extends React.Component {
 
     let styles = this.getStyles();
     let selectClassName = "StyledSelect";
-    if (this.state.focused) {selectClassName += " is-focused";}
-    if ((selectValue && (selectValue.toString().length > 0))) {selectClassName += " has-value";}
-    if (errorText) {selectClassName += " is-error";}
-    if (multi) {selectClassName += " is-multi";}
+    if (this.state.focused) {
+      selectClassName += " is-focused";
+    }
+    if ((selectValue && (selectValue.toString().length > 0))) {
+      selectClassName += " has-value";
+    }
+    if (errorText) {
+      selectClassName += " is-error";
+    }
+    if (multi) {
+      selectClassName += " is-multi";
+    }
 
     // <input className="rowAligner" type="text" style={{width: '100%', height: '100%', visibility: 'hidden'}} />
 
     let floatingLabelTextElement = floatingLabelText ? (
-    <label className="SelectLabel"
-      htmlFor={inputId}
-      onTouchTap={this.focus}
-      style={floatingLabelStyle}>
-      {floatingLabelText}
-    </label>) : null;
+      <label className="SelectLabel"
+             htmlFor={inputId}
+             onTouchTap={this.focus}
+             style={floatingLabelStyle}>
+        {floatingLabelText}
+      </label>) : null;
 
     return (
       <div className={selectClassName} style={MaterialStyles.mergeAndPrefix(styles.root, this.props.style)}>
-    {floatingLabelTextElement}
-  <input className="rowAligner" type="text" style={{width: '100%', height: '100%', visibility: 'hidden'}} />
-  <Select ref="select" onFocus={this.onFocusEvent} onBlur={this.onBlurEvent} onChange={this.onChangeEvent}
-    name={name}
-    valueRenderer={valueRenderer}
-    value={value}
-    options={options}
-    clearable={clearable}
-    searchable={searchable}
-    multi={multi}
-    delimiter={delimiter}
-    disabled={disabled}
-    matchProp="label"
-      />
-      <hr className="underscore-grey"  />
-      <hr className="underscore-blue"  />
-      <div className="errorText">{errorText}</div>
+        {floatingLabelTextElement}
+        <input className="rowAligner" type="text" style={{width: '100%', height: '100%', visibility: 'hidden'}}/>
+        <Select ref="select" onFocus={this.onFocusEvent} onBlur={this.onBlurEvent} onChange={this.onChangeEvent}
+                name={name}
+                valueRenderer={valueRenderer}
+                value={value}
+                options={options}
+                clearable={clearable}
+                searchable={searchable}
+                multi={multi}
+                delimiter={delimiter}
+                disabled={disabled}
+                matchProp="label"
+        />
+        <hr className="underscore-grey"/>
+        <hr className="underscore-blue"/>
+        <div className="errorText">{errorText}</div>
       </div>
-  )
+    )
   }
 
 

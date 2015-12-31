@@ -83,40 +83,40 @@ class PartyAddressForm extends React.Component {
       <div>
         <div className="row">
           <div className="col-xs-4">
-            <StyledSelect {...addressType}/>
+            <StyledSelect {...addressType.props}/>
           </div>
           <div className="col-xs-4">
-            <TextField {...name} />
+            <TextField {...name.props} />
           </div>
           <div className="col-xs-4">
-            <TextField {...toHands} />
+            <TextField {...toHands.props} />
           </div>
         </div>
 
         <div className="row">
           <div className="col-xs-4">
-            <TextField {...street}/>
+            <TextField {...street.props}/>
           </div>
           <div className="col-xs-2">
-            <TextField {...descriptiveNumber} />
+            <TextField {...descriptiveNumber.props} />
           </div>
           <div className="col-xs-2">
-            <TextField {...orientationalNumber} />
+            <TextField {...orientationalNumber.props} />
           </div>
           <div className="col-xs-2">
-            <TextField {...city} />
+            <TextField {...city.props} />
           </div>
           <div className="col-xs-2">
-            <TextField {...zip} />
+            <TextField {...zip.props} />
           </div>
         </div>
 
         <div className="row">
           <div className="col-xs-3">
-            <StyledSelect {...country} />
+            <StyledSelect {...country.props} />
           </div>
           <div className="col-xs-9">
-            <TextField {...comment}/>
+            <TextField {...comment.props}/>
           </div>
         </div>
       </div>
@@ -144,7 +144,7 @@ class PartyAddressForm extends React.Component {
 }
 
 const definition = {
-  form: 'PartyAddressForm',
+  formName: 'PartyAddressForm',
   fields: [{
     name: 'addressType',
     validators: ['required']

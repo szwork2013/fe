@@ -36,7 +36,12 @@ export default class ActiveItem extends React.Component {
     evt.stopPropagation();
     let {dataObject, setDataAction, rootObject, onCommit} = this.props;
 
-    if (onCommit) onCommit(dataObject);
+    if (onCommit) {
+      let res = onCommit(dataObject);
+      if (!res) {
+        return;
+      }
+    }
     dataObject.$open = false;
     setDataAction(rootObject);
     console.log('onCommit %o', dataObject);

@@ -68,9 +68,9 @@ class PartyContactForm extends React.Component {
 
 
 
-    const {dataObject, rootObject, lastValue, index, entities, fields: {
-      value, comment, contactType
-      }} = this.props;
+    const {dataObject, rootObject, lastValue, index, entities} = this.props;
+    let {value, comment, contactType} = dataObject.$forms[definition.formName].fields;
+
 
     const PartyContactType = entities.get('PartyContactType');
     let typeLov = PartyContactType.getLovItem(dataObject.contactType);
@@ -82,10 +82,10 @@ class PartyContactForm extends React.Component {
     const openContent = (
       <div style={{display: 'flex', flexDirection: 'column'}}>
         <div style={{display: 'flex', flexDirection: 'row'}}>
-          <TextField {...value}   />
-          <StyledSelect {...contactType}/>
+          <TextField {...value.props}   />
+          <StyledSelect {...contactType.props}/>
         </div>
-        <TextField {...comment}/>
+        <TextField {...comment.props}/>
       </div>
     );
 
@@ -108,7 +108,7 @@ class PartyContactForm extends React.Component {
 }
 
 const definition = {
-  form: 'PartyContactForm',
+  formName: 'PartyContactForm',
   fields: [{
     name: 'value',
     validators: ['required'],

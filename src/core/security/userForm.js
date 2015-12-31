@@ -16,12 +16,8 @@ class UserForm extends React.Component {
 
   render() {
 
-
-
-    let {dataObject, rootObject, lastValue,  entities, fields: {
-      username, enabled, locked, expired
-      }} = this.props;
-
+    let {dataObject, rootObject, lastValue,  entities} = this.props;
+    let {username, enabled, locked, expired}= dataObject.$forms[definition.formName].fields;
 
     let openContent = (
       <div>
@@ -29,20 +25,20 @@ class UserForm extends React.Component {
         {/*  1. row  */}
         <div className="row">
           <div className="col-xs-6 col-sm-4">
-            <TextField {...username} />
+            <TextField {...username.props} />
           </div>
         </div>
 
         {/*  2. row  */}
         <div className="row">
           <div className="col-xs-6 col-sm-4">
-            <Checkbox {...enabled} />
+            <Checkbox {...enabled.props} />
           </div>
           <div className="col-xs-6 col-sm-4">
-            <Checkbox {...locked} />
+            <Checkbox {...locked.props} />
           </div>
           <div className="col-xs-6 col-sm-4">
-            <Checkbox {...expired} />
+            <Checkbox {...expired.props} />
           </div>
         </div>
 
@@ -71,7 +67,7 @@ class UserForm extends React.Component {
 }
 
 const definition = {
-  form: 'UserForm',
+  formName: 'UserForm',
   fields: [{
     name: 'username',
     validators: ['required']

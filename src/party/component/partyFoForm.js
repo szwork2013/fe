@@ -8,6 +8,8 @@ import StyledSelect from 'core/components/styledSelect/styledSelect';
 import StyledDatePicker from 'core/components/styledDatePicker/styledDatePicker';
 import BlockComp from 'core/components/blockComp/blockComp';
 import ActiveItem from 'core/components/blockComp/activeItem';
+import {Validate} from 'core/form/validate';
+import {HasLength} from 'core/form/rules';
 
 
 class PartyFoForm extends React.Component {
@@ -15,17 +17,24 @@ class PartyFoForm extends React.Component {
 
 
   onCommit = (dataObject) => {
+    let res = this.props.validate();
+    if (!res) return false;
+
     dataObject.fullName = [dataObject.firstName, dataObject.lastName].filter(v=>v).join(' ');
+    return true;
   };
+
+
+
 
   render() {
 
 
 
-    let {dataObject, rootObject, lastValue,  entities, fields: {
-      firstName, lastName, titleBefore, dateOfBirth, birthNumber, birthLastName, salutation, placeOfBirth, nationality, taxDomicile, gender
-      }} = this.props;
+    let {dataObject, rootObject, lastValue,  entities} = this.props;
 
+    let {firstName, lastName, titleBefore, dateOfBirth, birthNumber, birthLastName, salutation, placeOfBirth, nationality, taxDomicile, gender}
+      = dataObject.$forms[definition.formName].fields;
 
     let openContent = (
       <div>
@@ -34,42 +43,43 @@ class PartyFoForm extends React.Component {
         {/*  1. row  */}
         <div className="row">
           <div className="col-xs-6 col-sm-4">
-            <TextField {...firstName} />
+            <TextField {...firstName.props} />
           </div>
           <div className="col-xs-6 col-sm-4">
-            <TextField {...lastName} />
+            <TextField  {...lastName.props}/>
+            <Validate field={lastName} value={lastName.props.value}/>
           </div>
             <div className="col-xs-6 col-sm-4">
-              <TextField {...titleBefore} />
+              <TextField {...titleBefore.props} />
             </div>
         </div>
 
         {/*  3. 4. 6. row  */}
         <div className="row">
           <div className="col-xs-6 col-sm-4">
-            <StyledDatePicker {...dateOfBirth}  />
+            <StyledDatePicker {...dateOfBirth.props}  />
           </div>
           <div className="col-xs-6 col-sm-4">
-            <TextField {...birthNumber}  />
+            <TextField {...birthNumber.props}  />
           </div>
           <div className="col-xs-6 col-sm-4">
-            <StyledSelect {...gender}  />
+            <StyledSelect {...gender.props}  />
           </div>
           <div className="col-xs-6 col-sm-4">
-            <TextField {...birthLastName}  />
+            <TextField {...birthLastName.props}  />
           </div>
 
           <div className="col-xs-6 col-sm-4">
-            <TextField {...salutation}  />
+            <TextField {...salutation.props}  />
           </div>
           <div className="col-xs-6 col-sm-4">
-            <TextField {...placeOfBirth}  />
+            <TextField {...placeOfBirth.props}  />
           </div>
           <div className="col-xs-6 col-sm-4">
-            <StyledSelect {...nationality}  />
+            <StyledSelect {...nationality.props}  />
           </div>
           <div className="col-xs-6 col-sm-4">
-            <StyledSelect {...taxDomicile} />
+            <StyledSelect {...taxDomicile.props} />
           </div>
         </div>
 
@@ -107,12 +117,13 @@ class PartyFoForm extends React.Component {
 }
 
 const definition = {
-  form: 'PartyFoForm',
+  formName: 'PartyFoForm',
   fields: [{
-    name: 'firstName'
+    name: 'firstName',
+    validators: ['IsRequired']
   }, {
     name: 'lastName',
-    validators: ['required']
+    validators: ['IsRequired']
   }, {
     name: 'titleBefore'
   }, {

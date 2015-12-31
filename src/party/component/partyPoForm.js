@@ -26,51 +26,51 @@ class PartyPoForm extends React.Component {
         {/*  1. row  */}
         <div className="row">
           <div className="col-xs-12">
-            <TextField {...fullName} />
+            <TextField {...fullName.props} />
           </div>
         </div>
 
         {/*  2. row  */}
         <div className="row">
           <div className="col-xs-6 col-sm-4">
-            <TextField {...ico} />
+            <TextField {...ico.props} />
           </div>
           <div className="col-xs-6 col-sm-4">
-            <TextField {...dic} />
+            <TextField {...dic.props} />
           </div>
           {showForTenant(
             (<div className="col-xs-6 col-sm-4">
-              <TextField {...icoDph} />
+              <TextField {...icoDph.props} />
             </div>), 2)}
         </div>
 
         {/*  3. 4. 6. row  */}
         <div className="row">
           <div className="col-xs-6 col-sm-4">
-            <StyledSelect {...defaultCurrency}  />
+            <StyledSelect {...defaultCurrency.props}  />
           </div>
           <div className="col-xs-6 col-sm-4">
-            <StyledSelect {...defaultLanguage}  />
+            <StyledSelect {...defaultLanguage.props}  />
           </div>
           <div className="col-xs-6 col-sm-4">
-            <StyledSelect {...defaultPaymentCond}  />
-          </div>
-
-          <div className="col-xs-6 col-sm-4">
-            <StyledSelect {...legalForm}  />
-          </div>
-          <div className="col-xs-6 col-sm-4">
-            <StyledSelect {...naceCode}  />
-          </div>
-          <div className="col-xs-6 col-sm-4">
-            <StyledSelect {...marketingSource}  />
+            <StyledSelect {...defaultPaymentCond.props}  />
           </div>
 
           <div className="col-xs-6 col-sm-4">
-            <StyledSelect {...nationality}  />
+            <StyledSelect {...legalForm.props}  />
           </div>
           <div className="col-xs-6 col-sm-4">
-            <StyledSelect {...taxDomicile} />
+            <StyledSelect {...naceCode.props}  />
+          </div>
+          <div className="col-xs-6 col-sm-4">
+            <StyledSelect {...marketingSource.props}  />
+          </div>
+
+          <div className="col-xs-6 col-sm-4">
+            <StyledSelect {...nationality.props}  />
+          </div>
+          <div className="col-xs-6 col-sm-4">
+            <StyledSelect {...taxDomicile.props} />
           </div>
         </div>
 
@@ -116,7 +116,7 @@ class PartyPoForm extends React.Component {
 }
 
 const definition = {
-  form: 'PartyPoForm',
+  formName: 'PartyPoForm',
   fields: [{
     name: 'fullName',
     validators: ['required']

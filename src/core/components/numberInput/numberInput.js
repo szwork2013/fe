@@ -150,9 +150,12 @@ const NumberInput = React.createClass({
       value: null,
       type: 'tel',
       format: DEFAULT_NUMBER_FORMAT,
-      onFocus: function() {},
-      onBlur: function() {},
-      onChange: function() {},
+      onFocus: function () {
+      },
+      onBlur: function () {
+      },
+      onChange: function () {
+      },
 
       // textfield default props
       fullWidth: false,
@@ -229,7 +232,7 @@ const NumberInput = React.createClass({
   onChange(event) {
     event.persist();
     this.setState(
-      { value: event.target.value }
+      {value: event.target.value}
     );
   },
 
@@ -237,7 +240,7 @@ const NumberInput = React.createClass({
    * vrati zformatovanou hodnotu dle zadaneho "format"
    *
    * @returns {string}
-     */
+   */
   valueAsFormatted() {
     const value = this.state.value
     const n = toNumeral(value);
@@ -398,20 +401,20 @@ const NumberInput = React.createClass({
     let inputId = id || this._uniqueId;
 
     let errorTextElement = this.state.errorText ? (
-    <div style={styles.error}>{this.state.errorText}</div>
-  ) : null;
+      <div style={styles.error}>{this.state.errorText}</div>
+    ) : null;
 
     let hintTextElement = hintText ? (
-    <div style={this.mergeAndPrefix(styles.hint)}>{hintText}</div>
-  ) : null;
+      <div style={this.mergeAndPrefix(styles.hint)}>{hintText}</div>
+    ) : null;
 
     let floatingLabelTextElement = floatingLabelText ? (
-    <label
-      style={this.mergeAndPrefix(styles.floatingLabel, this.props.floatingLabelStyle)}
-    htmlFor={inputId}>
-      {floatingLabelText}
+      <label
+        style={this.mergeAndPrefix(styles.floatingLabel, this.props.floatingLabelStyle)}
+        htmlFor={inputId}>
+        {floatingLabelText}
       </label>
-  ) : null;
+    ) : null;
 
     let inputProps;
     let inputElement;
@@ -440,37 +443,37 @@ const NumberInput = React.createClass({
     }
     else {
       inputElement = multiLine ? (
-      <EnhancedTextarea
-      {...other}
-      {...inputProps}
-      rows={rows}
-      onHeightChange={this._handleTextAreaHeightChange}
-      textareaStyle={this.mergeAndPrefix(styles.textarea)} />
-    ) : (
-      <input
-      {...other}
-      {...inputProps}
-      type={type} />
-    );
+        <EnhancedTextarea
+          {...other}
+          {...inputProps}
+          rows={rows}
+          onHeightChange={this._handleTextAreaHeightChange}
+          textareaStyle={this.mergeAndPrefix(styles.textarea)}/>
+      ) : (
+        <input
+          {...other}
+          {...inputProps}
+          type={type}/>
+      );
     }
 
     let underlineElement = this.props.disabled ? (
-    <div style={this.mergeAndPrefix(styles.underlineAfter)}></div>
-  ) : (
-    <hr style={this.mergeAndPrefix(styles.underline)}/>
-  );
-    let focusUnderlineElement = <hr style={this.mergeAndPrefix(styles.focusUnderline)} />;
+      <div style={this.mergeAndPrefix(styles.underlineAfter)}></div>
+    ) : (
+      <hr style={this.mergeAndPrefix(styles.underline)}/>
+    );
+    let focusUnderlineElement = <hr style={this.mergeAndPrefix(styles.focusUnderline)}/>;
 
     return (
       <div className={className} style={this.mergeAndPrefix(styles.root, this.props.style)}>
-    {floatingLabelTextElement}
-    {hintTextElement}
-    {inputElement}
-    {underlineElement}
-    {focusUnderlineElement}
-    {errorTextElement}
-  </div>
-  );
+        {floatingLabelTextElement}
+        {hintTextElement}
+        {inputElement}
+        {underlineElement}
+        {focusUnderlineElement}
+        {errorTextElement}
+      </div>
+    );
   },
 
   blur() {

@@ -2,16 +2,17 @@ function identity(t) {
   return t;
 }
 
-export function createAction(type, actionCreator, metaCreator) {
-  var finalActionCreator = typeof actionCreator === 'function' ? actionCreator : identity;
+export function createAction(type) {
 
   var fn = function () {
     var action = {
       type: type,
-      payload: finalActionCreator.apply(undefined, arguments)
+      payload: arguments[0]
     };
 
-    if (typeof metaCreator === 'function') action.meta = metaCreator.apply(undefined, arguments);
+    if (arguments.length > 1) {
+      action.caller = arguments[1];
+    }
 
     return action;
   };

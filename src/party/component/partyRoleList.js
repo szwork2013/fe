@@ -68,20 +68,20 @@ class PartyRoleForm extends React.Component {
 
 
 
-    const {dataObject, rootObject, containerObject, lastValue, index, entities, fields: {
-      roleType
-      }} = this.props;
+    const {dataObject, rootObject, containerObject, lastValue, index, entities} = this.props;
+    let {roleType} = dataObject.$forms[definition.formName].fields;
+
 
     const PartyRoleType = entities.get('PartyRoleType');
     let typeLov = PartyRoleType.getLovItem(dataObject.roleType);
 
     // vyhazu ze option selectu role ktere uz na customerovi existuji, krome te me co zrovna edituji
     let roleTypeArray = containerObject.roles.map(role => role.roleType);
-    roleType.options = roleType.options.filter(lov => !includes(roleTypeArray, lov.value) || roleType.value === lov.value );
+    roleType.props.options = roleType.props.options.filter(lov => !includes(roleTypeArray, lov.value) || roleType.props.value === lov.value );
 
     const openContent = (
       <div>
-          <StyledSelect {...roleType}/>
+          <StyledSelect {...roleType.props}/>
       </div>
     );
 
@@ -98,7 +98,7 @@ class PartyRoleForm extends React.Component {
 }
 
 const definition = {
-  form: 'PartyRoleForm',
+  formName: 'PartyRoleForm',
   fields: [{
     name: 'roleType'
   }]

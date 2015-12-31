@@ -3,6 +3,8 @@ import PureRenderMixin from 'react-addons-pure-render-mixin';
 import {get, set} from 'lodash';
 
 
+
+
 export default function createForm(definition, FormComponent) {
 
   const defaultStyle = {
@@ -40,75 +42,168 @@ export default function createForm(definition, FormComponent) {
 
     constructor(props) {
       super(props);
+    }
 
-      console.log('createForm props: %o', props);
+    allValid() {
+      let fields = this.props.dataObject.$forms[definition.formName].fields;
+      // nastaveni value
+      for(let field of Object.values(fields)) {
+        if (field.valid === false) return false
+      }
+      return true;
+    }
 
-      this.fields = definition.fields.reduce((fields, field) => {
+    showAllValidations() {
+      let fields = this.props.dataObject.$forms[definition.formName].fields;
+      // nastaveni value
+      for(let field of Object.values(fields)) {
+        field.showValidation = true;
+      }
+      this.props.setDataAction(this.props.rootObject, 'createForm#showAllValidations()');
+    }
+
+    validate = () => {
+      let res = this.allValid();
+      if (!res) {
+        this.showAllValidations();
+        return false;
+      } else {
+        return true;
+      }
+    }
+
+    componentWillMount() {
+      let {dataObject, rootObject, setDataAction} = this.props;
+      let fields = this._setupFields(this.props);
+
+      if (!dataObject.$forms) dataObject.$forms = {};
+      if (!dataObject.$forms[definition.formName]) dataObject.$forms[definition.formName] = {};
+      dataObject.$forms[definition.formName].fields = fields;
+
+      this._updateFieldsValue(dataObject);
+
+      setDataAction(rootObject, 'createForm#componentWillMount()');
+    }
+
+    componentWillReceiveProps(nextProps) {
+      this._updateFieldsValue(nextProps.dataObject);
+    }
+
+    render() {
+      return <FormComponent {...this.props} validate={this.validate} />;
+    }
+
+    _updateFieldsValue(dataObject) {
+      let fields = dataObject.$forms[definition.formName].fields;
+
+      // nastaveni value
+      for(let field of Object.values(fields)) {
+        field.props[(field.mdField.dataType === 'BOOLEAN') ? 'checked' : 'value'] = this.getValue(dataObject, field);
+      }
+    }
+
+    _setupFields(props) {
+
+      const fields = definition.fields.reduce((acc, field) => {
         //console.debug('createForm: field: %o on entity %o', field, entity);
         const mdField = props.entity.fields[field.name];
+
         const fieldObject = {
-          fullWidth: true,
-          textLabel: mdField.label,
-          errorText: null,
           name: field.name,
           fieldPath: field.fieldPath,
+          textLabel: mdField.label,
           mdField: mdField,
-          [(mdField.dataType === 'BOOLEAN') ? 'onCheck' : 'onChange']: (evt) => {
-            let value = (typeof evt === 'object' && evt.target) ?  ( (mdField.dataType === 'BOOLEAN') ? evt.target.checked : evt.target.value) : evt;
-            //console.log('Form ' + definition.form + " onChange event on " + field.name + ", value = " + value + ", $open = " + this.props.rootObject.$open);
-            this.setValue(this.props.dataObject, field, value);
-            this.props.setDataAction(this.props.rootObject);
-          },
-          style: Object.assign({}, defaultStyle, field.style)
+          validators: field.validators
         };
+
+        const propsObject = {
+          $fieldObject: fieldObject,
+          fullWidth: true,
+          name: field.name,
+          style: Object.assign({}, defaultStyle, field.style),
+          get errorText() {
+            return this.$fieldObject.showValidation && this.$fieldObject.errorMessage
+          }
+        };
+
+        fieldObject.props = propsObject;
+
+
+        switch (mdField.dataType) {
+          case 'BOOLEAN':
+            propsObject.onCheck = (evt) => {
+              this.setValue(this.props.dataObject, field, evt.target.checked);
+              this.props.setDataAction(this.props.rootObject, 'createForm field ' + field.name + ' onCheck()');
+            };
+            propsObject.label = mdField.label;
+            break;
+          default:
+            propsObject.onChange = (evt) => {
+              let value = (evt != null && evt.target) ? evt.target.value : evt;
+              this.setValue(this.props.dataObject, field, value);
+              this.props.setDataAction(this.props.rootObject, 'createForm field ' + field.name + ' onChange()');
+            };
+            propsObject.floatingLabelText = mdField.label;
+        }
+
 
         if (mdField.hasLocalValueSource()) {
           let valueSourceEntity =  props.entities.get(mdField.valueSource);
           if (valueSourceEntity) {
-            fieldObject.options = [{value: '', label: '---'}, ...valueSourceEntity.lovItems];
+            propsObject.options = [{value: '', label: '---'}, ...valueSourceEntity.lovItems];
           }
-          fieldObject.clearable = false;
-          fieldObject.searchable = (valueSourceEntity.lovItems.length > 8);
-
+          propsObject.clearable = false;
+          propsObject.searchable = (valueSourceEntity.lovItems.length > 8);
         }
 
         // TextField style overrides (zmenseni)
         // dame to ted na vsechny jine nez StyledSelect, mozna budeme dale vyhazovat
         if (!mdField.valueSourceType) {
-          fieldObject.hintStyle = {lineHeight: 24};
-          fieldObject.floatingLabelStyle = {marginBottom: 0, top: 'initial', bottom: 12};
-          fieldObject.inputStyle = {marginTop: 0, paddingTop: 6};
+          propsObject.hintStyle = {lineHeight: 24};
+          propsObject.floatingLabelStyle = {marginBottom: 0, top: 'initial', bottom: 12};
+          propsObject.inputStyle = {marginTop: 0, paddingTop: 6};
+          propsObject.errorStyle = {top: -4};  // lepsi by bylo nastavit bottom, jenze v kodu TextField se bottom nastavuje natvrdo na fontSize + 3 = 15px, takze nastavime top a vyuzijme toho ze "When both top and bottom are specified, the top property takes precedence and the bottom property is ignored."
         }
 
-        // checkbox ma label, ostatni asi floatingLabelText
-        if (mdField.dataType === 'BOOLEAN') {
-          fieldObject.label = mdField.label;
-        } else {
-          fieldObject.floatingLabelText = mdField.label;
-        }
+        propsObject.onBlur = (evt) => {
+          fieldObject.showValidation = true;
+          this.props.setDataAction(this.props.rootObject, 'createForm field ' + fieldObject.name + ' onBlur()');
+        };
+
+
+        fieldObject.handleValidation = ({validationResult, showValidation}) => {
+          console.log("%c field = %s, validationResult = %O, showValidation = %s", 'background-color: lightblue', fieldObject.name, validationResult, showValidation);
+          let {showValidation: show, valid} = fieldObject;
+
+          if (validationResult != null) {
+            valid = validationResult.valid;
+            let {error, rule} = validationResult;
+            if (valid === false) {
+              fieldObject.errorMessage = `Invalid (rule: ${rule}, error: ${error})`
+            } else {
+              fieldObject.errorMessage = null;
+            }
+          }
+
+          show = showValidation != null ? showValidation : show;
+
+          fieldObject.showValidation = show;
+          fieldObject.valid = valid;
+
+          if (valid != null) {
+            this.props.setDataAction(this.props.rootObject, 'createForm field ' + fieldObject.name + ' handleValidation()');
+          }
+        };
 
 
 
-        fields[field.name] = fieldObject;
-        return fields;
+        acc[field.name] = fieldObject;
+        return acc;
       }, {});
+
+     return fields;
     }
 
-    //componentDidMount() {
-    //  this.setState({ data: 'Hello' });
-    //}
-    render() {
-
-      let dataObject = this.props.dataObject;
-
-      // nastaveni value
-      for(let field of Object.values(this.fields)) {
-        field[(field.mdField.dataType === 'BOOLEAN') ? 'checked' : 'value'] = this.getValue(dataObject, field);
-      }
-
-
-      return <FormComponent fields={this.fields} {...this.props} />;
-    }
   };
 
 }
