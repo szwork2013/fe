@@ -17,6 +17,7 @@ import {customizeThemeForDetail, TabTemplate}  from 'core/common/config/mui-them
 import {screenLg} from 'core/common/config/variables';
 import BlockComp from 'core/components/blockComp/blockComp';
 import {selectGrid, preSave} from 'core/form/formUtils';
+import {ErrorComp} from 'core/components/errorComp/errorComp';
 
 import UserForm from 'core/security/userForm';
 import PartySelector from 'party/component/partySelector';
@@ -105,12 +106,23 @@ export default class UserDetail extends React.Component {
     this.props.setUserAction(null);
   }
 
+  customValidate = (userObject) => {
+    let errors = [];
+    if (userObject.tenants.length === 0) {
+      errors.push({message: "At least one tenant must be selected"})
+    }
+    if (!userObject.party) {
+      errors.push({message: "Party must be selected"});
+    }
+    return errors;
+  };
+
 
   onSave = (evt) => {
     console.log('onSave');
     let {userObject, setUserAction} = this.props;
 
-    let result = preSave(userObject, setUserAction);
+    let result = preSave(userObject, setUserAction, this.customValidate);
 
     if (result) {
       console.log('onSave - OK');
@@ -180,6 +192,8 @@ export default class UserDetail extends React.Component {
       <main className="main-content container">
         {this._createToolMenu(userObject)}
 
+        <ErrorComp messages={userObject.$errors} />
+
         <BlockComp style={{marginTop: 10}} header="User">
           <form >
             <UserForm {...propsForCreateForm} />
@@ -189,7 +203,7 @@ export default class UserDetail extends React.Component {
           <div className="col-xs-12 col-sm-6" style={{display: 'flex', flexDirection: 'column'}}>
             <BlockComp header="Connected Party" style={{flexGrow: 1}}>
               <PartySelector partyObject={userObject.party} dataObject={userObject} partyEntity={entities.get('Party')}
-                             onPartyChange={this.onPartyChange}  setDataAction={setUserAction} entities={entities} />
+                             onPartyChange={this.onPartyChange}  setDataAction={setUserAction} entities={entities} newPartyTemplate={{partyCategory: 'FO', roles: [{roleType:4}]}} />
             </BlockComp>
           </div>
           <div className="col-xs-12 col-sm-6">

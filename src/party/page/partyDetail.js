@@ -74,16 +74,27 @@ export default class PartyDetail extends React.Component {
   };
 
   static fetchData(routerParams, query) {
-    console.log("PartyDetail#fetchData()");
+    console.log("PartyDetail#fetchData(%O)", query);
 
     let metadataPromise = MdEntityService.fetchEntityMetadata(['Party', 'PartyContact', 'PartyRole', 'Address'], [{entity: 'PARTYCONTACTCATEGORY', lov: true}]);
 
-    let partyPromise = ((routerParams.id === 'new') ? When(Object.assign({
-      contacts: [],
-      addresses: [],
-      roles: [],
-      $new: true
-    }, query)) : PartyService.readParty(routerParams.id));
+    let partyPromise;
+    if (routerParams.id === 'new') {
+      let q = Object.assign({}, query);
+      let roles = [];
+      if (q.roles != null) {
+        roles.push({roleType: parseInt(q.roles)});
+        delete q.roles;
+      }
+      partyPromise = Object.assign({
+        contacts: [],
+        addresses: [],
+        roles: roles,
+        $new: true
+      }, q);
+    } else {
+      partyPromise = PartyService.readParty(routerParams.id);
+    }
 
     let gridPromise = GridService.fetchGrids(vehicleGridLocation, invoiceGridLocation, partyRelGridLocation);
 

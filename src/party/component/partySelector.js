@@ -28,7 +28,8 @@ export default class PartySelector extends React.Component {
     dataObject: React.PropTypes.object,
     partyEntity: React.PropTypes.object.isRequired,
     setDataAction: React.PropTypes.func.isRequired,
-    onPartyChange: React.PropTypes.func.isRequired
+    onPartyChange: React.PropTypes.func.isRequired,
+    newPartyTemplate: React.PropTypes.func.isRequired
   };
 
 
@@ -97,12 +98,12 @@ export default class PartySelector extends React.Component {
 
   onNew = (e) => {
     console.log('onNew');
-    let {dataObject, setDataAction, onPartyChange} = this.props;
+    let {dataObject, setDataAction, onPartyChange, newPartyTemplate} = this.props;
 
     MdEntityService.fetchEntityMetadata(['Party'])
     .then(entityMap => {
       dataObject.$partySelector.newDialogOpened = true;
-      dataObject.$partySelector.newParty = {$new: true};
+      dataObject.$partySelector.newParty = Object.assign({$new: true}, newPartyTemplate);
       setDataAction(dataObject);
     });
 

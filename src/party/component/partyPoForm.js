@@ -4,9 +4,19 @@ import {TextField} from 'material-ui';
 
 import createForm from 'core/form/createForm';
 import {showForTenant, FieldText} from 'core/form/formUtils';
+import PartyService from 'party/partyService';
 import StyledSelect from 'core/components/styledSelect/styledSelect';
 import BlockComp from 'core/components/blockComp/blockComp';
 import ActiveItem from 'core/components/blockComp/activeItem';
+import {Validate} from 'core/form/validate';
+import {valid, invalid} from 'core/form/rules';
+
+
+function PartyExist({value}) {
+  if (!value) return valid();
+  return PartyService.partyExist({ico: value})
+    .then( (exists) => (exists) ? invalid(`Customer with ICO ${value} already exists`) : valid());
+}
 
 class PartyPoForm extends React.Component {
   shouldComponentUpdate = PureRenderMixin.shouldComponentUpdate.bind(this);
@@ -27,6 +37,7 @@ class PartyPoForm extends React.Component {
         <div className="row">
           <div className="col-xs-12">
             <TextField {...fullName.props} />
+            <Validate field={fullName} value={fullName.props.value}/>
           </div>
         </div>
 
@@ -34,6 +45,9 @@ class PartyPoForm extends React.Component {
         <div className="row">
           <div className="col-xs-6 col-sm-4">
             <TextField {...ico.props} />
+            <Validate field={ico} value={ico.props.value}>
+              <PartyExist/>
+            </Validate>
           </div>
           <div className="col-xs-6 col-sm-4">
             <TextField {...dic.props} />
@@ -119,9 +133,10 @@ const definition = {
   formName: 'PartyPoForm',
   fields: [{
     name: 'fullName',
-    validators: ['required']
+    validators: ['IsRequired']
   }, {
-    name: 'ico'
+    name: 'ico',
+    validators: ['IsRequired']
   }, {
     name: 'dic'
   }, {

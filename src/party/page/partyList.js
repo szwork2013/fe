@@ -21,7 +21,7 @@ export default class PartyList extends PageAncestor {
   render() {
     return (
         <GridCompConnected gridLocation={gridLocation} gridId={this.props.params.gridId} query={this.props.query}>
-            <ZzIconButtonRoute tooltip="New Customer" fontIcon="fa fa-user-plus"  routeName="partyDetail" params={{id: 'new'}} query={{partyCategory: 'PO'}} />
+            <ZzIconButtonRoute tooltip="New Customer" fontIcon="fa fa-user-plus"  routeName="partyDetail" params={{id: 'new'}} query={{partyCategory: 'PO', roles:1}} />
         </GridCompConnected>
     );
   }

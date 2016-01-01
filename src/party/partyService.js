@@ -29,6 +29,16 @@ class PartyService  {
       + ((address.country)? ', ' + countryEntity.getLovItem(address.country).label : '');
   }
 
+  /**
+   * spec :  {ico: 456456}, {birthNumber: 346456456}, {ico: 456456, birthNumber: 346456456}
+   * @param spec
+   * @returns {*}
+     */
+  partyExist(spec) {
+    return Axios.get('/party/party-exist', {params:spec})
+      .then(response => response.data);
+  }
+
 
 }
 
