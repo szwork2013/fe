@@ -48,7 +48,10 @@ class SecurityService  {
       .then(response => response.data);
   }
 
-
+  userExist(username) {
+    return Axios.get('/core/security/user-exist/' + username)
+      .then(response => response.data);
+  }
 }
 
 export default new SecurityService();

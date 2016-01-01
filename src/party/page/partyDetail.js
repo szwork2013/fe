@@ -14,7 +14,7 @@ import PartyService from 'party/partyService';
 import {setPartyAction, updateGridAction} from 'party/partyActions';
 import {customizeThemeForDetail, TabTemplate}  from 'core/common/config/mui-theme';
 import {screenLg, tabStyle} from 'core/common/config/variables';
-import {selectGrid} from 'core/form/formUtils';
+import {selectGrid, preSave} from 'core/form/formUtils';
 
 import {enhanceParty, CUSTOMER_ROLE} from 'party/partyUtils';
 import PartyFoForm from 'party/component/partyFoForm';
@@ -82,7 +82,7 @@ export default class PartyDetail extends React.Component {
       contacts: [],
       addresses: [],
       roles: [],
-      $open: true
+      $new: true
     }, query)) : PartyService.readParty(routerParams.id));
 
     let gridPromise = GridService.fetchGrids(vehicleGridLocation, invoiceGridLocation, partyRelGridLocation);
@@ -203,9 +203,20 @@ export default class PartyDetail extends React.Component {
 
 
 
+
   onSave = (evt) => {
     console.log('onSave');
+    let {partyObject, setPartyAction} = this.props;
+
+    let result = preSave(partyObject, setPartyAction);
+
+    if (result) {
+      console.log('onSave - OK');
+    }
+
   };
+
+
   onDelete = (evt) => {
     console.log('onDelete');
   };
@@ -237,7 +248,7 @@ export default class PartyDetail extends React.Component {
       setDataAction: setPartyAction
     };
 
-    console.debug('%c partyDetail render $open = %s', 'background-color: yellow', partyObject.$open);
+    console.debug('%c partyDetail render', 'background-color: yellow');
 
     const mainForm = (
       <form style={{marginTop: 10}}>

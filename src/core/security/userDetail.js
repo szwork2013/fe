@@ -16,7 +16,7 @@ import {setUserAction, updateGridAction} from 'core/security/securityActions';
 import {customizeThemeForDetail, TabTemplate}  from 'core/common/config/mui-theme';
 import {screenLg} from 'core/common/config/variables';
 import BlockComp from 'core/components/blockComp/blockComp';
-import {selectGrid} from 'core/form/formUtils';
+import {selectGrid, preSave} from 'core/form/formUtils';
 
 import UserForm from 'core/security/userForm';
 import PartySelector from 'party/component/partySelector';
@@ -66,8 +66,8 @@ export default class UserDetail extends React.Component {
       gridConfigs: [],
       tenants: [],
       defaultGridConfig: {},
-      $open: true,
-      enabled: true
+      enabled: true,
+      $new: true
     }, query)) : SecurityService.readUser(routerParams.id))
       .then(userObject => {
         userObject.$grids = {};
@@ -108,7 +108,17 @@ export default class UserDetail extends React.Component {
 
   onSave = (evt) => {
     console.log('onSave');
+    let {userObject, setUserAction} = this.props;
+
+    let result = preSave(userObject, setUserAction);
+
+    if (result) {
+      console.log('onSave - OK');
+    }
+
   };
+
+
   onDelete = (evt) => {
     console.log('onDelete');
   };
@@ -163,7 +173,7 @@ export default class UserDetail extends React.Component {
     };
 
 
-    console.debug('%c userDetail render $open = %s', 'background-color: yellow', userObject.$open);
+    console.debug('%c userDetail render', 'background-color: yellow');
 
 
     return (

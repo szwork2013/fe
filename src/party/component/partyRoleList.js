@@ -7,6 +7,7 @@ import createForm from 'core/form/createForm';
 import StyledSelect from 'core/components/styledSelect/styledSelect';
 import BlockComp from 'core/components/blockComp/blockComp';
 import ActiveItem from 'core/components/blockComp/activeItem';
+import {Validate} from 'core/form/validate';
 
 const Colors = Styles.Colors;
 
@@ -23,7 +24,7 @@ export default class PartyRoleList extends React.Component {
   addRole = () => {
     console.debug('addRole');
     const {partyObject, setDataAction, rootObject} = this.props;
-    let newRole = {$open: true};
+    let newRole = {$new: true};
     partyObject.roles.push(newRole);
     setDataAction(rootObject);
   };
@@ -82,6 +83,7 @@ class PartyRoleForm extends React.Component {
     const openContent = (
       <div>
           <StyledSelect {...roleType.props}/>
+          <Validate field={roleType} value={roleType.props.value}/>
       </div>
     );
 
@@ -92,7 +94,7 @@ class PartyRoleForm extends React.Component {
     );
 
     return (
-      <ActiveItem openContent={openContent} closedContent={closedContent} key={index} lastValue={lastValue} onDelete={this.onDelete} tabIndex={0} {...this.props} />
+      <ActiveItem openContent={openContent} closedContent={closedContent} key={index} lastValue={lastValue} onDelete={this.onDelete} validate={this.props.validate} tabIndex={0} {...this.props} />
     );
   }
 }
@@ -100,7 +102,8 @@ class PartyRoleForm extends React.Component {
 const definition = {
   formName: 'PartyRoleForm',
   fields: [{
-    name: 'roleType'
+    name: 'roleType',
+    validators: ['IsRequired']
   }]
 };
 

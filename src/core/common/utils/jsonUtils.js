@@ -40,3 +40,28 @@ export function addReferences(dataObject) {
   return dataObject;
 }
 
+
+export function walk(object, level, fn) {
+  console.debug('walk object = %O, level = %s', object, level);
+
+  fn(object, level);
+
+  for (let i in object) {
+    if (i.startsWith && i.startsWith('$')) continue;
+
+    let subObject = object[i];
+
+    if (subObject !== null && typeof(subObject) == "object") {
+      if (isArray(subObject)) {
+        for (let item of subObject) {
+          fn(item, level + 1);
+          walk(item, level + 1, fn);
+        }
+      } else {
+        fn(subObject, level + 1);
+        walk(subObject, level + 1, fn);
+      }
+    }
+
+  }
+}

@@ -8,11 +8,23 @@ import { Alert } from 'react-bootstrap';
 import createForm from 'core/form/createForm';
 import {FieldText} from 'core/form/formUtils';
 import StyledSelect from 'core/components/styledSelect/styledSelect';
-
 import ActiveItem from 'core/components/blockComp/activeItem';
+import {Validate} from 'core/form/validate';
+import {valid, invalid} from 'core/form/rules';
+import SecurityService from 'core/security/securityService';
+
+
+function UserExist({value}) {
+  if (!value) return valid();
+  return SecurityService.userExist(value)
+    .then( (exists) => (exists) ? invalid(`User ${value} already exists`) : valid());
+}
+
 
 class UserForm extends React.Component {
   shouldComponentUpdate = PureRenderMixin.shouldComponentUpdate.bind(this);
+
+
 
   render() {
 
@@ -26,6 +38,9 @@ class UserForm extends React.Component {
         <div className="row">
           <div className="col-xs-6 col-sm-4">
             <TextField {...username.props} />
+            <Validate field={username} value={username.props.value}>
+              <UserExist/>
+            </Validate>
           </div>
         </div>
 
@@ -61,7 +76,7 @@ class UserForm extends React.Component {
 
 
     return (
-        <ActiveItem openContent={openContent} closedContent={closedContent} lastValue={true} tabIndex={0} {...this.props} />
+        <ActiveItem openContent={openContent} closedContent={closedContent} lastValue={true} tabIndex={0} {...this.props} validate={this.props.validate} />
     );
   }
 }
@@ -70,7 +85,7 @@ const definition = {
   formName: 'UserForm',
   fields: [{
     name: 'username',
-    validators: ['required']
+    validators: ['IsRequired']
   },{
     name: 'enabled'
   }, {

@@ -127,7 +127,7 @@ export default class GridLocationDetail extends React.Component {
       } = this.props;
 
 
-    console.debug('%c GridLocationDetail render $open = %s', 'background-color: yellow', gridObject.$open);
+    console.debug('%c GridLocationDetail render', 'background-color: yellow');
 
 
     return (

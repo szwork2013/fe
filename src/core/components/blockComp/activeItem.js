@@ -17,16 +17,17 @@ export default class ActiveItem extends React.Component {
     setDataAction: React.PropTypes.func.isRequired,
     lastValue: React.PropTypes.bool,
     index: React.PropTypes.number,
-    onCommit: React.PropTypes.func
+    validate: React.PropTypes.func.isRequired,
+    formName: React.PropTypes.string.isRequired
   };
 
 
 
   onClick = (evt) => {
-    let {dataObject, setDataAction, rootObject} = this.props;
+    let {dataObject, setDataAction, rootObject, formName} = this.props;
 
-    if (!dataObject.$open) {
-      dataObject.$open = true;
+    if (!dataObject.$forms[formName].open) {
+      dataObject.$forms[formName].open = true;
       setDataAction(rootObject);
       console.log('onClick %o', dataObject);
     }
@@ -34,15 +35,13 @@ export default class ActiveItem extends React.Component {
 
   onCommit = (evt) => {
     evt.stopPropagation();
-    let {dataObject, setDataAction, rootObject, onCommit} = this.props;
+    let {dataObject, setDataAction, rootObject, validate, formName} = this.props;
 
-    if (onCommit) {
-      let res = onCommit(dataObject);
-      if (!res) {
-        return;
-      }
-    }
-    dataObject.$open = false;
+    let res = validate(dataObject);
+    if (!res) return;
+
+    let form = dataObject.$forms[formName];
+    form.open = false;
     setDataAction(rootObject);
     console.log('onCommit %o', dataObject);
   };
@@ -57,6 +56,7 @@ export default class ActiveItem extends React.Component {
       openContent,
       closedContent,
       onDelete,
+      formName,
       ...other
       } = this.props;
 
@@ -68,7 +68,7 @@ export default class ActiveItem extends React.Component {
     };
 
 
-    return (dataObject.$open) ? (
+    return (dataObject.$forms[formName].open) ? (
       <div className="active-item--open" {...finalProps}>
         {openContent}
         <ZzIconButton fontIcon="fa fa-check" className="active-item--check"  iconStyle={{color: Colors.green500, fontSize: 18}} onClick={this.onCommit} />

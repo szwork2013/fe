@@ -125,7 +125,7 @@ export class Validate extends React.Component {
   static defaultProps = {
     args: {},
     children: []
-  }
+  };
 
   static propTypes = {
     args: React.PropTypes.any,

@@ -2,6 +2,7 @@ import React from 'react';
 import PureRenderMixin from 'react-addons-pure-render-mixin';
 import {get, set} from 'lodash';
 
+import Form from 'core/form/form';
 
 
 
@@ -42,43 +43,29 @@ export default function createForm(definition, FormComponent) {
 
     constructor(props) {
       super(props);
+      //console.log('%c %s constructor', 'background-color: magenta', definition.formName);
     }
 
-    allValid() {
-      let fields = this.props.dataObject.$forms[definition.formName].fields;
-      // nastaveni value
-      for(let field of Object.values(fields)) {
-        if (field.valid === false) return false
-      }
-      return true;
-    }
-
-    showAllValidations() {
-      let fields = this.props.dataObject.$forms[definition.formName].fields;
-      // nastaveni value
-      for(let field of Object.values(fields)) {
-        field.showValidation = true;
-      }
-      this.props.setDataAction(this.props.rootObject, 'createForm#showAllValidations()');
-    }
 
     validate = () => {
-      let res = this.allValid();
+      let {dataObject, rootObject, setDataAction} = this.props;
+      let form = Form.safeGet(dataObject, definition.formName);
+
+      let res = form.validateForm(dataObject);
       if (!res) {
-        this.showAllValidations();
-        return false;
-      } else {
-        return true;
+        setDataAction(rootObject, 'createForm#validate()');
       }
-    }
+
+      return res;
+    };
 
     componentWillMount() {
       let {dataObject, rootObject, setDataAction} = this.props;
+      //console.log('%c %s componentWillMount', 'background-color: magenta', definition.formName);
       let fields = this._setupFields(this.props);
 
-      if (!dataObject.$forms) dataObject.$forms = {};
-      if (!dataObject.$forms[definition.formName]) dataObject.$forms[definition.formName] = {};
-      dataObject.$forms[definition.formName].fields = fields;
+      let form = Form.safeGet(dataObject, definition.formName);
+      Object.assign(form, {fields, open: dataObject.$new, onCommit: definition.onCommit});
 
       this._updateFieldsValue(dataObject);
 
@@ -86,11 +73,20 @@ export default function createForm(definition, FormComponent) {
     }
 
     componentWillReceiveProps(nextProps) {
-      this._updateFieldsValue(nextProps.dataObject);
+      let {dataObject} = nextProps;
+      //console.log('%c %s componentWillReceiveProps', 'background-color: magenta', definition.formName);
+
+      let form = Form.safeGet(dataObject, definition.formName);
+      if (!form.fields) {
+        let fields = this._setupFields(nextProps);
+        Object.assign(form, {fields, open: dataObject.$new, onCommit: definition.onCommit});
+      }
+
+      this._updateFieldsValue(dataObject);
     }
 
     render() {
-      return <FormComponent {...this.props} validate={this.validate} />;
+      return <FormComponent {...this.props} formName={definition.formName} validate={this.validate} />;
     }
 
     _updateFieldsValue(dataObject) {
@@ -128,6 +124,13 @@ export default function createForm(definition, FormComponent) {
 
         fieldObject.props = propsObject;
 
+        // tucne a hvezdicka pro povinne
+        let editLabel = mdField.label;
+        let floatingLabelStyle = {marginBottom: 0, top: 'initial', bottom: 12};
+        if (fieldObject.validators && fieldObject.validators.includes('IsRequired')) {
+          editLabel = editLabel + " *";
+          floatingLabelStyle.fontWeight = 'bold';
+        }
 
         switch (mdField.dataType) {
           case 'BOOLEAN':
@@ -135,7 +138,7 @@ export default function createForm(definition, FormComponent) {
               this.setValue(this.props.dataObject, field, evt.target.checked);
               this.props.setDataAction(this.props.rootObject, 'createForm field ' + field.name + ' onCheck()');
             };
-            propsObject.label = mdField.label;
+            propsObject.label = editLabel;
             break;
           default:
             propsObject.onChange = (evt) => {
@@ -143,7 +146,11 @@ export default function createForm(definition, FormComponent) {
               this.setValue(this.props.dataObject, field, value);
               this.props.setDataAction(this.props.rootObject, 'createForm field ' + field.name + ' onChange()');
             };
-            propsObject.floatingLabelText = mdField.label;
+            propsObject.floatingLabelText = editLabel;
+        }
+
+        if (mdField.maxLength != null) {
+          propsObject.maxLength = mdField.maxLength;
         }
 
 
@@ -160,7 +167,7 @@ export default function createForm(definition, FormComponent) {
         // dame to ted na vsechny jine nez StyledSelect, mozna budeme dale vyhazovat
         if (!mdField.valueSourceType) {
           propsObject.hintStyle = {lineHeight: 24};
-          propsObject.floatingLabelStyle = {marginBottom: 0, top: 'initial', bottom: 12};
+          propsObject.floatingLabelStyle = floatingLabelStyle;
           propsObject.inputStyle = {marginTop: 0, paddingTop: 6};
           propsObject.errorStyle = {top: -4};  // lepsi by bylo nastavit bottom, jenze v kodu TextField se bottom nastavuje natvrdo na fontSize + 3 = 15px, takze nastavime top a vyuzijme toho ze "When both top and bottom are specified, the top property takes precedence and the bottom property is ignored."
         }
@@ -179,7 +186,7 @@ export default function createForm(definition, FormComponent) {
             valid = validationResult.valid;
             let {error, rule} = validationResult;
             if (valid === false) {
-              fieldObject.errorMessage = `Invalid (rule: ${rule}, error: ${error})`
+              fieldObject.errorMessage = error; //`Invalid (rule: ${rule}, error: ${error})`
             } else {
               fieldObject.errorMessage = null;
             }

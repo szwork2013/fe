@@ -102,7 +102,7 @@ export default class PartySelector extends React.Component {
     MdEntityService.fetchEntityMetadata(['Party'])
     .then(entityMap => {
       dataObject.$partySelector.newDialogOpened = true;
-      dataObject.$partySelector.newParty = {$open: true};
+      dataObject.$partySelector.newParty = {$new: true};
       setDataAction(dataObject);
     });
 

@@ -14,7 +14,7 @@ export function IsEmail({value}) {
 }
 
 export function IsRequired({value}) {
-  return (value != null && value.length > 0) ?
+  return (value != null && value !== '') ?
     valid() : invalid('This field is required')
 }
 

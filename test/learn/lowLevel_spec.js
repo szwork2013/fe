@@ -2,6 +2,9 @@ import {expect} from 'chai';
 import {List, Map, fromJS} from 'immutable';
 import {transform} from 'lodash';
 
+import Form from 'core/form/form';
+
+
 describe('low level', () => {
 
   // ...
@@ -45,5 +48,17 @@ describe('low level', () => {
     console.log(newObj2);
 
   });
+
+  describe('class assign', () => {
+    console.log('class assign');
+
+    let form = new Form('formik');
+    Object.assign(form, {fields: 'ff', open: true});
+
+    console.log(form);
+
+  });
+
+
 
 });

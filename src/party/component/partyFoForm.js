@@ -9,20 +9,11 @@ import StyledDatePicker from 'core/components/styledDatePicker/styledDatePicker'
 import BlockComp from 'core/components/blockComp/blockComp';
 import ActiveItem from 'core/components/blockComp/activeItem';
 import {Validate} from 'core/form/validate';
-import {HasLength} from 'core/form/rules';
+
 
 
 class PartyFoForm extends React.Component {
   shouldComponentUpdate = PureRenderMixin.shouldComponentUpdate.bind(this);
-
-
-  onCommit = (dataObject) => {
-    let res = this.props.validate();
-    if (!res) return false;
-
-    dataObject.fullName = [dataObject.firstName, dataObject.lastName].filter(v=>v).join(' ');
-    return true;
-  };
 
 
 
@@ -110,7 +101,7 @@ class PartyFoForm extends React.Component {
 
     return (
       <BlockComp>
-        <ActiveItem openContent={openContent} closedContent={closedContent} lastValue={true} onCommit={this.onCommit} tabIndex={0} {...this.props} />
+        <ActiveItem openContent={openContent} closedContent={closedContent} lastValue={true} validate={this.props.validate} tabIndex={0} {...this.props} />
       </BlockComp>
     );
   }
@@ -119,8 +110,7 @@ class PartyFoForm extends React.Component {
 const definition = {
   formName: 'PartyFoForm',
   fields: [{
-    name: 'firstName',
-    validators: ['IsRequired']
+    name: 'firstName'
   }, {
     name: 'lastName',
     validators: ['IsRequired']
@@ -144,7 +134,10 @@ const definition = {
     name: 'taxDomicile'
   }, {
     name: 'fullName'
-  }]
+  }],
+  onCommit(dataObject) {
+    dataObject.fullName = [dataObject.firstName, dataObject.lastName].filter(v=>v).join(' ');
+  }
 };
 
 export default createForm(definition, PartyFoForm);

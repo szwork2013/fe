@@ -7,6 +7,7 @@ import createForm from 'core/form/createForm';
 import StyledSelect from 'core/components/styledSelect/styledSelect';
 import BlockComp from 'core/components/blockComp/blockComp';
 import ActiveItem from 'core/components/blockComp/activeItem';
+import {Validate} from 'core/form/validate';
 
 const Colors = Styles.Colors;
 
@@ -23,7 +24,7 @@ export default class PartyContactList extends React.Component {
   addContact = () => {
     console.debug('addContact');
     const {partyObject, setDataAction, rootObject} = this.props;
-    let newContact = {$open: true};
+    let newContact = {$new: true};
     partyObject.contacts.push(newContact);
     setDataAction(rootObject);
   };
@@ -83,7 +84,9 @@ class PartyContactForm extends React.Component {
       <div style={{display: 'flex', flexDirection: 'column'}}>
         <div style={{display: 'flex', flexDirection: 'row'}}>
           <TextField {...value.props}   />
+          <Validate field={value} value={value.props.value}/>
           <StyledSelect {...contactType.props}/>
+          <Validate field={contactType} value={contactType.props.value}/>
         </div>
         <TextField {...comment.props}/>
       </div>
@@ -102,7 +105,7 @@ class PartyContactForm extends React.Component {
     );
 
     return (
-      <ActiveItem openContent={openContent} closedContent={closedContent} key={index} lastValue={lastValue} onDelete={this.onDelete} tabIndex={0} {...this.props} />
+      <ActiveItem openContent={openContent} closedContent={closedContent} key={index} lastValue={lastValue} onDelete={this.onDelete} validate={this.props.validate} tabIndex={0} {...this.props} />
     );
   }
 }
@@ -111,12 +114,13 @@ const definition = {
   formName: 'PartyContactForm',
   fields: [{
     name: 'value',
-    validators: ['required'],
+    validators: ['IsRequired'],
     style: {marginRight: 5}
   }, {
     name: 'comment'
   }, {
-    name: 'contactType'
+    name: 'contactType',
+    validators: ['IsRequired']
   }]
 };
 

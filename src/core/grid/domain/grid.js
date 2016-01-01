@@ -1,4 +1,4 @@
-import _ from 'lodash';
+import {remove, findIndex, first, isString, isEmpty} from 'lodash';
 
 import GridConfig from 'core/grid/domain/gridConfig';
 import GridConfigCondition from 'core/grid/domain/gridConfigCondition';
@@ -60,11 +60,11 @@ export default class Grid {
   }
 
   deleteGridConfig(gridId) {
-    _.remove(this.gridConfigs, gc => gc.gridId == gridId);
+    remove(this.gridConfigs, gc => gc.gridId == gridId);
   }
 
   replaceGridConfig(gridConfig) {
-    let index = _.findIndex(this.gridConfigs, gc => gc.gridId === gridConfig.gridId);
+    let index = findIndex(this.gridConfigs, gc => gc.gridId === gridConfig.gridId);
     if (index >= 0) {
       this.gridConfigs.splice(index, 1, gridConfig);
     } else {
@@ -84,11 +84,11 @@ export default class Grid {
     }
 
     if (!agc) {
-      agc = _.first(this.gridConfigs.filter(gc => gc.defaultGrid));
+      agc = first(this.gridConfigs.filter(gc => gc.defaultGrid));
     }
 
     if (!agc) {
-      agc = _.first(this.gridConfigs);
+      agc = first(this.gridConfigs);
     }
 
     return agc;
@@ -111,7 +111,7 @@ export default class Grid {
    */
   set sort(sortValue) {
     if (sortValue) {
-      if (_.isString(sortValue)) {
+      if (isString(sortValue)) {
         sortValue = [sortValue];
       }
       this.sortArray = sortValue.map(str => {
@@ -127,7 +127,7 @@ export default class Grid {
    * vytvori z conditionArray (pole gridConfigCondition) ->  { filter: [fieldName1_EQUAL, fieldName2_IN, ...],  fieldName1: [value11, value12, ...], fieldName2: [value21, value22, ...], .... }
    */
   getConditionQueryObject() {
-    if (_.isEmpty(this.conditionArray)) {
+    if (isEmpty(this.conditionArray)) {
       return {};
     } else {
       let queryObject = {filter: []};
@@ -154,7 +154,7 @@ export default class Grid {
    */
   setConditionQueryObject(query) {
 
-    if (_.isEmpty(query.filter)) {
+    if (isEmpty(query.filter)) {
       this.conditionArray = null;
     } else {
       this.conditionArray = [];

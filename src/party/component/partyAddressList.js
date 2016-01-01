@@ -8,6 +8,7 @@ import createForm from 'core/form/createForm';
 import StyledSelect from 'core/components/styledSelect/styledSelect';
 import BlockComp from 'core/components/blockComp/blockComp';
 import ActiveItem from 'core/components/blockComp/activeItem';
+import {Validate} from 'core/form/validate';
 
 const Colors = Styles.Colors;
 
@@ -23,7 +24,7 @@ export default class PartyAddressList extends React.Component {
   addAddress = () => {
     console.debug('addAddress');
     const {partyObject, setPartyAction} = this.props;
-    let newAddress = {$open: true};
+    let newAddress = {$new: true};
     partyObject.addresses.push(newAddress);
     setPartyAction(partyObject);
   };
@@ -69,10 +70,9 @@ class PartyAddressForm extends React.Component {
 
   render() {
 
+    const {dataObject, rootObject, lastValue, index, entities} = this.props;
+    let {addressType, name, street, toHands, descriptiveNumber, orientationalNumber, city, zip, comment, country} = dataObject.$forms[definition.formName].fields;
 
-    const {dataObject, rootObject, lastValue, index, entities, fields: {
-      addressType, name, street, toHands, descriptiveNumber, orientationalNumber, city, zip, comment, country
-      }} = this.props;
 
     const ADDRESSTYPE = entities.get('ADDRESSTYPE');
     let typeLov = ADDRESSTYPE.getLovItem(dataObject.addressType);
@@ -84,6 +84,7 @@ class PartyAddressForm extends React.Component {
         <div className="row">
           <div className="col-xs-4">
             <StyledSelect {...addressType.props}/>
+            <Validate field={addressType} value={addressType.props.value}/>
           </div>
           <div className="col-xs-4">
             <TextField {...name.props} />
@@ -96,6 +97,7 @@ class PartyAddressForm extends React.Component {
         <div className="row">
           <div className="col-xs-4">
             <TextField {...street.props}/>
+            <Validate field={street} value={street.props.value}/>
           </div>
           <div className="col-xs-2">
             <TextField {...descriptiveNumber.props} />
@@ -105,6 +107,7 @@ class PartyAddressForm extends React.Component {
           </div>
           <div className="col-xs-2">
             <TextField {...city.props} />
+            <Validate field={city} value={city.props.value}/>
           </div>
           <div className="col-xs-2">
             <TextField {...zip.props} />
@@ -138,7 +141,7 @@ class PartyAddressForm extends React.Component {
 
     return (
       <ActiveItem openContent={openContent} closedContent={closedContent} key={index} lastValue={lastValue}
-                  onDelete={this.onDelete} tabIndex={0} {...this.props} />
+                  onDelete={this.onDelete} tabIndex={0}  validate={this.props.validate} {...this.props} />
     );
   }
 }
@@ -147,21 +150,21 @@ const definition = {
   formName: 'PartyAddressForm',
   fields: [{
     name: 'addressType',
-    validators: ['required']
+    validators: ['IsRequired']
   }, {
     name: 'name'
   }, {
     name: 'toHands'
   }, {
-    name: 'street'
-  }, {
-    name: 'street'
+    name: 'street',
+    validators: ['IsRequired']
   }, {
     name: 'descriptiveNumber'
   }, {
     name: 'orientationalNumber'
   }, {
-    name: 'city'
+    name: 'city',
+    validators: ['IsRequired']
   }, {
     name: 'zip'
   }, {

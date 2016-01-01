@@ -1,5 +1,6 @@
 import React from 'react';
 
+import {walk} from 'core/common/utils/jsonUtils';
 import SecurityService from 'core/security/securityService';
 import Grid from 'core/grid/domain/grid';
 
@@ -48,4 +49,35 @@ export function updateChildGrid(parentObject, action) {
   if (!parentObject.$grids) parentObject.$grids = {};
   parentObject.$grids[action.payload.gridLocation] = Grid.clone(action.payload);
   return Object.assign({},parentObject);
+}
+
+
+export function preSave(rootObject, rootAction) {
+  // najdu otevrene form objekty
+  let openTuples = [];
+  walk(rootObject, 0, (object, level) => {
+    if (object.$forms) {
+      let tuples = Object.values(object.$forms).filter(form => form.open).map(form => ({form, object}));
+      openTuples.push(...tuples);
+    }
+  });
+
+
+  let formsWithError = [];
+
+  for(let {form, object} of openTuples) {
+    console.log('open form %O', form);
+    let res = form.validateForm(object);
+    if (res) {
+      form.open = false;
+    } else {
+      formsWithError.push(form);
+    }
+  }
+
+  if (openTuples.length) {
+    rootAction(rootObject, 'formUtils#preSave()');
+  }
+
+  return (formsWithError.length === 0);
 }

@@ -11,14 +11,14 @@ import ActiveItem from 'core/components/blockComp/activeItem';
 class PartyPoForm extends React.Component {
   shouldComponentUpdate = PureRenderMixin.shouldComponentUpdate.bind(this);
 
+
+
   render() {
 
 
-
-    let {dataObject, rootObject, lastValue,  entities, fields: {
-      fullName, ico, dic, icoDph, defaultCurrency, defaultLanguage, defaultPaymentCond, legalForm, naceCode, marketingSource, nationality, taxDomicile
-      }} = this.props;
-
+    let {dataObject, rootObject, lastValue,  entities} = this.props;
+    let {fullName, ico, dic, icoDph, defaultCurrency, defaultLanguage, defaultPaymentCond, legalForm, naceCode, marketingSource, nationality, taxDomicile}
+      = dataObject.$forms[definition.formName].fields;
 
     let openContent = (
       <div>
@@ -109,7 +109,7 @@ class PartyPoForm extends React.Component {
 
     return (
       <BlockComp>
-        <ActiveItem openContent={openContent} closedContent={closedContent} lastValue={true} tabIndex={0} {...this.props} />
+        <ActiveItem openContent={openContent} closedContent={closedContent} lastValue={true} validate={this.props.validate}  tabIndex={0} {...this.props} />
       </BlockComp>
     );
   }

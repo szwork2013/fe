@@ -59,10 +59,13 @@ export default class MdField {
     this.actionDisplay;
 
     // jmeno funkce pro FUNCTION actionType
-    functionName;
+    this.functionName;
 
     // format pro optional formatovani cisla
-    numberFormat;
+    this.numberFormat;
+
+    // max length pro textField
+    this.maxLength;
   }
 
 
