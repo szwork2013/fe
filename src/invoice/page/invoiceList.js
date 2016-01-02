@@ -15,7 +15,7 @@ export default class InvoiceList extends PageAncestor {
 
 
   static fetchData(routerParams) {
-    console.log("PartyList#fetchData(%s)", gridLocation);
+    console.log("InvoiceList#fetchData(%s)", gridLocation);
     return GridService.fetchGrids(gridLocation);
   }
 

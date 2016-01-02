@@ -63,7 +63,10 @@ export default class Application extends React.Component {
     commonService.emitter.on('LOADING', (isOn) => {
       let [loading] = isOn;
       console.log('LOADING listener: ', loading );
-      this.setState({loading});
+      if( this.state.loading ? !loading : loading ) {
+        this.setState({loading});
+      }
+
     });
   };
 

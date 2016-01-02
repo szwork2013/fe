@@ -4,9 +4,10 @@ import {Route, DefaultRoute} from 'react-router';
 import Application from 'core/application/application';
 import Home from 'core/home/home';
 
-import PartyList from 'party/page/partyList';
+import CustomerList from 'party/page/customerList';
 import ContactPersonList from 'party/page/contactPersonList';
 import SalesRepList from 'party/page/salesRepList';
+import PartyList from 'party/page/partyList';
 
 import PartyDetail from 'party/page/partyDetail';
 
@@ -41,9 +42,10 @@ const routes = (
 
 
 
-    <Route name="partyCustomers" path="party/grid/customer/:gridId?" handler={PartyList}/>
+    <Route name="partyCustomers" path="party/grid/customer/:gridId?" handler={CustomerList}/>
     <Route name="partyContacts" path="party/grid/contact-person/:gridId?" handler={ContactPersonList}/>
     <Route name="partySalesReps" path="party/grid/sales-rep/:gridId?" handler={SalesRepList}/>
+    <Route name="partyAll" path="party/grid/all/:gridId?" handler={PartyList}/>
     <Route name="partyDetail" path="party/detail/:id" handler={PartyDetail}/>
 
 

@@ -8,9 +8,9 @@ export function ErrorComp({messages}) {
     <Alert bsStyle='danger' style={{marginTop: 10}}>
       <ul>
         {
-          messages.map(m => {
+          messages.map( (m,i) => {
             return (
-              <li> {m.message} </li>
+              <li key={i}> {m.message} </li>
             );
           })
         }

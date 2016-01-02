@@ -111,6 +111,8 @@ export default class MainMenu extends React.Component {
 
 
           <MenuItem divider/>
+          { this._menuItem("partyAll") }
+
           <MenuItem eventKey='3'>Administration</MenuItem>
         </NavDropdown>
 

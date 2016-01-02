@@ -36,8 +36,6 @@ const invoiceGridLocation = 'partyInvoiceList';
 const partyRelGridLocation = 'partyRelList';
 
 
-
-
 function mapStateToProps(state) {
   let entities = state.getIn(['metamodel', 'entities']);
   let partyObject = enhanceParty(state.getIn(['party', 'partyObject']), entities);
@@ -56,7 +54,7 @@ function mapStateToProps(state) {
   };
 }
 
-
+var $freshLoadFlag = false;
 
 
 @connect(mapStateToProps, {setPartyAction, updateGridAction})
@@ -78,6 +76,8 @@ export default class PartyDetail extends React.Component {
 
   static fetchData(routerParams, query) {
     console.log("PartyDetail#fetchData(%O)", query);
+    $freshLoadFlag = true;
+
 
     let metadataPromise = MdEntityService.fetchEntityMetadata(['Party', 'PartyContact', 'PartyRole', 'Address'], [{entity: 'PARTYCONTACTCATEGORY', lov: true}]);
 
@@ -103,7 +103,9 @@ export default class PartyDetail extends React.Component {
 
     return When.all([metadataPromise, partyPromise, gridPromise])
       .then( ([entityMap, partyObject, gridMap]) => {
+        CommonService.loading(false);
         partyObject.$grids = {};
+        partyObject.$loaded = true;
         return store.dispatch(setPartyAction(partyObject))
     });
   }
@@ -141,8 +143,10 @@ export default class PartyDetail extends React.Component {
    * @param prevProps
    */
   componentDidUpdate(prevProps) {
-    if (this.props.partyObject.partyId && this.props.partyObject.partyId !== prevProps.partyObject.partyId) {
-      console.log("partyDetail#componentWillReceiveProps() - change of party, resetting grids");
+    console.debug("%c componentDidUpdate", "background-color: magenta");
+    if ($freshLoadFlag) {
+      $freshLoadFlag = false;
+      console.log("partyDetail#componentDidUpdate() - change of party, resetting grids");
 
       let {grids} = this.props;
       let selectedTab = (this.mediaQuery.matches && grids.length > 1) ? grids[1].gridLocation :  grids[0].gridLocation;
@@ -157,6 +161,8 @@ export default class PartyDetail extends React.Component {
   }
 
   componentDidMount() {
+    console.debug("%c componentDidMount", "background-color: magenta");
+    $freshLoadFlag = false;
     this.searchPartyGrids();
   }
 
@@ -235,13 +241,17 @@ export default class PartyDetail extends React.Component {
     CommonService.loading(true);
     PartyService.partySave(partyObject)
     .then( (partyId) => {
-      CommonService.loading(false);
-      CommonService.toastSuccess("Grid byl úspěšně uložen");
       if(doReturn) {
         this.context.router.goBack();
+        CommonService.loading(false);
       } else {
-        this.context.router.transitionTo('partyDetail', {id: partyId});
+        if(partyObject.$new) {
+          this.context.router.replaceWith('partyDetail', {id: partyId});
+        } else {
+          this.context.router.refresh();
+        }
       }
+      CommonService.toastSuccess("Party " + partyObject.fullName + " byl úspěšně uložen");
     });
 
   };
@@ -249,7 +259,23 @@ export default class PartyDetail extends React.Component {
 
   onDelete = (evt) => {
     console.log('onDelete');
+    let {partyObject, setPartyAction} = this.props;
+
+    CommonService.loading(true);
+    PartyService.deleteParty(partyObject.partyId)
+    .then(response => {
+      if (History.length <= 1) {
+        this.context.router.transitionTo('home');
+      } else {
+        this.context.router.goBack();
+      }
+      CommonService.loading(false);
+    }, error => {
+      partyObject.$errors = error.data.messages;
+      setPartyAction(partyObject, 'partyDetail#onDelete()');
+    });
   };
+
   onBack = (evt) => {
     console.log('onBack %O', this.context.router);
     this.context.router.goBack();

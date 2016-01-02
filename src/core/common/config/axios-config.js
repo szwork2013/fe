@@ -1,5 +1,6 @@
 import React from 'react';
 import Axios from 'axios';
+import When from 'when';
 
 import Locales from 'core/common/config/locales';
 import commonService from 'core/common/service/commonService';
@@ -43,7 +44,7 @@ Axios.interceptors.response.use(function (response) {
   return response;
 }, function (error) {
   // Do something with response error
-  console.log('Error %s', JSON.stringify(error));
+  console.log('Error %s', stringify(error));
 
   if (error.status == 401) {
     let _r = commonService.router;
@@ -55,47 +56,55 @@ Axios.interceptors.response.use(function (response) {
     commonService.loading(false);
     let _t = commonService.toastr;
     if (_t) {
-
-      let content = 'Error';
-      if (error.data) {
-        if (typeof error.data === 'string') {
-          content = ( <p>{error.data}</p> );
-        } else if (error.data.severity) {
-          content = (
-            <ul>
-              { error.data.messages.map((err) => (<li> {err.propertyPath + ' ' + err.message + ( (err.rootBeanClass)? " ( on " + err.rootBeanClass + ')' : '' )} </li>) ) }
-            </ul>
-          );
-        } else {
-          content = (<div><p>'{error.data.error}</p>
-            <p>
-              <pre>{error.data.exception} + ' - ' + {error.data.message}</pre>
-            </p>
-          </div> );
-        }
-      } else {
-        content = ( <p>{error.statusText}</p> );
+      if ((error.status !== 400 || !error.config.showPrettyError)) {
+        doToast(_t, error);
       }
-
-      _t.error(
-        content,
-        "Server error " + error.status, {
-          closeButton: true,
-          tapToDismiss: false,
-          showAnimation: 'animated fadeIn',
-          hideAnimation: '',
-          //hideDuration: 1000,
-          timeOut: 0,
-          extendedTimeOut: 0
-        });
     } else {
       window.location.replace("/login");
     }
   }
 
 
-  return Promise.reject(error);
+  return When.reject(error);
 });
+
+
+function doToast(_t, error) {
+  let content = 'Error';
+  if (error.data) {
+    if (typeof error.data === 'string') {
+      content = ( <p>{error.data}</p> );
+    } else if (error.data.severity) {
+      content = (
+        <ul>
+          { error.data.messages.map((err, index) => (<li key={index}> { ( (err.propertyPath) ? (err.propertyPath + ' ') : '') + err.message + ( (err.rootBeanClass)? " ( on " + err.rootBeanClass + ')' : '' )} </li>) ) }
+        </ul>
+      );
+    } else {
+      content = (<div><p>'{error.data.error}</p>
+        <p>
+          <pre>{error.data.exception} + ' - ' + {error.data.message}</pre>
+        </p>
+      </div> );
+    }
+  } else {
+    content = ( <p>{error.statusText}</p> );
+  }
+
+  console.log('going to show toast: ' + content);
+
+  _t.error(
+    content,
+    "Server error " + error.status, {
+      closeButton: true,
+      tapToDismiss: false,
+      showAnimation: 'animated fadeIn',
+      hideAnimation: '',
+      //hideDuration: 1000,
+      timeOut: 0,
+      extendedTimeOut: 0
+    });
+}
 
 
 export default Axios;

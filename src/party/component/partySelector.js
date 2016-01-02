@@ -125,10 +125,9 @@ export default class PartySelector extends React.Component {
     let {partyObject, partyEntity, setDataAction, dataObject, onPartyChange, entities} = this.props;
 
     console.log('%c partySelector render: partyObject = %O', 'background-color: yellow', partyObject);
-
     let searchForm = () => (
       <form onSubmit={this.onSearch}>
-        <TextField hintText="Search party..." style={{width: 140}}
+        <TextField hintText="Search party..." style={{fontSize: 14, height: 54, width: 140}}
                    onChange={(e) => {dataObject.$partySelector.searchTerm = e.target.value; setDataAction(dataObject);}}/>
         <FlatButton type="submit" secondary={true} label="Search" labelPosition="after" labelStyle={{paddingLeft: 8}}
                     style={{paddingLeft: 10, marginLeft: 5}}>

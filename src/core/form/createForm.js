@@ -69,7 +69,7 @@ export default function createForm(definition, FormComponent) {
 
       this._updateFieldsValue(dataObject);
 
-      setDataAction(rootObject, 'createForm#componentWillMount()');
+      setDataAction(rootObject, 'createForm(' + FormComponent.name + ')#componentWillMount()');
     }
 
     componentWillReceiveProps(nextProps) {
@@ -163,11 +163,14 @@ export default function createForm(definition, FormComponent) {
           propsObject.searchable = (valueSourceEntity.lovItems.length > 8);
         }
 
+        // Field overrides
+        propsObject.floatingLabelStyle = floatingLabelStyle;
+
+
         // TextField style overrides (zmenseni)
         // dame to ted na vsechny jine nez StyledSelect, mozna budeme dale vyhazovat
         if (!mdField.valueSourceType) {
           propsObject.hintStyle = {lineHeight: 24};
-          propsObject.floatingLabelStyle = floatingLabelStyle;
           propsObject.inputStyle = {marginTop: 0, paddingTop: 6};
           propsObject.errorStyle = {top: -4};  // lepsi by bylo nastavit bottom, jenze v kodu TextField se bottom nastavuje natvrdo na fontSize + 3 = 15px, takze nastavime top a vyuzijme toho ze "When both top and bottom are specified, the top property takes precedence and the bottom property is ignored."
         }

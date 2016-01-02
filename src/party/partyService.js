@@ -44,6 +44,10 @@ class PartyService  {
     .then((response) => response.data);
   }
 
+  deleteParty(partyId) {
+    return Axios.delete('/party/' + partyId, {showPrettyError: true});
+  }
+
 
 }
 
