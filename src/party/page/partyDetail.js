@@ -22,6 +22,8 @@ import PartyPoForm from 'party/component/partyPoForm';
 import PartyContactList from 'party/component/partyContactList';
 import PartyRoleList from 'party/component/partyRoleList';
 import PartyAddressList from 'party/component/partyAddressList';
+import {ErrorComp} from 'core/components/errorComp/errorComp';
+
 
 import GridService from 'core/grid/gridService';
 import Grid from 'core/grid/domain/grid';
@@ -212,6 +214,13 @@ export default class PartyDetail extends React.Component {
     }
   }
 
+  customValidate = (partyObject) => {
+    let errors = [];
+    if (partyObject.roles.length === 0) {
+      errors.push({message: "Party must have at least one role"})
+    }
+    return errors;
+  };
 
 
 
@@ -219,7 +228,7 @@ export default class PartyDetail extends React.Component {
     console.log('onSave');
     let {partyObject, setPartyAction} = this.props;
 
-    let result = preSave(partyObject, setPartyAction);
+    let result = preSave(partyObject, setPartyAction, this.customValidate);
 
     if (result) {
       console.log('onSave - OK');
@@ -297,6 +306,7 @@ export default class PartyDetail extends React.Component {
         <main className="main-content" style={{display: 'flex', flexDirection: 'row', height: '100%'}} >
           <div style={{display: 'flex', flexDirection: 'column', height: '100%', flexBasis: '50%', flexShrink: 0}}>
             {this._createToolMenu(partyObject)}
+            <ErrorComp messages={partyObject.$errors} />
             {mainForm}
             {tabs}
           </div>
@@ -307,6 +317,7 @@ export default class PartyDetail extends React.Component {
       return (
         <main className="main-content" style={{display: 'flex', flexDirection: 'column', height: '100%'}} >
           {this._createToolMenu(partyObject)}
+          <ErrorComp messages={partyObject.$errors} />
           {mainForm}
           {tabs}
         </main>

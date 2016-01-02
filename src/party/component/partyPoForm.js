@@ -12,9 +12,9 @@ import {Validate} from 'core/form/validate';
 import {valid, invalid} from 'core/form/rules';
 
 
-function PartyExist({value}) {
+function PartyExist({value, partyId}) {
   if (!value) return valid();
-  return PartyService.partyExist({ico: value})
+  return PartyService.partyExist({ico: value, partyId})
     .then( (exists) => (exists) ? invalid(`Customer with ICO ${value} already exists`) : valid());
 }
 
@@ -46,7 +46,7 @@ class PartyPoForm extends React.Component {
           <div className="col-xs-6 col-sm-4">
             <TextField {...ico.props} />
             <Validate field={ico} value={ico.props.value}>
-              <PartyExist/>
+              <PartyExist partyId={dataObject.partyId} />
             </Validate>
           </div>
           <div className="col-xs-6 col-sm-4">
