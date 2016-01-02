@@ -75,9 +75,6 @@ export default class GridAdminView extends React.Component {
   };
 
 
-
-
-
   /* ****************   EVENT HENDLERS ************************************************************ */
 
   onChangeGridConfig = (evt, key, gridId) => {
@@ -88,13 +85,13 @@ export default class GridAdminView extends React.Component {
 
     // dotahny vsechny existujici seznamy
     let valueSources = _.uniq(clonedGridConfig.conditions
-      .filter(condition => (condition.$columnRef && condition.$columnRef.hasLocalValueSource()) )
+      .filter(condition => (condition.$columnRef && condition.$columnRef.hasLocalValueSource()))
       .map(condition => ({entity: condition.$columnRef.valueSource, lov: true})));
 
     MdEntityService.fetchEntities(valueSources)
-    .then(() => {
-      this.setState({gridId, editedGridConfig: clonedGridConfig});
-    });
+      .then(() => {
+        this.setState({gridId, editedGridConfig: clonedGridConfig});
+      });
   };
 
 
@@ -152,7 +149,6 @@ export default class GridAdminView extends React.Component {
   }
 
 
-
   onClickAdd = (evt) => {
     console.log('onClickAdd');
 
@@ -182,14 +178,15 @@ export default class GridAdminView extends React.Component {
     CommonService.loading(true);
 
     Axios.delete('/core/grid-config/' + gridId)
-    .then(response => {
-      grid.deleteGridConfig(gridId);
-      updateGridAction(grid);
-      CommonService.loading(false);
-      this.setState({
-        gridId: null,
-        editedGridConfig: null});
-    });
+      .then(response => {
+        grid.deleteGridConfig(gridId);
+        updateGridAction(grid);
+        CommonService.loading(false);
+        this.setState({
+          gridId: null,
+          editedGridConfig: null
+        });
+      });
   };
 
   onClickBack = () => {
@@ -215,7 +212,7 @@ export default class GridAdminView extends React.Component {
     console.debug('validateTextField %s, value = %s', fieldName, value);
 
     let error;
-    if(isPositiveNumber) {
+    if (isPositiveNumber) {
       value = parseInt(value);
       if (!Number.isInteger(value)) {
         error = message;
@@ -248,8 +245,6 @@ export default class GridAdminView extends React.Component {
     this.validateMaxColumnWidth();
     this.setState({editedGridConfig: this.state.editedGridConfig});
   };
-
-
 
 
   onCheckGridUse = (evt, checked) => {
@@ -292,7 +287,7 @@ export default class GridAdminView extends React.Component {
     let grid = this.props.grid;
     let editedGridConfig = this.state.editedGridConfig;
 
-    for(let v of fieldNames) {
+    for (let v of fieldNames) {
       let fieldKey = Utils.formatId(grid.entityName, v);
       let index = editedGridConfig.columns.indexOf(fieldKey);
       if (index < 1) {
@@ -312,7 +307,7 @@ export default class GridAdminView extends React.Component {
     let editedGridConfig = this.state.editedGridConfig;
 
     let iLen = fieldNames.length;
-    for (let i=iLen-1; i>=0; i--) {
+    for (let i = iLen - 1; i >= 0; i--) {
       let v = fieldNames[i];
       let fieldKey = Utils.formatId(grid.entityName, v);
       let index = editedGridConfig.columns.indexOf(fieldKey);
@@ -351,7 +346,10 @@ export default class GridAdminView extends React.Component {
   fetchLovItems(conditions) {
     if (_.isEmpty(conditions)) return;
 
-    let valueSources = _.uniq(conditions.filter(c => (c.$columnRef && c.$columnRef.hasLocalValueSource())).map(c => ({entity: c.$columnRef.valueSource, lov: true})));
+    let valueSources = _.uniq(conditions.filter(c => (c.$columnRef && c.$columnRef.hasLocalValueSource())).map(c => ({
+      entity: c.$columnRef.valueSource,
+      lov: true
+    })));
 
     if (valueSources.length > 0) {
       MdEntityService.fetchEntities(valueSources);
@@ -451,13 +449,14 @@ export default class GridAdminView extends React.Component {
 
     let publicGridConfig = new Boolean(editedGridConfig && editedGridConfig.gridUse == 'PUBLIC').toString();
 
-    const gridConfigItems = grid.gridConfigs.map( (li,i) => <MenuItem value={li.gridId} key={i} primaryText={li.label}/>);
+    const gridConfigItems = grid.gridConfigs.map((li, i) => <MenuItem value={li.gridId} key={i}
+                                                                      primaryText={li.label}/>);
 
     return (
       <main className="main-content container">
         {toolMenu}
 
-        <h4 className="zauzoo" style={{marginTop: 20}} >Průvodce správou sestav</h4>
+        <h4 className="zauzoo" style={{marginTop: 20}}>Průvodce správou sestav</h4>
 
         { (this.state.gridId !== 0) ? (
           <SelectField
@@ -490,11 +489,12 @@ export default class GridAdminView extends React.Component {
                              errorText={editedGridConfig.$error_gridName}
                              value={editedGridConfig.gridName}
                              onChange={this.onChangeTextField.bind(this, 'gridName', false)}
-                             onBlur={this.onBlurGridConfigName} />
+                             onBlur={this.onBlurGridConfigName}/>
                   <LocalizeField/>
                 </div>
                 <div style={{marginLeft: 30, alignSelf: 'flex-end', marginBottom: 5}}>
-                  <Checkbox name="gridUse" defaultChecked={editedGridConfig.gridUse == 'PUBLIC'} value={publicGridConfig} label="Public Grid" onCheck={this.onCheckGridUse}/>
+                  <Checkbox name="gridUse" defaultChecked={editedGridConfig.gridUse == 'PUBLIC'}
+                            value={publicGridConfig} label="Public Grid" onCheck={this.onCheckGridUse}/>
                 </div>
               </div>
             </BlockComp>
@@ -515,16 +515,16 @@ export default class GridAdminView extends React.Component {
             <BlockComp header="3. Aplikuj výběrové filtry" style={{marginBottom: 30}}>
               <table className="table">
                 <thead>
-                  <tr>
-                    <td style={{width: '31%'}}>Název sloupce</td>
-                    <td style={{width: '16%'}}>Operátor</td>
-                    <td style={{width: '51%'}}>Hodnota</td>
-                    <td style={{width: '3%'}}></td>
-                  </tr>
+                <tr>
+                  <td style={{width: '31%'}}>Název sloupce</td>
+                  <td style={{width: '16%'}}>Operátor</td>
+                  <td style={{width: '51%'}}>Hodnota</td>
+                  <td style={{width: '3%'}}></td>
+                </tr>
                 </thead>
                 <tbody>
                 {
-                  editedGridConfig.conditions.map( (condition, index) => {
+                  editedGridConfig.conditions.map((condition, index) => {
                     console.debug('all operators: ', allOperators);
                     let operatorOptions = (condition.$columnRef) ? allOperators
                       .filter(li => _.includes(condition.$columnRef.availableOperators, li.value)) : [];
@@ -536,13 +536,18 @@ export default class GridAdminView extends React.Component {
                     return (
                       <tr key={index}>
                         <td style={borderStyle}>
-                          <StyledSelect name="conditionColumn" value={condition.column} options={fieldOptions} onChange={this.onChangeConditionColumn.bind(this, condition)} clearable={false} disabled={condition.implicit}/>
+                          <StyledSelect name="conditionColumn" value={condition.column} options={fieldOptions}
+                                        onChange={this.onChangeConditionColumn.bind(this, condition)} clearable={false}
+                                        disabled={condition.implicit}/>
                         </td>
                         <td style={borderStyle}>
-                          <StyledSelect name="conditionOperator" value={condition.operator} options={operatorOptions} onChange={this.onChangeConditionOperator.bind(this, condition)}  clearable={false} disabled={condition.implicit}/>
+                          <StyledSelect name="conditionOperator" value={condition.operator} options={operatorOptions}
+                                        onChange={this.onChangeConditionOperator.bind(this, condition)}
+                                        clearable={false} disabled={condition.implicit}/>
                         </td>
                         <td style={borderStyle}>
-                          <ConditionValue condition={condition} onChange={this.onChangeConditionValues} disabled={condition.implicit}/>
+                          <ConditionValue condition={condition} onChange={this.onChangeConditionValues}
+                                          disabled={condition.implicit}/>
                         </td>
                         <td style={borderStyle}>
                           {
@@ -577,23 +582,28 @@ export default class GridAdminView extends React.Component {
                 </thead>
                 <tbody>
                 {
-                  editedGridConfig.sortColumns.map( (sort, index) => {
+                  editedGridConfig.sortColumns.map((sort, index) => {
 
                     let borderStyle = (index > 0) ? {borderTop: 'inherit'} : {};
 
                     return (
                       <tr key={index}>
                         <td style={borderStyle}>
-                          <StyledSelect name="sortColumn" value={sort.field} options={fieldOptions} onChange={this.onChangeSortField.bind(this, sort)} clearable={false}/>
+                          <StyledSelect name="sortColumn" value={sort.field} options={fieldOptions}
+                                        onChange={this.onChangeSortField.bind(this, sort)} clearable={false}/>
                         </td>
                         <td style={borderStyle}>
-                          <StyledSelect name="sortOrder" value={sort.sortOrder} options={sortOrderOptions} onChange={this.onChangeSortOrder.bind(this, sort)}  clearable={false}/>
+                          <StyledSelect name="sortOrder" value={sort.sortOrder} options={sortOrderOptions}
+                                        onChange={this.onChangeSortOrder.bind(this, sort)} clearable={false}/>
                         </td>
                         <td style={borderStyle}>
-                          <Checkbox name="sortFixed" value={new Boolean(sort.fixed).toString()} defaultChecked={sort.fixed} label="Fixní řazení" onCheck={this.onCheckSortFixed.bind(this, sort)}/>
+                          <Checkbox name="sortFixed" value={new Boolean(sort.fixed).toString()}
+                                    defaultChecked={sort.fixed} label="Fixní řazení"
+                                    onCheck={this.onCheckSortFixed.bind(this, sort)}/>
                         </td>
                         <td style={borderStyle}>
-                          <a className="font-button-link" onClick={this.onDeleteSort.bind(this, index)}><span className="fa fa-trash"/></a>
+                          <a className="font-button-link" onClick={this.onDeleteSort.bind(this, index)}><span
+                            className="fa fa-trash"/></a>
                         </td>
 
                       </tr>
@@ -607,33 +617,32 @@ export default class GridAdminView extends React.Component {
               </RaisedButton>
             </BlockComp>
 
-            <BlockComp header="5. Pokročilé nastavení"  style={{marginBottom: 30}}>
+            <BlockComp header="5. Pokročilé nastavení" style={{marginBottom: 30}}>
               <div style={{display: 'flex'}}>
                 <TextField name="gridScrollSize"
                            floatingLabelText="Max scroll Size"
                            style={inputStyle} required errorText={editedGridConfig.$error_gridScrollSize}
                            value={editedGridConfig.gridScrollSize}
                            onChange={this.onChangeTextField.bind(this, 'gridScrollSize', true)}
-                           onBlur={this.onBlurGridScrollSize}  />
+                           onBlur={this.onBlurGridScrollSize}/>
                 <TextField name="gridScrollIncrement"
                            floatingLabelText="Scroll increment"
                            style={inputStyle} required errorText={editedGridConfig.$error_gridScrollIncrement}
                            value={editedGridConfig.gridScrollIncrement}
                            onChange={this.onChangeTextField.bind(this, 'gridScrollIncrement', true)}
-                           onBlur={this.onBlurGridScrollIncrement}  />
+                           onBlur={this.onBlurGridScrollIncrement}/>
                 <TextField name="maxColumnWidth"
                            floatingLabelText="Max column width"
                            style={inputStyle} required errorText={editedGridConfig.$error_maxColumnWidth}
                            value={editedGridConfig.maxColumnWidth}
                            onChange={this.onChangeTextField.bind(this, 'maxColumnWidth', true)}
-                           onBlur={this.onBlurMaxColumnWidth}  />
+                           onBlur={this.onBlurMaxColumnWidth}/>
               </div>
             </BlockComp>
 
 
           </form>
         ) : ''}
-
 
 
       </main>
@@ -646,26 +655,26 @@ export default class GridAdminView extends React.Component {
 
   _createToolMenu() {
     return (
-        <Toolmenu>
-          { (this.state.gridId != null) ? (
-            <FlatButton onClick={this.onClickSave}>
-              <span className="fa fa-save"/><span> Uložit sestavu</span>
-            </FlatButton>
-          ) : <div/>}
-          { (this.state.gridId !== 0) ? (
-            <FlatButton onClick={this.onClickAdd}>
-              <span className="fa fa-file"/><span> Vytvořit novou sestavu</span>
-            </FlatButton>
-          ) : <div/>}
-          { (this.state.gridId > 0) ? (
-            <FlatButton onClick={this.onClickDelete}>
-              <span className="fa fa-trash"/><span> Smazat sestavu</span>
-            </FlatButton>
-          ) : <div/>}
-          <FlatButton onClick={this.onClickBack}>
-            <span className="fa fa-chevron-left"/><span> Zpět</span>
+      <Toolmenu>
+        { (this.state.gridId != null) ? (
+          <FlatButton onClick={this.onClickSave}>
+            <span className="fa fa-save"/><span> Uložit sestavu</span>
           </FlatButton>
-        </Toolmenu>
+        ) : <div/>}
+        { (this.state.gridId !== 0) ? (
+          <FlatButton onClick={this.onClickAdd}>
+            <span className="fa fa-file"/><span> Vytvořit novou sestavu</span>
+          </FlatButton>
+        ) : <div/>}
+        { (this.state.gridId > 0) ? (
+          <FlatButton onClick={this.onClickDelete}>
+            <span className="fa fa-trash"/><span> Smazat sestavu</span>
+          </FlatButton>
+        ) : <div/>}
+        <FlatButton onClick={this.onClickBack}>
+          <span className="fa fa-chevron-left"/><span> Zpět</span>
+        </FlatButton>
+      </Toolmenu>
     );
   }
 

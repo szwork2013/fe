@@ -25,7 +25,7 @@ class CommonService {
         showAnimation: 'animated fadeIn',
         hideAnimation: '',
         closeButton: true,
-        //hideDuration: 1000,
+        hideDuration: 2000,
         timeOut: 2000,
         extendedTimeOut: 1000
       });

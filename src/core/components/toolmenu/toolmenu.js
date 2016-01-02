@@ -3,6 +3,9 @@ import PureRenderMixin from 'react-addons-pure-render-mixin';
 import {} from 'react-addons-pure-render-mixin';
 import {Styles, IconButton, FontIcon} from 'material-ui';
 import {customizeTheme}  from 'core/common/config/mui-theme';
+import Sticky from 'core/components/sticky/sticky';
+import {navbarHeight} from 'core/common/config/variables';
+
 import css from 'core/components/toolmenu/toolmenu.less';
 
 
@@ -27,23 +30,25 @@ export default class Toolmenu extends React.Component {
       } = this.props;
 
     return (
-      <div className="toolmenu" style={style}>
-        {
-          React.Children.map(children, (child, index) => {
-            return React.cloneElement(
-              child,
-              {
-                key: index,
-                style: Object.assign({},child.props.style, {
-                  fontWeight: Typography.fontWeightNormal,
-                  paddingLeft: 8,
-                  paddingRight: 8
-                })
-              }
-            );
-          })
-        }
-      </div>
+      <Sticky stickyClass="supersticky" stickyStyle={{}} topOffset={-navbarHeight}>
+        <div className="toolmenu" style={style}>
+          {
+            React.Children.map(children, (child, index) => {
+              return React.cloneElement(
+                child,
+                {
+                  key: index,
+                  style: Object.assign({},child.props.style, {
+                    fontWeight: Typography.fontWeightNormal,
+                    paddingLeft: 8,
+                    paddingRight: 8
+                  })
+                }
+              );
+            })
+          }
+        </div>
+      </Sticky>
     )
   }
 

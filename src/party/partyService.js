@@ -39,6 +39,11 @@ class PartyService  {
       .then(response => response.data);
   }
 
+  partySave(party) {
+    return Axios.post('/party', party)
+    .then((response) => response.data);
+  }
+
 
 }
 

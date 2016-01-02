@@ -15,6 +15,7 @@ import {setPartyAction, updateGridAction} from 'party/partyActions';
 import {customizeThemeForDetail, TabTemplate}  from 'core/common/config/mui-theme';
 import {screenLg, tabStyle} from 'core/common/config/variables';
 import {selectGrid, preSave} from 'core/form/formUtils';
+import CommonService from 'core/common/service/commonService';
 
 import {enhanceParty, CUSTOMER_ROLE} from 'party/partyUtils';
 import PartyFoForm from 'party/component/partyFoForm';
@@ -224,15 +225,24 @@ export default class PartyDetail extends React.Component {
 
 
 
-  onSave = (evt) => {
-    console.log('onSave');
+  onSave = (doReturn, evt) => {
+    console.log('onSave ' + doReturn);
     let {partyObject, setPartyAction} = this.props;
 
     let result = preSave(partyObject, setPartyAction, this.customValidate);
+    if (!result) return;
 
-    if (result) {
-      console.log('onSave - OK');
-    }
+    CommonService.loading(true);
+    PartyService.partySave(partyObject)
+    .then( (partyId) => {
+      CommonService.loading(false);
+      CommonService.toastSuccess("Grid byl úspěšně uložen");
+      if(doReturn) {
+        this.context.router.goBack();
+      } else {
+        this.context.router.transitionTo('partyDetail', {id: partyId});
+      }
+    });
 
   };
 
@@ -340,8 +350,11 @@ export default class PartyDetail extends React.Component {
   _createToolMenu(partyObject) {
     return (
       <Toolmenu>
-        <FlatButton onClick={this.onSave}>
-          <span className="fa fa-save"/><span> Save customer</span>
+        <FlatButton onClick={this.onSave.bind(this, false)}>
+          <span className="fa fa-save"/><span> Save</span>
+        </FlatButton>
+        <FlatButton onClick={this.onSave.bind(this, true)} disabled={History.length <= 1}>
+          <span className="fa fa-save"/><span> Save and return</span>
         </FlatButton>
         { (partyObject.partyId > 0) ? (
           <FlatButton onClick={this.onDelete}>
