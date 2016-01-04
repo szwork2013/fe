@@ -62,7 +62,7 @@ export default class PartyDetail extends React.Component {
   shouldComponentUpdate = PureRenderMixin.shouldComponentUpdate.bind(this);
 
   static title = 'Customer';
-  static icon = 'user';
+  static icon = 'male';
 
   static willTransitionTo = PageAncestor.willTransitionTo;
   static willTransitionFrom = PageAncestor.willTransitionFrom;

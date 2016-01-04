@@ -14,7 +14,7 @@ var gridLocation = 'partySalesReps';
 export default class SalesRepList extends PageAncestor {
 
   static title = 'Sales Representative';
-  static icon = 'male';
+  static icon = 'child';
 
   static fetchData(params) {
     console.log("SalesRepList#fetchData(%s)", gridLocation);

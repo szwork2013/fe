@@ -10,7 +10,6 @@ var gridLocation = 'partyAll';
 export default class PartyList extends PageAncestor {
 
   static title = 'All Parties';
-  static icon = 'user';
 
   static fetchData(routerParams) {
     console.log("PartyList#fetchData(%s)", gridLocation);

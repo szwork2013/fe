@@ -10,7 +10,7 @@ var gridLocation = 'partyCustomers';
 export default class CustomerList extends PageAncestor {
 
   static title = 'Customers';
-  static icon = 'user';
+  static icon = 'male';
 
   static fetchData(routerParams) {
     console.log("CustomerList#fetchData(%s)", gridLocation);

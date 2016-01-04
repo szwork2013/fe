@@ -19,6 +19,8 @@ import ProductList from 'product/page/productList';
 import ProductDetail from 'product/page/productDetail';
 import UserList from 'core/security/userList';
 import UserDetail from 'core/security/userDetail';
+import UserProfile from 'core/security/userProfile';
+import SetPassword from 'core/security/setPassword';
 
 import LoginPage from 'core/security/loginPage';
 import EntityList from 'core/metamodel/entityList';
@@ -60,6 +62,8 @@ const routes = (
 
     <Route name="userList" path="user/grid/:gridId?" handler={UserList}/>
     <Route name="userDetail" path="user/detail/:id" handler={UserDetail}/>
+    <Route name="userProfile" path="user/profile" handler={UserProfile}/>
+    <Route name="setPassword" path="user/set-password/:mode/:id?" handler={SetPassword}/>
 
     <Route name="gridAdmin" path="core/grid/admin/:gridLocation" handler={GridAdminView}/>
 

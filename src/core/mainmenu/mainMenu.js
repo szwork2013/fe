@@ -82,7 +82,8 @@ export default class MainMenu extends React.Component {
 
     var userMenuFrag = (
       <NavDropdown eventKey={3} id="user_menu_dropdown" title={currentUser ? (currentUser.get('displayName') + ' (' + currentUser.get('tenantName') + ')' ) : ''}>
-        <MenuItem eventKey='1' onSelect={this.logout}>Logout</MenuItem>
+        { this._menuItem("userProfile", undefined, undefined, (e) => {e.preventDefault(); this.context.router.transitionTo("userProfile");} ) }
+        <MenuItem eventKey='logout' onSelect={this.logout}>Logout</MenuItem>
       </NavDropdown>
     );
 
@@ -169,18 +170,25 @@ export default class MainMenu extends React.Component {
   }
 
 
-  _menuItem(route, title, icon) {
+  _menuItem(route, title, icon, onSelect) {
     let routeObj = this.context.router.namedRoutes[route];
     let routeHandler = (routeObj) ? routeObj.handler : null;
     let resolvedIcon = (icon) ? icon : ((routeHandler) ? routeHandler.icon : null);
     let resolvedIconClassname = (resolvedIcon) ? ('fa fa-' + resolvedIcon.replace(/^fa-/, '')) : null;
     let resolvedTitle = (title) ? title : ((routeHandler) ? routeHandler.title : null);
 
-    var href = this.context.router.makeHref(route);
     //var isActive = this.isActive('destination', {some: 'params'}, {some: 'query param'});
     var iconElement = (resolvedIconClassname) ? <span className={resolvedIconClassname}/> :  '';
 
-    return <MenuItem href={href} eventKey={route}> {iconElement} {resolvedTitle} </MenuItem>;
+    let menuItemProps = {
+      href: this.context.router.makeHref(route),
+      eventKey: route
+    };
+    if (onSelect) {
+      menuItemProps.onSelect = onSelect;
+    }
+
+    return <MenuItem {...menuItemProps}> {iconElement} {resolvedTitle} </MenuItem>;
   }
 
 }

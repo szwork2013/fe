@@ -2,6 +2,7 @@ import React from 'react';
 import PureRenderMixin from 'react-addons-pure-render-mixin';
 import {TextField, FlatButton, Styles, FontIcon, Dialog} from 'material-ui';
 import When from 'when';
+import {Link} from 'react-router';
 
 import BlockComp from 'core/components/blockComp/blockComp';
 import {FieldText} from 'core/form/formUtils';
@@ -172,9 +173,11 @@ export default class PartySelector extends React.Component {
 
     let partyText = () => (
       <div style={{display: 'flex', alignItems: 'baseline' }}>
-        <div style={{fontSize: '18px', fontWeight: 'bold', marginRight: 8}}>{partyObject.fullName}</div>
-        <FieldText label={partyEntity.fields.ico.label} value={partyObject.ico}/>
-        <FieldText label={partyEntity.fields.birthNumber.label} value={partyObject.birthNumber}/>
+        <Link to="partyDetail" params={{id: partyObject.partyId}}>
+          <div style={{fontSize: '18px', fontWeight: 'bold', marginRight: 8}}>{partyObject.fullName}</div>
+          <FieldText label={partyEntity.fields.ico.label} value={partyObject.ico}/>
+          <FieldText label={partyEntity.fields.birthNumber.label} value={partyObject.birthNumber}/>
+        </Link>
         <FlatButton onClick={onPartyChange.bind(this, undefined)} secondary={true} label="Disconnect" labelPosition="after"
                     labelStyle={{paddingLeft: 8}} style={{paddingLeft: 10, marginLeft: 10}}>
           <FontIcon className="fa fa-chain-broken" style={{fontSize:14, color: Colors.indigo500}}/>

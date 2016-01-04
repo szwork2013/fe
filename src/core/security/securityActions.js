@@ -18,3 +18,5 @@ export const setUserAction = createAction('CORE_SECURITY_SET_USER');
 
 export const updateGridAction = createAction('CORE_SECURITY_UPDATE_GRID');
 
+export const setUserProfileAction = createAction('CORE_SECURITY_SET_USER_PROFILE');
+
