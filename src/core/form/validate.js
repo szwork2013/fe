@@ -59,7 +59,7 @@ function isPromise(obj) {
 
 function rules(children, args, field, value) {
   children = isIterable(children) ? List(children).toJS() : [children];
-  let rules = children.map((c) => {
+  let rules = children.filter(c => c).map((c) => {
     return {fn: c.type, args: {value, ...args, ...c.props}, name: c.type.name}
   });
 

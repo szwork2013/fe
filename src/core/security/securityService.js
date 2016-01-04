@@ -52,6 +52,20 @@ class SecurityService  {
     return Axios.get('/core/security/user-exist/' + username)
       .then(response => response.data);
   }
+
+  userCreate(user) {
+    return Axios.put('/core/security/user', user)
+      .then((response) => response.data);
+  }
+  userUpdate(user) {
+    return Axios.post('/core/security/user', user)
+      .then((response) => response.data);
+  }
+
+  deleteUser(username) {
+    return Axios.delete('/core/security/user/' + username, {showPrettyError: true});
+  }
+
 }
 
 export default new SecurityService();

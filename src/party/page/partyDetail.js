@@ -235,8 +235,11 @@ export default class PartyDetail extends React.Component {
     console.log('onSave ' + doReturn);
     let {partyObject, setPartyAction} = this.props;
 
-    let result = preSave(partyObject, setPartyAction, this.customValidate);
-    if (!result) return;
+    let result = preSave(partyObject, this.customValidate);
+    if (!result) {
+      setPartyAction(partyObject);
+      return;
+    }
 
     CommonService.loading(true);
     PartyService.partySave(partyObject)
@@ -386,7 +389,7 @@ export default class PartyDetail extends React.Component {
           <FlatButton onClick={this.onDelete}>
             <span className="fa fa-trash"/><span> Delete Customer</span>
           </FlatButton>
-        ) : <div/>}
+        ) : <noscript/>}
         <FlatButton onClick={this.onBack} disabled={History.length <= 1}>
           <span className="fa fa-chevron-left"/><span> Back</span>
         </FlatButton>

@@ -516,11 +516,11 @@ export default class GridComp extends React.Component {
                 <div key={columnIndex} className="md-grid-cell"
                      style={styleObject}>
                   {
-                    (field.actionDisplay === 'BUTTON') ?
+                    (field.displayType === 'BUTTON') ?
                       <FlatButton primary={true} style={{lineHeight: '28px'}} label={gridCell.value}
                                   labelPosition="after"
                                   onClick={this.onAction.bind(this, field.functionName, cellId, index)}/>
-                      : ( (field.actionDisplay === 'CHECKBOX') ?
+                      : ( (field.displayType === 'CHECKBOX') ?
                         <Checkbox name={field.fieldName} checked={functionMap[field.functionNameGetter()](cellId, index)}
                                   onCheck={this.onAction.bind(this, field.functionNameSetter(), cellId, index)}/>
                         :

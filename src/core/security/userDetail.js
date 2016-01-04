@@ -11,6 +11,7 @@ import Toolmenu from 'core/components/toolmenu/toolmenu';
 import {store} from 'core/common/redux/store';
 import MdEntityService from 'core/metamodel/mdEntityService';
 import SecurityService from 'core/security/securityService';
+import CommonService from 'core/common/service/commonService';
 import PartyService from 'party/partyService';
 import {setUserAction, updateGridAction} from 'core/security/securityActions';
 import {customizeThemeForDetail, TabTemplate}  from 'core/common/config/mui-theme';
@@ -41,6 +42,7 @@ function mapStateToProps(state) {
   };
 }
 
+var $freshLoadFlag = false;
 
 @connect(mapStateToProps, {setUserAction, updateGridAction})
 export default class UserDetail extends React.Component {
@@ -60,6 +62,7 @@ export default class UserDetail extends React.Component {
 
   static fetchData(routerParams, query) {
     console.log("UserDetail#fetchData()");
+    $freshLoadFlag = true;
 
     let metadataPromise = MdEntityService.fetchEntityMetadata(['User'], ['Tenant', 'Party']);
 
@@ -78,7 +81,11 @@ export default class UserDetail extends React.Component {
 
     let gridPromise = GridService.fetchGrids(tenantGridLocation);
 
-    return When.all([metadataPromise, userPromise, gridPromise]);
+    return When.all([metadataPromise, userPromise, gridPromise])
+      .then(array => {
+        CommonService.loading(false);
+        return array;
+      })
   }
 
 
@@ -98,7 +105,24 @@ export default class UserDetail extends React.Component {
   }
 
 
+  /**
+   * tohle je tady kvuli prechodu na jiny detail party (z relationship vazeb), kdy react-router neudela reload
+   * @param prevProps
+   */
+  componentDidUpdate(prevProps) {
+    if ($freshLoadFlag) {
+      $freshLoadFlag = false;
+      console.log("userDetail#componentDidUpdate() - save, reload, resetting grids");
+
+      let {tenantGrid,updateGridAction} = this.props;
+      tenantGrid.activeGridConfig = tenantGrid.getActiveGridConfig();
+      this.refs[this.props.tenantGrid.gridLocation].search();
+    }
+  }
+
+
   componentDidMount() {
+    $freshLoadFlag = false;
     this.refs[this.props.tenantGrid.gridLocation].search();
   }
 
@@ -118,22 +142,61 @@ export default class UserDetail extends React.Component {
   };
 
 
-  onSave = (evt) => {
+  onSave = (doReturn, evt) => {
     console.log('onSave');
     let {userObject, setUserAction} = this.props;
 
-    let result = preSave(userObject, setUserAction, this.customValidate);
-
-    if (result) {
-      console.log('onSave - OK');
+    let result = preSave(userObject, this.customValidate);
+    if (!result) {
+      setUserAction(userObject);
+      return;
     }
+
+    CommonService.loading(true);
+    let promise = (userObject.$new) ? SecurityService.userCreate(userObject) : SecurityService.userUpdate(userObject);
+    promise.then( (username) => {
+        if(doReturn) {
+          this.context.router.goBack();
+          CommonService.loading(false);
+        } else {
+          if(userObject.$new) {
+            this.context.router.replaceWith('userDetail', {id: username});
+          } else {
+            this.context.router.refresh();
+          }
+        }
+        CommonService.toastSuccess("User " + userObject.username + " byl úspěšně uložen");
+      });
 
   };
 
 
   onDelete = (evt) => {
     console.log('onDelete');
+    let {userObject, setUserAction} = this.props;
+
+    CommonService.loading(true);
+    SecurityService.deleteUser(userObject.username)
+      .then(response => {
+        if (History.length <= 1) {
+          this.context.router.transitionTo('home');
+        } else {
+          this.context.router.goBack();
+        }
+        CommonService.loading(false);
+      }, error => {
+        userObject.$errors = error.data.messages;
+        setUserAction(userObject, 'userDetail#onDelete()');
+      });
   };
+
+  onSetPassword = (evt) => {
+    console.log('onSetPassword');
+    let {userObject, setUserAction} = this.props;
+
+  };
+
+
   onBack = (evt) => {
     console.log('onBack %O', this.context.router);
     this.context.router.goBack();
@@ -224,14 +287,24 @@ export default class UserDetail extends React.Component {
   _createToolMenu(userObject) {
     return (
       <Toolmenu>
-        <FlatButton onClick={this.onSave}>
-          <span className="fa fa-save"/><span> Save User</span>
+        <FlatButton onClick={this.onSave.bind(this, false)}>
+          <span className="fa fa-save"/><span> Save</span>
         </FlatButton>
-        { (userObject.party > 0) ? (
+        <FlatButton onClick={this.onSave.bind(this, true)} disabled={History.length <= 1}>
+          <span className="fa fa-save"/><span> Save and return</span>
+        </FlatButton>
+        { (!userObject.$new) ? (
+          <FlatButton onClick={this.onSetPassword}>
+            <span className="fa fa-unlock-alt"/><span> Set password</span>
+          </FlatButton>
+        ) : <noscript/>}
+        { (!userObject.$new) ? (
           <FlatButton onClick={this.onDelete}>
             <span className="fa fa-trash"/><span> Delete User</span>
           </FlatButton>
-        ) : <div/>}
+        ) : <noscript/>}
+
+
         <FlatButton onClick={this.onBack} disabled={History.length <= 1}>
           <span className="fa fa-chevron-left"/><span> Back</span>
         </FlatButton>

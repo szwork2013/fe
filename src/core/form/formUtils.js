@@ -52,7 +52,7 @@ export function updateChildGrid(parentObject, action) {
 }
 
 
-export function preSave(rootObject, rootAction, customValidate) {
+export function preSave(rootObject,  customValidate) {
   // najdu otevrene form objekty
   let openTuples = [];
   walk(rootObject, 0, (object, level) => {
@@ -75,16 +75,12 @@ export function preSave(rootObject, rootAction, customValidate) {
     }
   }
 
-  let actionByCV = false;
+  let newErrors;
   if (customValidate) {
-    let newErrors = customValidate(rootObject);
-    actionByCV = (newErrors && newErrors.length) || (rootObject.$errors && rootObject.$errors.length);
+    newErrors = customValidate(rootObject);
     rootObject.$errors = newErrors;
   }
 
-  if (openTuples.length || actionByCV) {
-    rootAction(rootObject, 'formUtils#preSave()');
-  }
 
-  return (formsWithError.length === 0);
+  return (formsWithError.length === 0 && (!newErrors || newErrors.length === 0));
 }

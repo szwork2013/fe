@@ -10,7 +10,7 @@ import {FieldText} from 'core/form/formUtils';
 import StyledSelect from 'core/components/styledSelect/styledSelect';
 import ActiveItem from 'core/components/blockComp/activeItem';
 import {Validate} from 'core/form/validate';
-import {valid, invalid} from 'core/form/rules';
+import {valid, invalid, AreSame, HasLength} from 'core/form/rules';
 import SecurityService from 'core/security/securityService';
 
 
@@ -29,7 +29,7 @@ class UserForm extends React.Component {
   render() {
 
     let {dataObject, rootObject, lastValue,  entities} = this.props;
-    let {username, enabled, locked, expired}= dataObject.$forms[definition.formName].fields;
+    let {username, enabled, locked, expired, password1, password2}= dataObject.$forms[definition.formName].fields;
 
     let openContent = (
       <div>
@@ -37,9 +37,9 @@ class UserForm extends React.Component {
         {/*  1. row  */}
         <div className="row">
           <div className="col-xs-6 col-sm-4">
-            <TextField {...username.props} />
+            <TextField {...username.props} disabled={!dataObject.$new} />
             <Validate field={username} value={username.props.value}>
-              <UserExist/>
+              {(dataObject.$new) ? <UserExist/> : null}
             </Validate>
           </div>
         </div>
@@ -56,6 +56,26 @@ class UserForm extends React.Component {
             <Checkbox {...expired.props} />
           </div>
         </div>
+
+        {/*  3. row  */}
+        { (dataObject.$new) ?
+          <div className="row">
+            <div className="col-xs-6 col-sm-4">
+              <TextField type="password" {...password1.props} />
+              <Validate field={password1} value={password1.props.value}>
+                <HasLength min={6}/>
+              </Validate>
+            </div>
+            <div className="col-xs-6 col-sm-4">
+              <TextField type="password" {...password2.props} />
+              <Validate field={password2} value={password2.props.value} needTouch={[['AreSame', 'value1'], ['AreSame', 'value2']]}>
+                <HasLength min={6}/>
+                <AreSame value1={password1.props.value} value2={password2.props.value} />
+              </Validate>
+            </div>
+          </div>
+          : null
+        }
 
       </div>
     );
@@ -92,6 +112,12 @@ const definition = {
     name: 'locked'
   }, {
     name: 'expired'
+  }, {
+      name: 'password1',
+      validators: ['IsRequired']
+  }, {
+    name: 'password2',
+    validators: ['IsRequired']
   }
   ]
 };

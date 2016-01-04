@@ -26,7 +26,7 @@ Router.run(routes, Router.HistoryLocation, (Root, state) => {
   const routes = state.routes;
   const lastRoute = routes[routes.length - 1];
 
-  document.title =  lastRoute.handler.title;  // 'ZZ ' + routes.map(r => r.handler.title).join(' / ');
+  document.title =  (lastRoute) ? lastRoute.handler.title : undefined;  // 'ZZ ' + routes.map(r => r.handler.title).join(' / ');
 
   var promises = state.routes.filter((route) => route.handler.fetchData)
     .reduce((promises, route) => {

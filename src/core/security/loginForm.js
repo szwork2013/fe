@@ -66,7 +66,7 @@ export class LoginForm extends React.Component {
       </div>
     );
 
-    const tenantItems = loginFormData.tenant.lovItems.map( (li,i) => <MenuItem value={li.value} key={i} primaryText={li.label}/>);
+    const tenantItems = loginFormData.tenant.lovItems.map( (li,i) => <MenuItem value={li.value} key={li.value} primaryText={li.label}/>);
 
 
     return (
@@ -90,7 +90,7 @@ export class LoginForm extends React.Component {
               <SelectField
                 style={{marginLeft:15, maxWidth:200}}
                 value={loginFormData.tenant.value}
-                onChange={(e) => {setLoginFormDataAction(loginFormData.setFieldValue('tenant', e.target.value, true));}}
+                onChange={(e,key,payload) => {setLoginFormDataAction(loginFormData.setFieldValue('tenant', payload, true));}}
                 disabled={loginFormData.isTenantDisabled()}
                 hintText="Client" fullWidth errorText={loginFormData.tenant.errorText} autoComplete="off">
                 {tenantItems}

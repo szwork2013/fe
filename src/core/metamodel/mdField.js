@@ -53,12 +53,12 @@ export default class MdField {
     this.textAlign;
 
     // FUNCTION, URL
-    this.actionType;
+    this.fieldType;
 
     // BUTTON, ICON
-    this.actionDisplay;
+    this.displayType;
 
-    // jmeno funkce pro FUNCTION actionType
+    // jmeno funkce pro FUNCTION fieldType
     this.functionName;
 
     // format pro optional formatovani cisla

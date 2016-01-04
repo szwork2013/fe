@@ -7,8 +7,11 @@ import BlockComp from 'core/components/blockComp/blockComp';
 import {FieldText} from 'core/form/formUtils';
 import {customizeTheme}  from 'core/common/config/mui-theme';
 import GridService from 'core/grid/gridService';
+import PartyService from 'party/partyService';
+import CommonService from 'core/common/service/commonService';
 import Grid from 'core/grid/domain/grid';
 import GridComp from 'core/grid/component/gridComp';
+import {preSave} from 'core/form/formUtils';
 import PartyFoForm from 'party/component/partyFoForm';
 import MdEntityService from 'core/metamodel/mdEntityService';
 
@@ -29,7 +32,7 @@ export default class PartySelector extends React.Component {
     partyEntity: React.PropTypes.object.isRequired,
     setDataAction: React.PropTypes.func.isRequired,
     onPartyChange: React.PropTypes.func.isRequired,
-    newPartyTemplate: React.PropTypes.func.isRequired
+    newPartyTemplate: React.PropTypes.object.isRequired
   };
 
 
@@ -114,10 +117,36 @@ export default class PartySelector extends React.Component {
     dataObject.$partySelector.newDialogOpened = false;
     setDataAction(dataObject);
   };
+
   saveNewParty = () => {
     let {dataObject, setDataAction, onPartyChange} = this.props;
-    dataObject.$partySelector.newDialogOpened = false;
-    setDataAction(dataObject);
+
+
+    let result = preSave(dataObject.$partySelector.newParty, null);
+    if (!result) {
+      setDataAction(dataObject);
+      return;
+    }
+
+    CommonService.loading(true);
+    PartyService.partySave(dataObject.$partySelector.newParty)
+      .then( (partyId) => {
+
+        let partyObject = dataObject.$partySelector.newParty;
+        partyObject.partyId = partyId;
+        partyObject.$new = undefined;
+        dataObject.$partySelector.newParty = undefined;
+
+        dataObject.$partySelector.newDialogOpened = false;
+        CommonService.loading(false);
+
+        onPartyChange(partyObject);
+
+        CommonService.toastSuccess("Party " + partyObject.fullName + " byl úspěšně uložen");
+
+      });
+
+
   };
 
   render() {
