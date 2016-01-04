@@ -2,6 +2,8 @@ import React from 'react';
 import DateTimePicker from 'react-widgets/lib/DateTimePicker';
 import Popup from 'react-widgets/lib/Popup';
 
+import MaterialStyles from 'material-ui/lib/utils/styles';
+import UniqueId from 'material-ui/lib/utils/unique-id';
 import 'react-widgets/lib/less/react-widgets.less';
 import 'core/components/styledDatePicker/styledDatePicker.less';
 
@@ -36,6 +38,10 @@ export default class StyledDatePicker extends React.Component {
 
     style:          React.PropTypes.object,
     errorText:      React.PropTypes.string,
+
+    floatingLabelStyle: React.PropTypes.object,
+    floatingLabelText: React.PropTypes.node,
+    id: React.PropTypes.string,
   };
 
   static defaultProps = {
@@ -48,6 +54,10 @@ export default class StyledDatePicker extends React.Component {
     this.state = {
       focused: false
     }
+  }
+
+  componentDidMount() {
+    this._uniqueId = UniqueId.generate();
   }
 
   onBlurEvent = (e) => {
@@ -85,16 +95,35 @@ export default class StyledDatePicker extends React.Component {
       autoFocus,
       style,
       errorText,
+      floatingLabelStyle,
+      floatingLabelText,
+      id,
       ...other,
       } = this.props;
+
+    let inputId = id || this._uniqueId;
 
     let className = "StyledDatePicker";
     if (this.state.focused) {className += " is-focused";}
     if (errorText) {className += " is-error";}
+    if ((value && (value.toString().length > 0))) {className += " has-value";}
+
+    let localStyles = {
+        position: 'relative',
+    }
+
+    let floatingLabelTextElement = floatingLabelText ? (
+    <label className="DatePickerLabel"
+      htmlFor={inputId}
+      onTouchTap={this.focus}
+      style={floatingLabelStyle}>
+        {floatingLabelText}
+      </label>) : null;
 
     return (
-      <div className={className} style={style}>
-        <div style={{position: 'relative', height: '48px'}}>
+      <div className={className} style={MaterialStyles.mergeAndPrefix(localStyles, this.props.style)}>
+        {floatingLabelTextElement}
+        <div style={{position: 'relative', height: '100%'}}>
           <DateTimePicker onFocus={this.onFocusEvent} onBlur={this.onBlurEvent}
             defaultValue={defaultValue}
             value={value}
