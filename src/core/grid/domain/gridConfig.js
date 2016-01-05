@@ -55,6 +55,9 @@ export default class GridConfig {
     // priznak, zda se maji radky pod mysi obarvovat
     this.showRowHover = false;
 
+    // priznak, ze grid config je defaultni
+    this.defaultGrid;
+
     this.gridScrollSize;
     this.gridScrollIncrement;
     this.maxColumnWidth;

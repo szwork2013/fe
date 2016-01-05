@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 import reactMixin from 'react-mixin';
 import {Router,Link} from 'react-router';
 import PureRenderMixin from 'react-addons-pure-render-mixin';
-import {debounce} from 'lodash';
+import {debounce, last} from 'lodash';
 import classNames from 'classnames';
 import {Navbar, Nav, NavItem, NavDropdown, MenuItem, CollapsibleNav, Input} from 'react-bootstrap';
 import {Checkbox, IconButton, FontIcon, Styles, FlatButton} from 'material-ui';
@@ -177,11 +177,11 @@ export default class GridComp extends React.Component {
   /* *******   EVENT HENDLERS ************ */
 
 
-  onSelectGridConfig = (event, gridId) => {
-    console.log('onSelectGridConfig gridId = ' + gridId);
+  onSelectGridConfig = (event, gc) => {
+    console.log('onSelectGridConfig gridId = ' + gc.gridId);
 
     let grid = this.props.grid;
-    grid.activeGridConfig = this.props.grid.getGridConfig(gridId);
+    grid.activeGridConfig = gc;
     grid.searchTerm = null;
     grid.sortArray = null;
     grid.conditionArray = null;
@@ -193,6 +193,21 @@ export default class GridComp extends React.Component {
     }
 
     this.search(true);
+  };
+
+  onSetDefault = (event, gridConfig) => {
+    console.log('onSetDefault %O', gridConfig);
+
+    let {grid, updateGrid} = this.props;
+
+    GridService.setDefault(gridConfig.gridId)
+    .then( response => {
+      for(let gc of grid.gridConfigs) {
+        gc.defaultGrid = undefined;
+      }
+      gridConfig.defaultGrid = true;
+      updateGrid(grid);
+    });
   };
 
   onSelectGridManage = (evt) => {
@@ -352,12 +367,20 @@ export default class GridComp extends React.Component {
       )
     }
 
+
+
+    // {/*<MenuItem eventKey={gc.gridId} key={gc.gridId} onSelect={this.onSelectGridConfig}> {gc.label} <span className="fa fa-bookmark"></span> </MenuItem>*/}
+
     let gridConfigMenu = (
       <NavDropdown id={dropdownId} eventKey={3} title={grid.activeGridConfig.label}>
         {
-          grid.gridConfigs.map((gc) => {
+          grid.gridConfigs.map((gc, index) => {
+
+            let routeName = last(this.context.router.getCurrentRoutes()).name;
+            let routeDef = (uiLocation === 'page') ? this.context.router.makeHref(routeName, {gridId: gc.gridId}) : '';
+
             return (
-              <MenuItem eventKey={gc.gridId} key={gc.gridId} onSelect={this.onSelectGridConfig}>{gc.label}</MenuItem>
+              <GridSelectMenuItem eventKey={gc.gridId} key={gc.gridId} onSelect={this.onSelectGridConfig} onSetDefault={this.onSetDefault} route={routeDef} gc={gc} />
             );
           })
         }
@@ -465,7 +488,6 @@ export default class GridComp extends React.Component {
     let {grid, functionMap} = this.props;
 
 
-
     let activeGridConfig = grid.activeGridConfig;
     let rowClass = "md-grid-row";
 
@@ -521,7 +543,8 @@ export default class GridComp extends React.Component {
                                   labelPosition="after"
                                   onClick={this.onAction.bind(this, field.functionName, cellId, index)}/>
                       : ( (field.displayType === 'CHECKBOX') ?
-                        <Checkbox name={field.fieldName} checked={functionMap[field.functionNameGetter()](cellId, index)}
+                        <Checkbox name={field.fieldName}
+                                  checked={functionMap[field.functionNameGetter()](cellId, index)}
                                   onCheck={this.onAction.bind(this, field.functionNameSetter(), cellId, index)}/>
                         :
                         (
@@ -546,3 +569,28 @@ export default class GridComp extends React.Component {
 }
 
 
+class GridSelectMenuItem extends React.Component {
+
+  onClick = (evt) => {
+    evt.preventDefault();
+    this.props.onSelect(evt, this.props.gc);
+  };
+
+  onClick2 = (evt) => {
+    evt.preventDefault();
+    this.props.onSetDefault(evt, this.props.gc);
+  };
+
+  render() {
+    let {gc, route} = this.props;
+
+    return (
+      <li style={{display: 'flex', justifyContent: 'space-between'}}>
+        <a role="menuitem" tabIndex={-1} href={route} onClick={this.onClick} style={{flexGrow: 1}}>
+          {gc.label}
+        </a>
+        <a href onClick={this.onClick2}><span className={classNames('fa', {'fa-bookmark': gc.defaultGrid, 'fa-bookmark-o': !gc.defaultGrid})}></span></a>
+      </li>
+    );
+  }
+}

@@ -217,6 +217,11 @@ class GridService {
   }
 
 
+  setDefault(gridId) {
+    return Axios.post('/core/grid-config/set-default', gridId);
+  }
+
+
 }
 
 export default new GridService();
