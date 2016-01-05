@@ -46,6 +46,7 @@ Axios.interceptors.response.use(function (response) {
   // Do something with response error
   console.log('Error %s', stringify(error));
 
+  commonService.loading(false);
   if (error.status == 401) {
     let _r = commonService.router;
     if (_r) {
@@ -53,7 +54,6 @@ Axios.interceptors.response.use(function (response) {
       _r.transitionTo('loginPage');
     }
   } else {
-    commonService.loading(false);
     let _t = commonService.toastr;
     if (_t) {
       if ((error.status !== 400 || !error.config.showPrettyError)) {

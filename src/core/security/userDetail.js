@@ -190,10 +190,11 @@ export default class UserDetail extends React.Component {
       });
   };
 
+
   onSetPassword = (evt) => {
     console.log('onSetPassword');
     let {userObject, setUserAction} = this.props;
-
+    this.context.router.transitionTo('setPassword', {mode: 'ADMIN', id: userObject.username});
   };
 
 

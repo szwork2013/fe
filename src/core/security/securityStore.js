@@ -3,7 +3,8 @@ import { combineReducers } from 'redux-immutablejs';
 
 import { LoginFormRecord } from 'core/security/loginForm';
 import {updateChildGrid} from 'core/form/formUtils';
-import {setCurrentUserAction, redirectAfterLoginAction, setLoginFormDataAction, setLoginFormUsernameAction, setUserAction, updateGridAction} from 'core/security/securityActions';
+import {setCurrentUserAction, redirectAfterLoginAction, setLoginFormDataAction,
+  setLoginFormUsernameAction, setUserAction, updateGridAction, setUserProfileAction, setPasswordAction} from 'core/security/securityActions';
 
 
 function currentUser(state = null, action) {
@@ -53,13 +54,32 @@ function userObject(state = null, action) {
   }
 }
 
+function userProfileObject(state = null, action) {
+  switch (action.type) {
+    case setUserProfileAction.type:
+      console.log('setUserProfileAction = ', action);
+      return Object.assign({},action.payload);
+    default:
+      return state;
+  }
+}
 
-
+function passwordObject(state = null, action) {
+  switch (action.type) {
+    case setPasswordAction.type:
+      console.log('setPasswordAction = ', action);
+      return Object.assign({},action.payload);
+    default:
+      return state;
+  }
+}
 
 export const security = combineReducers({
   currentUser,
   redirectAfterLogin,
   loginFormData,
-  userObject
+  userObject,
+  userProfileObject,
+  passwordObject
 });
 

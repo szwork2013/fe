@@ -52,12 +52,19 @@ export function updateChildGrid(parentObject, action) {
 }
 
 
-export function preSave(rootObject,  customValidate) {
+/**
+ * 1. najde otevrene formy (ve $forms), zkusi je zvalidovat, pokud OK, zavre je.
+ * 2. pokud zadana customValidate funkce, tak ji zavola a chyby ulozi do rootObject.$errors
+ * @param rootObject
+ * @param customValidate
+ * @returns {boolean} - true pokud ani 1. ani 2. nevrati zadnou chybu, jinak false
+ */
+export function preSave(rootObject,  customValidate, validateAllForms) {
   // najdu otevrene form objekty
   let openTuples = [];
   walk(rootObject, 0, (object, level) => {
     if (object.$forms) {
-      let tuples = Object.values(object.$forms).filter(form => form.open).map(form => ({form, object}));
+      let tuples = Object.values(object.$forms).filter(form => form.open || validateAllForms).map(form => ({form, object}));
       openTuples.push(...tuples);
     }
   });

@@ -66,6 +66,10 @@ class SecurityService  {
     return Axios.delete('/core/security/user/' + username, {showPrettyError: true});
   }
 
+  resetPassoword(user, mode) {
+    return Axios.post('/core/security/user-reset-password/' + mode, user, {showPrettyError: true});
+  }
+
 }
 
 export default new SecurityService();

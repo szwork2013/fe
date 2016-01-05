@@ -11,7 +11,7 @@ import {store} from 'core/common/redux/store';
 import MdEntityService from 'core/metamodel/mdEntityService';
 import SecurityService from 'core/security/securityService';
 import CommonService from 'core/common/service/commonService';
-import {setUserAction} from 'core/security/securityActions';
+import {setUserProfileAction} from 'core/security/securityActions';
 import {customizeThemeForDetail}  from 'core/common/config/mui-theme';
 import BlockComp from 'core/components/blockComp/blockComp';
 
@@ -21,16 +21,16 @@ const Colors = Styles.Colors;
 
 
 function mapStateToProps(state) {
-  let userObject = state.getIn(['security', 'userObject']);
+  let userProfileObject = state.getIn(['security', 'userProfileObject']);
 
   return {
-    userObject,
+    userProfileObject,
     entities: state.getIn(['metamodel', 'entities'])
   };
 }
 
 
-@connect(mapStateToProps, {setUserAction})
+@connect(mapStateToProps, {setUserProfileAction})
 export default class UserProfile extends React.Component {
   shouldComponentUpdate = PureRenderMixin.shouldComponentUpdate.bind(this);
 
@@ -54,8 +54,8 @@ export default class UserProfile extends React.Component {
     let currentUser = store.getState().getIn(['security', 'currentUser']);
 
     let userPromise = SecurityService.readUser(currentUser.get('username'))
-      .then(userObject => {
-        return store.dispatch(setUserAction(userObject));
+      .then(userProfileObject => {
+        return store.dispatch(setUserProfileAction(userProfileObject));
       });
 
 
@@ -72,18 +72,17 @@ export default class UserProfile extends React.Component {
   }
 
   componentWillUnmount() {
-    this.props.setUserAction(null);
+    this.props.setUserProfileAction(null);
   }
 
   onDetail = (evt) => {
     console.log('onDetail');
-    this.context.router.transitionTo('partyDetail', {id: this.props.userObject.party.partyId})
+    this.context.router.transitionTo('partyDetail', {id: this.props.userProfileObject.party.partyId});
   };
 
   onSetPassword = (evt) => {
     console.log('onSetPassword');
-    let {userObject, setUserAction} = this.props;
-
+    this.context.router.transitionTo('setPassword', {mode: 'USER'});
   };
 
 
@@ -97,12 +96,12 @@ export default class UserProfile extends React.Component {
 
 
     let {
-      userObject,
+      userProfileObject,
       entities,
-      setUserAction,
+      setUserProfileAction,
       } = this.props;
 
-    let tenantLovs = entities.get('Tenant').lovItems.filter(li => userObject.tenants.includes(li.value));
+    let tenantLovs = entities.get('Tenant').lovItems.filter(li => userProfileObject.tenants.includes(li.value));
 
 
     console.debug('%c userProfile render', 'background-color: yellow');
@@ -110,11 +109,11 @@ export default class UserProfile extends React.Component {
 
     return (
       <main className="main-content container">
-        {this._createToolMenu(userObject)}
+        {this._createToolMenu(userProfileObject)}
 
         <BlockComp style={{marginTop: 10}} header="User Profile">
           <div style={{display: 'flex', alignItems: 'baseline'}}>
-            <div style={{fontSize: '18px', fontWeight: 'bold', marginRight: 8}}>{userObject.username}</div>
+            <div style={{fontSize: '18px', fontWeight: 'bold', marginRight: 8}}>{userProfileObject.username}</div>
             <FlatButton onClick={this.onDetail} secondary={true} label="Edit" labelPosition="after"
                         labelStyle={{paddingLeft: 8}} style={{paddingLeft: 5}}>
               <FontIcon className="fa fa-pencil" style={{fontSize:14, color: Colors.indigo500}}/>
@@ -134,7 +133,7 @@ export default class UserProfile extends React.Component {
   }
 
 
-  _createToolMenu(userObject) {
+  _createToolMenu(userProfileObject) {
     return (
       <Toolmenu>
         <FlatButton onClick={this.onSetPassword}>

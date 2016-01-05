@@ -8,10 +8,6 @@ import Form from 'core/form/form';
 
 export default function createForm(definition, FormComponent) {
 
-  const defaultStyle = {
-    fontSize: 14,
-    height: 54
-  };
 
   return class extends React.Component {
     shouldComponentUpdate = PureRenderMixin.shouldComponentUpdate.bind(this);
@@ -100,23 +96,29 @@ export default function createForm(definition, FormComponent) {
 
     _setupFields(props) {
 
-      const fields = definition.fields.reduce((acc, field) => {
+      const fields = definition.fields.reduce((acc, fieldDef) => {
         //console.debug('createForm: field: %o on entity %o', field, entity);
-        const mdField = props.entity.fields[field.name];
+        const mdField = props.entity.fields[fieldDef.name];
+
+        const defaultStyle = (fieldDef.big) ? {} : {
+          fontSize: 14,
+          height: 54
+        };
+
 
         const fieldObject = {
-          name: field.name,
-          fieldPath: field.fieldPath,
+          name: fieldDef.name,
+          fieldPath: fieldDef.fieldPath,
           textLabel: mdField.label,
           mdField: mdField,
-          validators: field.validators
+          validators: fieldDef.validators
         };
 
         const propsObject = {
           $fieldObject: fieldObject,
           fullWidth: true,
-          name: field.name,
-          style: Object.assign({}, defaultStyle, field.style),
+          name: fieldDef.name,
+          style: Object.assign({}, defaultStyle, fieldDef.style),
           get errorText() {
             return this.$fieldObject.showValidation && this.$fieldObject.errorMessage
           }
@@ -135,16 +137,16 @@ export default function createForm(definition, FormComponent) {
         switch (mdField.dataType) {
           case 'BOOLEAN':
             propsObject.onCheck = (evt) => {
-              this.setValue(this.props.dataObject, field, evt.target.checked);
-              this.props.setDataAction(this.props.rootObject, 'createForm field ' + field.name + ' onCheck()');
+              this.setValue(this.props.dataObject, fieldDef, evt.target.checked);
+              this.props.setDataAction(this.props.rootObject, 'createForm field ' + fieldDef.name + ' onCheck()');
             };
             propsObject.label = editLabel;
             break;
           default:
             propsObject.onChange = (evt) => {
               let value = (evt != null && evt.target) ? evt.target.value : evt;
-              this.setValue(this.props.dataObject, field, value);
-              this.props.setDataAction(this.props.rootObject, 'createForm field ' + field.name + ' onChange()');
+              this.setValue(this.props.dataObject, fieldDef, value);
+              this.props.setDataAction(this.props.rootObject, 'createForm field ' + fieldDef.name + ' onChange()');
             };
             propsObject.floatingLabelText = editLabel;
         }
@@ -169,7 +171,7 @@ export default function createForm(definition, FormComponent) {
 
         // TextField style overrides (zmenseni)
         // dame to ted na vsechny jine nez StyledSelect, mozna budeme dale vyhazovat
-        if (!mdField.valueSourceType) {
+        if (!fieldDef.big && !mdField.valueSourceType) {
           propsObject.hintStyle = {lineHeight: 24};
           propsObject.inputStyle = {marginTop: 0, paddingTop: 6};
           propsObject.errorStyle = {top: -4};  // lepsi by bylo nastavit bottom, jenze v kodu TextField se bottom nastavuje natvrdo na fontSize + 3 = 15px, takze nastavime top a vyuzijme toho ze "When both top and bottom are specified, the top property takes precedence and the bottom property is ignored."
@@ -207,7 +209,7 @@ export default function createForm(definition, FormComponent) {
 
 
 
-        acc[field.name] = fieldObject;
+        acc[fieldDef.name] = fieldObject;
         return acc;
       }, {});
 
