@@ -8,7 +8,7 @@ import { connect } from 'react-redux'
 
 import MdField from 'core/metamodel/mdField';
 import StyledSelect from 'core/components/styledSelect/styledSelect';
-
+import {styleSmall, styleTextFieldSmall} from 'core/form/createForm';
 
 function mapStateToProps(state, ownProps ) {
   let fieldOptions;
@@ -69,7 +69,7 @@ export default class FilterFieldComp extends React.Component {
 
     if (field.valueSource) {
       return (
-        <StyledSelect name={name}  value={value} multi={multi} options={fieldOptions} onChange={this.onChangeSelect}  clearable={false} disabled={disabled}/>
+        <StyledSelect {...styleSmall} name={name}  value={value} multi={multi} options={fieldOptions} onChange={this.onChangeSelect}  fullWidth={true} clearable={false} disabled={disabled}/>
       );
     } else {
       if (!field.dataType) throw 'Field ' + field.fieldKey + ' has no valueSource nor a dataType';
@@ -77,19 +77,19 @@ export default class FilterFieldComp extends React.Component {
       switch (field.dataType) {
         case 'NUMBER':
           return (
-            <TextField value={value} hintText={label} onChange={this.onChangeText} disabled={disabled}/>
+            <TextField {...styleSmall} value={value} hintText={label} onChange={this.onChangeText} fullWidth={true} disabled={disabled}/>
           );
         case 'STRING':
           return (
-            <TextField value={value} hintText={label} onChange={this.onChangeText} disabled={disabled}/>
+            <TextField {...styleSmall} {...styleTextFieldSmall} value={value} hintText={label} onChange={this.onChangeText} fullWidth={true} disabled={disabled}/>
           );
         case 'DATE':
           return (
-            <TextField value={value} hintText={label} onChange={this.onChangeText} disabled={disabled} />
+            <TextField {...styleSmall} {...styleTextFieldSmall} value={value} hintText={label} onChange={this.onChangeText} fullWidth={true} disabled={disabled} />
           );
         case 'DATETIME':
           return (
-            <TextField value={value} hintText={label} onChange={this.onChangeText} disabled={disabled} />
+            <TextField {...styleSmall} {...styleTextFieldSmall} value={value} hintText={label} onChange={this.onChangeText} fullWidth={true} disabled={disabled} />
           );
         default :
               return null;

@@ -5,6 +5,31 @@ import {get, set} from 'lodash';
 import Form from 'core/form/form';
 
 
+export const styleBig = {
+  style: {},
+  floatingLabelStyle: {}
+};
+
+export const styleSmall = {
+  style: {
+    fontSize: 14,
+    height: 54
+  },
+  floatingLabelStyle: {
+    marginBottom: 0,
+    top: 'initial',
+    bottom: 12}
+};
+
+export const styleTextFieldSmall = {
+  hintStyle: {lineHeight: 24},
+  inputStyle: {marginTop: 0, paddingTop: 12},
+  errorStyle: {top: -4}  // lepsi by bylo nastavit bottom, jenze v kodu TextField se bottom nastavuje natvrdo na fontSize + 3 = 15px, takze nastavime top a vyuzijme toho ze "When both top and bottom are specified, the top property takes precedence and the bottom property is ignored."
+};
+
+export const styleTextFieldBig = {
+};
+
 
 export default function createForm(definition, FormComponent) {
 
@@ -99,12 +124,8 @@ export default function createForm(definition, FormComponent) {
       const fields = definition.fields.reduce((acc, fieldDef) => {
         //console.debug('createForm: field: %o on entity %o', field, entity);
         const mdField = props.entity.fields[fieldDef.name];
-
-        const defaultStyle = (fieldDef.big) ? {} : {
-          fontSize: 14,
-          height: 54
-        };
-
+        const styleDef = (fieldDef.big)? styleBig : styleSmall;
+        const styleTextFieldDef = (fieldDef.big)? styleTextFieldBig : styleTextFieldSmall;
 
         const fieldObject = {
           name: fieldDef.name,
@@ -118,7 +139,7 @@ export default function createForm(definition, FormComponent) {
           $fieldObject: fieldObject,
           fullWidth: true,
           name: fieldDef.name,
-          style: Object.assign({}, defaultStyle, fieldDef.style),
+          style: Object.assign({}, styleDef.style, fieldDef.style),
           get errorText() {
             return this.$fieldObject.showValidation && this.$fieldObject.errorMessage
           }
@@ -128,7 +149,7 @@ export default function createForm(definition, FormComponent) {
 
         // tucne a hvezdicka pro povinne
         let editLabel = mdField.label;
-        let floatingLabelStyle = {marginBottom: 0, top: 'initial', bottom: 12};
+        let floatingLabelStyle = Object.assign({}, styleDef.floatingLabelStyle);
         if (fieldObject.validators && fieldObject.validators.includes('IsRequired')) {
           editLabel = editLabel + " *";
           floatingLabelStyle.fontWeight = 'bold';
@@ -171,10 +192,8 @@ export default function createForm(definition, FormComponent) {
 
         // TextField style overrides (zmenseni)
         // dame to ted na vsechny jine nez StyledSelect, mozna budeme dale vyhazovat
-        if (!fieldDef.big && !mdField.valueSourceType) {
-          propsObject.hintStyle = {lineHeight: 24};
-          propsObject.inputStyle = {marginTop: 0, paddingTop: 12};
-          propsObject.errorStyle = {top: -4};  // lepsi by bylo nastavit bottom, jenze v kodu TextField se bottom nastavuje natvrdo na fontSize + 3 = 15px, takze nastavime top a vyuzijme toho ze "When both top and bottom are specified, the top property takes precedence and the bottom property is ignored."
+        if (!mdField.valueSourceType) {
+          Object.assign(propsObject, styleTextFieldDef);
         }
 
         propsObject.onBlur = (evt) => {

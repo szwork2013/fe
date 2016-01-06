@@ -28,6 +28,7 @@ import BlockComp from 'core/components/blockComp/blockComp';
 import LocalizeField from 'core/components/localizeField/localizeField';
 import DualSelector from 'core/components/dualSelector/dualSelector';
 import StyledSelect from 'core/components/styledSelect/styledSelect';
+import {styleSmall, styleTextFieldSmall} from 'core/form/createForm';
 
 
 function mapStateToProps(state, ownProps) {
@@ -516,9 +517,9 @@ export default class GridAdminView extends React.Component {
               <table className="table">
                 <thead>
                 <tr>
-                  <td style={{width: '31%'}}>Název sloupce</td>
-                  <td style={{width: '16%'}}>Operátor</td>
-                  <td style={{width: '51%'}}>Hodnota</td>
+                  <td style={{width: '30%'}}>Název sloupce</td>
+                  <td style={{width: '20%'}}>Operátor</td>
+                  <td style={{width: '47%'}}>Hodnota</td>
                   <td style={{width: '3%'}}></td>
                 </tr>
                 </thead>
@@ -536,12 +537,12 @@ export default class GridAdminView extends React.Component {
                     return (
                       <tr key={index}>
                         <td style={borderStyle}>
-                          <StyledSelect name="conditionColumn" value={condition.column} options={fieldOptions}
+                          <StyledSelect {...styleSmall} name="conditionColumn" value={condition.column} options={fieldOptions} fullWidth={true}
                                         onChange={this.onChangeConditionColumn.bind(this, condition)} clearable={false}
                                         disabled={condition.implicit}/>
                         </td>
                         <td style={borderStyle}>
-                          <StyledSelect name="conditionOperator" value={condition.operator} options={operatorOptions}
+                          <StyledSelect {...styleSmall} name="conditionOperator" value={condition.operator} options={operatorOptions}  fullWidth={true}
                                         onChange={this.onChangeConditionOperator.bind(this, condition)}
                                         clearable={false} disabled={condition.implicit}/>
                         </td>
@@ -589,15 +590,15 @@ export default class GridAdminView extends React.Component {
                     return (
                       <tr key={index}>
                         <td style={borderStyle}>
-                          <StyledSelect name="sortColumn" value={sort.field} options={fieldOptions}
+                          <StyledSelect {...styleSmall} name="sortColumn" value={sort.field} options={fieldOptions}
                                         onChange={this.onChangeSortField.bind(this, sort)} clearable={false}/>
                         </td>
                         <td style={borderStyle}>
-                          <StyledSelect name="sortOrder" value={sort.sortOrder} options={sortOrderOptions}
+                          <StyledSelect {...styleSmall} name="sortOrder" value={sort.sortOrder} options={sortOrderOptions}
                                         onChange={this.onChangeSortOrder.bind(this, sort)} clearable={false}/>
                         </td>
                         <td style={borderStyle}>
-                          <Checkbox name="sortFixed" value={new Boolean(sort.fixed).toString()}
+                          <Checkbox style={Object.assign({marginTop: 10}, styleSmall)}  name="sortFixed" value={new Boolean(sort.fixed).toString()}
                                     defaultChecked={sort.fixed} label="Fixní řazení"
                                     onCheck={this.onCheckSortFixed.bind(this, sort)}/>
                         </td>
