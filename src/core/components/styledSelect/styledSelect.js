@@ -2,9 +2,10 @@ import React from 'react';
 import Select from 'react-select';
 
 import UniqueId from 'material-ui/lib/utils/unique-id';
-import Styles from 'core/components/styledSelect/styledSelect.less';
 import MaterialStyles from 'material-ui/lib/utils/styles';
 import Transitions from 'material-ui/lib/styles/transitions';
+
+import css from 'core/components/styledSelect/styledSelect.less';
 
 /**
  * Komponenta StyledSelect v designu Material-UI.
@@ -116,9 +117,11 @@ export default class StyledSelect extends React.Component {
   };
 
   onChangeEvent = (newValue) => {
-    this.setState({value: newValue});
+    //console.log('select onChangeEvent', newValue);
+    let stripValue = (newValue) ? ( (this.props.multi) ? newValue.map(v => v.value) : newValue.value ) : newValue;
+    this.setState({value: stripValue});
     if (this.props.onChange) {
-      this.props.onChange(newValue);
+      this.props.onChange(stripValue);
     }
   };
 

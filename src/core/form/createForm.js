@@ -159,7 +159,7 @@ export default function createForm(definition, FormComponent) {
         if (mdField.hasLocalValueSource()) {
           let valueSourceEntity =  props.entities.get(mdField.valueSource);
           if (valueSourceEntity) {
-            propsObject.options = [{value: '', label: '---'}, ...valueSourceEntity.lovItems];
+            propsObject.options = [{value: null, label: '---'}, ...valueSourceEntity.lovItems];
           }
           propsObject.clearable = false;
           propsObject.searchable = (valueSourceEntity.lovItems.length > 8);
@@ -173,7 +173,7 @@ export default function createForm(definition, FormComponent) {
         // dame to ted na vsechny jine nez StyledSelect, mozna budeme dale vyhazovat
         if (!fieldDef.big && !mdField.valueSourceType) {
           propsObject.hintStyle = {lineHeight: 24};
-          propsObject.inputStyle = {marginTop: 0, paddingTop: 6};
+          propsObject.inputStyle = {marginTop: 0, paddingTop: 12};
           propsObject.errorStyle = {top: -4};  // lepsi by bylo nastavit bottom, jenze v kodu TextField se bottom nastavuje natvrdo na fontSize + 3 = 15px, takze nastavime top a vyuzijme toho ze "When both top and bottom are specified, the top property takes precedence and the bottom property is ignored."
         }
 

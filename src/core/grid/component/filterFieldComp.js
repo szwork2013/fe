@@ -47,6 +47,7 @@ export default class FilterFieldComp extends React.Component {
 
   onChangeMultiSelect = (newValue, newValuesArray) => {
     //this.props.onChange(newValuesArray);
+    console.log('onChangeMultiSelect: ', newValue);
     this.props.onChange(newValue.split('|'));
   };
   onChangeSelect = (newValue) => {
@@ -67,18 +68,9 @@ export default class FilterFieldComp extends React.Component {
       } = this.props;
 
     if (field.valueSource) {
-
-      if (multi) {
-        return (
-          <StyledSelect name={name}  value={value} multi={true} delimiter="|" options={fieldOptions}
-                  onChange={this.onChangeMultiSelect}  clearable={false} disabled={disabled}/>
-        );
-      } else {
-        return (
-          <StyledSelect name={name} value={value} options={fieldOptions} onChange={this.onChangeSelect}  clearable={false} disabled={disabled}/>
-        );
-      }
-
+      return (
+        <StyledSelect name={name}  value={value} multi={multi} options={fieldOptions} onChange={this.onChangeSelect}  clearable={false} disabled={disabled}/>
+      );
     } else {
       if (!field.dataType) throw 'Field ' + field.fieldKey + ' has no valueSource nor a dataType';
 
